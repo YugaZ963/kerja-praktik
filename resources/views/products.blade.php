@@ -55,7 +55,7 @@
 
         <!-- Products Grid -->
         <div class="row g-3" id="products-container">
-
+            @foreach ($products as $product) 
             <div class="col-md-3">
                 <div class="card h-100 shadow-sm">
                     <div class="position-relative">
@@ -67,13 +67,12 @@
                         {{-- @endif --}}
                     </div>
                     <div class="card-body p-3">
-                        <h5 class="card-title">{{ $product['name'] }}{{-- Str::limit($product->name, 20) --}}</h5>
-                        <p class="card-text text-muted">{{ Str::limit($product['description'], 78) }}{{-- Str::limit($product->description, 30) --}}
-                        </p>
+                        <h5 class="card-title">{{ $product ['name'] }}{{-- Str::limit($product->name, 20) --}}</h5>
+                        <p class="card-text text-muted">{{ Str::limit($product ['description'], 78 ) }}{{-- Str::limit($product->description, 30) --}}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="fw-bold">Rp {{ $product['price'] }}{{-- number_format($product->price) --}}</span>
-                                <small class="text-muted"> {{ $product['size'] }}· {{-- $product->size --}}</small>
+                                <span class="fw-bold">Rp {{ $product ['price'] }}{{-- number_format($product->price) --}}</span>
+                                <small class="text-muted"> {{ $product ['size'] }}· {{-- $product->size --}}</small>
                             </div>
                             <form action="{{-- route('cart.add', $product->id) --}}" method="POST" class="d-inline">
                                 {{-- @csrf --}}
@@ -81,9 +80,12 @@
                             </form>
                         </div>
                     </div>
+                    <div class="card-footer bg-white">
+                        <a href="/products/{{ $product ['slug'] }}{{-- route('products.show', $product->id) --}}" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
+                    </div>
                 </div>
             </div>
-
+            @endforeach
         </div>
 
         <!-- Pagination -->
