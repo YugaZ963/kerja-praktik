@@ -16,8 +16,7 @@
                     <a class="nav-link {{ request()->is('product') ? 'active' : '' }}" href="/products">Produk</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }}"
-                        href="/inventory">Inventaris</a>
+                    <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }}" href="/inventory">Inventaris</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('about') ? 'active' : '' }}" href="/about">Tentang Kami</a>
