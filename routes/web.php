@@ -1,7 +1,11 @@
 <?php
 
+use App\Models\Product;
+use App\Models\Inventory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get('/', function () {
     return view('welcome', ['titleShop' => 'RAVAZKA']);
@@ -14,221 +18,31 @@ Route::get('/contact', function () {
     return view('contact', ['titleShop' => 'RAVAZKA']);
 });
 Route::get('/products', function () {
-    return view('products', ['titleShop' => 'RAVAZKA', 'products' => [
-        [
-            'id' => 1,
-            'slug' => 'seragam-sd-pendek',
-            'name' => 'Seragam SD Pendek',
-            'price' => 40000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 10,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 2,
-            'slug' => 'seragam-sd-panjang',
-            'name' => 'Seragam SD Panjang',
-            'price' => 43000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 14,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 3,
-            'slug' => 'topi-sd',
-            'name' => 'Topi SD',
-            'price' => 10000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 6,
-            'size' => '-',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 4,
-            'slug' => 'sabuk-sd',
-            'name' => 'Sabuk SD',
-            'price' => 10000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 11,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ]
-    ]]);
+    return view('products', ['titleShop' => 'RAVAZKA', 'products' => Product::all()]);
 });
 
 Route::get('/products/{slug}', function ($slug) {
     // dd($id);
-    $products = [
-        [
-            'id' => 1,
-            'slug' => 'seragam-sd-pendek',
-            'name' => 'Seragam SD Pendek',
-            'price' => 40000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 10,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 2,
-            'slug' => 'seragam-sd-panjang',
-            'name' => 'Seragam SD Panjang',
-            'price' => 43000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 14,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 3,
-            'slug' => 'topi-sd',
-            'name' => 'Topi SD',
-            'price' => 10000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 6,
-            'size' => '-',
-            'category' => 'Seragam Sekolah SD',
-        ],
-        [
-            'id' => 4,
-            'slug' => 'sabuk-sd',
-            'name' => 'Sabuk SD',
-            'price' => 10000,
-            'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatem!',
-            'stock' => 11,
-            'size' => 'M',
-            'category' => 'Seragam Sekolah SD',
-        ]
-    ];
 
-    $product = Arr::first($products, function ($product) use ($slug) {
-        return $product['slug'] == $slug;
-    });
+
+    $product = Product::find($slug);
 
     // dd($product);
     return view('product', ['titleShop' => 'RAVAZKA', 'product' => $product]);
 });
 
 // Rute untuk manajemen inventaris
-// Definisi data dummy untuk inventaris
-$dummyItems = [
-    [
-        'id' => 1,
-        'code' => 'INV-SD-001',
-        'name' => 'Seragam SD Pendek',
-        'category' => 'Seragam Sekolah SD',
-        'stock' => 45,
-        'min_stock' => 10,
-        'purchase_price' => 35000,
-        'selling_price' => 40000,
-        'supplier' => 'PT Seragam Jaya',
-        'last_restock' => '2023-10-15',
-    ],
-    [
-        'id' => 2,
-        'code' => 'INV-SD-002',
-        'name' => 'Seragam SD Panjang',
-        'category' => 'Seragam Sekolah SD',
-        'stock' => 38,
-        'min_stock' => 10,
-        'purchase_price' => 38000,
-        'selling_price' => 43000,
-        'supplier' => 'PT Seragam Jaya',
-        'last_restock' => '2023-10-15',
-    ],
-    [
-        'id' => 3,
-        'code' => 'INV-SD-003',
-        'name' => 'Topi SD',
-        'category' => 'Seragam Sekolah SD',
-        'stock' => 25,
-        'min_stock' => 5,
-        'purchase_price' => 8000,
-        'selling_price' => 10000,
-        'supplier' => 'CV Aksesoris Sekolah',
-        'last_restock' => '2023-09-20',
-    ],
-];
-
-Route::prefix('inventory')->group(function () use ($dummyItems) {
-    Route::get('/', function () use ($dummyItems) {
+Route::prefix('inventory')->group(function () {
+    Route::get('/', function () {
         return view('inventory.index', [
             'titleShop' => 'RAVAZKA - Inventaris',
-            'inventory_items' => $dummyItems
+            'inventory_items' => Inventory::all()
         ]);
     });
 
     // Detail item inventaris
-    Route::get('/{code}', function ($code) use ($dummyItems) {
-        $inventory_items = [
-            [
-                'id' => 1,
-                'code' => 'INV-SD-001',
-                'name' => 'Seragam SD Pendek',
-                'category' => 'Seragam Sekolah SD',
-                'stock' => 45,
-                'min_stock' => 10,
-                'purchase_price' => 35000,
-                'selling_price' => 40000,
-                'supplier' => 'PT Seragam Jaya',
-                'last_restock' => '2023-10-15',
-                'sizes_available' => ['S', 'M', 'L', 'XL'],
-                'location' => 'Rak A-1',
-                'description' => 'Seragam SD lengan pendek putih dengan kualitas premium, tahan lama dan nyaman dipakai.',
-                'stock_history' => [
-                    ['date' => '2023-10-15', 'type' => 'in', 'quantity' => 20, 'notes' => 'Pembelian dari supplier'],
-                    ['date' => '2023-09-10', 'type' => 'in', 'quantity' => 30, 'notes' => 'Stok awal'],
-                    ['date' => '2023-09-25', 'type' => 'out', 'quantity' => 5, 'notes' => 'Penjualan'],
-                ]
-            ],
-            [
-                'id' => 2,
-                'code' => 'INV-SD-002',
-                'name' => 'Seragam SD Panjang',
-                'category' => 'Seragam Sekolah SD',
-                'stock' => 38,
-                'min_stock' => 10,
-                'purchase_price' => 38000,
-                'selling_price' => 43000,
-                'supplier' => 'PT Seragam Jaya',
-                'last_restock' => '2023-10-15',
-                'sizes_available' => ['S', 'M', 'L', 'XL'],
-                'location' => 'Rak A-2',
-                'description' => 'Seragam SD lengan panjang putih dengan kualitas premium, tahan lama dan nyaman dipakai.',
-                'stock_history' => [
-                    ['date' => '2023-10-15', 'type' => 'in', 'quantity' => 15, 'notes' => 'Pembelian dari supplier'],
-                    ['date' => '2023-09-10', 'type' => 'in', 'quantity' => 25, 'notes' => 'Stok awal'],
-                    ['date' => '2023-09-25', 'type' => 'out', 'quantity' => 2, 'notes' => 'Penjualan'],
-                ]
-            ],
-            [
-                'id' => 3,
-                'code' => 'INV-SD-003',
-                'name' => 'Topi SD',
-                'category' => 'Seragam Sekolah SD',
-                'stock' => 25,
-                'min_stock' => 5,
-                'purchase_price' => 8000,
-                'selling_price' => 10000,
-                'supplier' => 'CV Aksesoris Sekolah',
-                'last_restock' => '2023-09-20',
-                'sizes_available' => ['All Size'],
-                'location' => 'Rak B-1',
-                'description' => 'Topi SD standar nasional dengan logo dan bahan berkualitas.',
-                'stock_history' => [
-                    ['date' => '2023-09-20', 'type' => 'in', 'quantity' => 25, 'notes' => 'Pembelian dari supplier'],
-                    ['date' => '2023-08-15', 'type' => 'in', 'quantity' => 15, 'notes' => 'Stok awal'],
-                    ['date' => '2023-09-05', 'type' => 'out', 'quantity' => 15, 'notes' => 'Penjualan'],
-                ]
-            ],
-        ];
-
-        $item = Arr::first($inventory_items, function ($item) use ($code) {
-            return $item['code'] == $code;
-        });
-
+    Route::get('/{code}', function ($code) {
+        $item = Inventory::find($code);
         return view('inventory.detail', ['titleShop' => 'RAVAZKA - Detail Inventaris', 'item' => $item]);
     });
 
