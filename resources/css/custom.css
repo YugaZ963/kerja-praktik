@@ -1,0 +1,29 @@
+/* resources/css/custom.css */
+body {
+    font-family: "Nunito", sans-serif;
+    color: #333;
+}
+
+.btn-primary {
+    background-color: #4169e1;
+    border-color: #4169e1;
+}
+
+.btn-primary:hover {
+    background-color: #3050b5;
+    border-color: #3050b5;
+}
+
+.card {
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+footer {
+    margin-top: 5rem;
+    background-color: #f8f9fa;
+    padding: 3rem 0;
+}
