@@ -61,7 +61,7 @@
                                 <i class="bi bi-mortarboard fs-1 text-primary"></i>
                                 <h5 class="mt-3">Seragam SMA</h5>
                                 <p class="text-muted">SMA/SMK/SMAK dan sejenisnya</p>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
+                                <a href="{{ route('customer.products', ['category' => 'sma']) }}" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                                 <i class="bi bi-people fs-1 text-primary"></i>
                                 <h5 class="mt-3">Seragam SMP</h5>
                                 <p class="text-muted">SMP/MTs dan sejenisnya</p>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
+                                <a href="{{ route('customer.products', ['category' => 'smp']) }}" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                                 <i class="bi bi-patch-check fs-1 text-primary"></i>
                                 <h5 class="mt-3">Seragam SD</h5>
                                 <p class="text-muted">SD/MI dan sejenisnya</p>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
+                                <a href="{{ route('customer.products', ['category' => 'sd']) }}" class="btn btn-sm btn-outline-primary">Lihat Produk</a>
                             </div>
                         </div>
                     </div>

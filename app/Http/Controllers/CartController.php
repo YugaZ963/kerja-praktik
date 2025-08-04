@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -113,11 +114,14 @@ class CartController extends Controller
         }
 
         $total = $cartItems->sum('total');
+        $shippingService = new ShippingService();
+        $provinces = $shippingService->getProvinces();
 
         return view('cart.checkout', [
             'titleShop' => 'RAVAZKA - Checkout',
             'cartItems' => $cartItems,
-            'total' => $total
+            'total' => $total,
+            'provinces' => $provinces
         ]);
     }
 
@@ -127,6 +131,10 @@ class CartController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
+            'province_id' => 'required|integer',
+            'city_id' => 'required|integer',
+            'shipping_service' => 'required|string',
+            'shipping_cost' => 'required|integer',
             'notes' => 'nullable|string'
         ]);
 
@@ -157,18 +165,25 @@ class CartController extends Controller
         $message = "*PESANAN BARU - RAVAZKA*\n\n";
         $message .= "📋 *Detail Pesanan:*\n";
         
-        $total = 0;
+        $subtotal = 0;
         foreach ($cartItems as $item) {
-            $subtotal = $item->quantity * $item->price;
-            $total += $subtotal;
+            $itemSubtotal = $item->quantity * $item->price;
+            $subtotal += $itemSubtotal;
             
             $message .= "• {$item->product->name}\n";
             $message .= "  Ukuran: {$item->product->size}\n";
             $message .= "  Qty: {$item->quantity} x Rp " . number_format($item->price, 0, ',', '.') . "\n";
-            $message .= "  Subtotal: Rp " . number_format($subtotal, 0, ',', '.') . "\n\n";
+            $message .= "  Subtotal: Rp " . number_format($itemSubtotal, 0, ',', '.') . "\n\n";
         }
         
-        $message .= "💰 *Total: Rp " . number_format($total, 0, ',', '.') . "*\n\n";
+        $shippingCost = $customerData['shipping_cost'];
+        $total = $subtotal + $shippingCost;
+        
+        $message .= "💰 *Ringkasan Biaya:*\n";
+        $message .= "Subtotal Produk: Rp " . number_format($subtotal, 0, ',', '.') . "\n";
+        $message .= "Ongkos Kirim ({$customerData['shipping_service']}): Rp " . number_format($shippingCost, 0, ',', '.') . "\n";
+        $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        $message .= "*TOTAL: Rp " . number_format($total, 0, ',', '.') . "*\n\n";
         
         $message .= "👤 *Data Pelanggan:*\n";
         $message .= "Nama: {$customerData['name']}\n";
@@ -183,6 +198,45 @@ class CartController extends Controller
         $message .= "\nTerima kasih telah berbelanja di RAVAZKA! 🙏";
         
         return $message;
+    }
+
+    public function getCities(Request $request)
+    {
+        $provinceId = $request->get('province_id');
+        $shippingService = new ShippingService();
+        $cities = $shippingService->getCities($provinceId);
+        
+        return response()->json($cities);
+    }
+
+    public function getShippingCost(Request $request)
+    {
+        $request->validate([
+            'destination' => 'required|integer',
+            'courier' => 'required|string|in:jne,jnt'
+        ]);
+
+        $sessionId = Session::getId();
+        $cartItems = Cart::with('product')
+            ->where('session_id', $sessionId)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['error' => 'Keranjang kosong'], 400);
+        }
+
+        $shippingService = new ShippingService();
+        $weight = $shippingService->calculateCartWeight($cartItems);
+        $shippingOptions = $shippingService->getShippingCost(
+            $request->destination,
+            $weight,
+            $request->courier
+        );
+
+        return response()->json([
+            'weight' => $weight,
+            'shipping_options' => $shippingOptions
+        ]);
     }
 
     public function getCartCount()

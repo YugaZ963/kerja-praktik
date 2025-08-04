@@ -12,6 +12,17 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
+        // Filter pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('size', 'like', "%{$search}%");
+            });
+        }
+
         // Filter kategori
         if ($request->filled('category')) {
             $query->where('category', $request->category);
@@ -20,6 +31,29 @@ class ProductController extends Controller
         // Filter ukuran
         if ($request->filled('size')) {
             $query->where('size', strtoupper($request->size));
+        }
+
+        // Filter harga
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', $request->price_min);
+        }
+        if ($request->filled('price_max')) {
+            $query->where('price', '<=', $request->price_max);
+        }
+
+        // Filter stok
+        if ($request->filled('stock_status')) {
+            switch ($request->stock_status) {
+                case 'available':
+                    $query->where('stock', '>', 0);
+                    break;
+                case 'low':
+                    $query->where('stock', '>', 0)->where('stock', '<=', 5);
+                    break;
+                case 'out':
+                    $query->where('stock', 0);
+                    break;
+            }
         }
 
         // Sorting
@@ -35,6 +69,12 @@ class ProductController extends Controller
                 break;
             case 'name-desc':
                 $query->orderBy('name', 'desc');
+                break;
+            case 'stock-asc':
+                $query->orderBy('stock', 'asc');
+                break;
+            case 'stock-desc':
+                $query->orderBy('stock', 'desc');
                 break;
             default:
                 $query->latest();

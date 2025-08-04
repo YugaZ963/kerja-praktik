@@ -16,8 +16,26 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                            <!-- Search Bar -->
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-primary text-white">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text" class="form-control" name="search" 
+                                               placeholder="Cari produk berdasarkan nama, kategori, ukuran, atau deskripsi..." 
+                                               value="{{ request('search') }}">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-search me-1"></i>Cari
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Filters -->
                             <div class="row align-items-end g-3">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label fw-semibold">Kategori</label>
                                     <select class="form-select" name="category">
                                         <option value="">Semua Kategori</option>
@@ -29,7 +47,7 @@
                                         <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label fw-semibold">Ukuran</label>
                                     <select class="form-select" name="size">
                                         <option value="">Semua Ukuran</option>
@@ -43,24 +61,44 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Rentang Harga</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="price_min" 
+                                               placeholder="Min" value="{{ request('price_min') }}">
+                                        <span class="input-group-text">-</span>
+                                        <input type="number" class="form-control" name="price_max" 
+                                               placeholder="Max" value="{{ request('price_max') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Status Stok</label>
+                                    <select class="form-select" name="stock_status">
+                                        <option value="">Semua Status</option>
+                                        <option value="available" {{ request('stock_status') == 'available' ? 'selected' : '' }}>Tersedia</option>
+                                        <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Stok Rendah</option>
+                                        <option value="out" {{ request('stock_status') == 'out' ? 'selected' : '' }}>Habis</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
                                     <label class="form-label fw-semibold">Urutkan</label>
                                     <select class="form-select" name="sort">
                                         <option value="">Terbaru</option>
-                                        <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>
-                                            Harga ↑</option>
-                                        <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>
-                                            Harga ↓</option>
-                                        <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Nama
-                                            A-Z</option>
-                                        <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>
-                                            Nama Z-A</option>
+                                        <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>Harga ↑</option>
+                                        <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>Harga ↓</option>
+                                        <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Nama A-Z</option>
+                                        <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Nama Z-A</option>
+                                        <option value="stock-asc" {{ request('sort') == 'stock-asc' ? 'selected' : '' }}>Stok ↑</option>
+                                        <option value="stock-desc" {{ request('sort') == 'stock-desc' ? 'selected' : '' }}>Stok ↓</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary flex-fill">Filter</button>
-                                    <a href="{{ route('customer.products') }}"
-                                        class="btn btn-outline-secondary flex-fill">Reset</a>
+                                <div class="col-md-2 d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i class="bi bi-funnel me-1"></i>Filter
+                                    </button>
+                                    <a href="{{ route('customer.products') }}" class="btn btn-outline-secondary flex-fill">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                                    </a>
                                 </div>
                             </div>
                         </div>

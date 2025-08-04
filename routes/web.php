@@ -4,8 +4,20 @@ use App\Models\Product;
 use App\Models\Inventory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InventoryController;
 
+// Authentication Routes
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Dashboard Route (protected)
+Route::get('/dashboard', function () {
+    return view('dashboard', ['titleShop' => 'RAVAZKA - Dashboard']);
+})->middleware('auth')->name('dashboard');
 
 Route::get('/', function () {
     return view('welcome', ['titleShop' => 'RAVAZKA']);
@@ -26,45 +38,7 @@ Route::get('/products/{slug}', function ($slug) {
 
 // Rute untuk manajemen inventaris
 Route::prefix('inventory')->group(function () {
-    Route::get('/', function () {
-        // Dapatkan produk yang terkait dengan inventaris
-        $query = Product::query();
-        
-        // Filter berdasarkan kategori
-        if (request('category')) {
-            $query->where('category', request('category'));
-        }
-        
-        // Filter berdasarkan ukuran
-        if (request('size')) {
-            $query->where('size', request('size'));
-        }
-        
-        // Filter berdasarkan status stok
-        if (request('status')) {
-            if (request('status') == 'low') {
-                $query->whereRaw('stock <= 5')->whereRaw('stock > 0');
-            } elseif (request('status') == 'out') {
-                $query->where('stock', 0);
-            } elseif (request('status') == 'ready') {
-                $query->whereRaw('stock > 5');
-            }
-        }
-        
-        // Filter berdasarkan pencarian
-        if (request('search')) {
-            $search = request('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
-            });
-        }
-        
-        return view('inventory.index', [
-            'titleShop' => 'RAVAZKA - Inventaris',
-            'inventory_items' => $query->paginate(10)->withQueryString()
-        ]);
-    })->name('inventory.index');
+    Route::get('/', [InventoryController::class, 'index'])->name('inventory.index');
     
     // Route untuk membuat inventaris baru
     Route::get('/create', function () {
@@ -74,12 +48,7 @@ Route::prefix('inventory')->group(function () {
     })->name('inventory.create');
     
     // Route untuk laporan inventaris
-    Route::get('/report', function () {
-        return view('inventory.report', [
-            'titleShop' => 'RAVAZKA - Laporan Inventaris',
-            'inventory_items' => Inventory::paginate(15)
-        ]);
-    })->name('inventory.report');
+    Route::get('/report', [InventoryController::class, 'report'])->name('inventory.report');
     
     // Route untuk export inventaris
     Route::get('/export', function () {
@@ -151,7 +120,7 @@ Route::prefix('inventory')->group(function () {
                     ];
                 }),
         ]);
-    });
+    })->name('inventory.reports.stock');
     
     // Route untuk detail inventaris berdasarkan kode
     Route::get('/{code}', function ($code) {
@@ -175,4 +144,8 @@ Route::prefix('cart')->group(function () {
     Route::get('/checkout', [\App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/process-order', [\App\Http\Controllers\CartController::class, 'processOrder'])->name('cart.process-order');
     Route::get('/count', [\App\Http\Controllers\CartController::class, 'getCartCount'])->name('cart.count');
+    
+    // API routes untuk ongkos kirim
+    Route::get('/api/cities', [\App\Http\Controllers\CartController::class, 'getCities'])->name('cart.api.cities');
+    Route::post('/api/shipping-cost', [\App\Http\Controllers\CartController::class, 'getShippingCost'])->name('cart.api.shipping-cost');
 });

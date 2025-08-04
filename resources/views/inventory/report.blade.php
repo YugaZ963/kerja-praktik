@@ -18,48 +18,93 @@
         <!-- Filter dan Periode Laporan -->
         <div class="card mb-4">
             <div class="card-header bg-white">
-                <h5 class="mb-0">Filter Laporan</h5>
+                <h5 class="mb-0">Filter & Pencarian Laporan</h5>
             </div>
             <div class="card-body">
-                <form method="GET" action="{{ route('inventory.report') }}" class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">Kategori</label>
-                        <select name="category" class="form-select">
-                            <option value="">Semua Kategori</option>
-                            <option value="Kemeja Sekolah" {{ request('category') == 'Kemeja Sekolah' ? 'selected' : '' }}>Kemeja Sekolah</option>
-                            <option value="Kemeja Batik" {{ request('category') == 'Kemeja Batik' ? 'selected' : '' }}>Kemeja Batik</option>
-                            <option value="Kemeja Batik Koko" {{ request('category') == 'Kemeja Batik Koko' ? 'selected' : '' }}>Kemeja Batik Koko</option>
-                            <option value="Kemeja Padang" {{ request('category') == 'Kemeja Padang' ? 'selected' : '' }}>Kemeja Padang</option>
-                            <option value="Rok Sekolah" {{ request('category') == 'Rok Sekolah' ? 'selected' : '' }}>Rok Sekolah</option>
-                            <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
-                        </select>
+                <form method="GET" action="{{ route('inventory.report') }}">
+                    <!-- Search Bar -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-primary text-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control" name="search" 
+                                       placeholder="Cari berdasarkan nama, kode, kategori, atau supplier..." 
+                                       value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-1"></i>Cari
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Status Stok</label>
-                        <select name="status" class="form-select">
-                            <option value="">Semua Status</option>
-                            <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia</option>
-                            <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah</option>
-                            <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Habis</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Periode</label>
-                        <select name="period" class="form-select">
-                            <option value="all" {{ request('period') == 'all' ? 'selected' : '' }}>Semua Waktu</option>
-                            <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>Hari Ini</option>
-                            <option value="week" {{ request('period') == 'week' ? 'selected' : '' }}>Minggu Ini</option>
-                            <option value="month" {{ request('period') == 'month' ? 'selected' : '' }}>Bulan Ini</option>
-                            <option value="year" {{ request('period') == 'year' ? 'selected' : '' }}>Tahun Ini</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">
-                            <i class="bi bi-filter"></i> Filter
-                        </button>
-                        <a href="{{ route('inventory.report') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-counterclockwise"></i> Reset
-                        </a>
+                    
+                    <!-- Advanced Filters -->
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Kategori</label>
+                            <select name="category" class="form-select">
+                                <option value="">Semua Kategori</option>
+                                <option value="Kemeja Sekolah" {{ request('category') == 'Kemeja Sekolah' ? 'selected' : '' }}>Kemeja Sekolah</option>
+                                <option value="Kemeja Batik" {{ request('category') == 'Kemeja Batik' ? 'selected' : '' }}>Kemeja Batik</option>
+                                <option value="Kemeja Batik Koko" {{ request('category') == 'Kemeja Batik Koko' ? 'selected' : '' }}>Kemeja Batik Koko</option>
+                                <option value="Kemeja Padang" {{ request('category') == 'Kemeja Padang' ? 'selected' : '' }}>Kemeja Padang</option>
+                                <option value="Rok Sekolah" {{ request('category') == 'Rok Sekolah' ? 'selected' : '' }}>Rok Sekolah</option>
+                                <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Supplier</label>
+                            <select name="supplier" class="form-select">
+                                <option value="">Semua Supplier</option>
+                                <option value="PT Tekstil Nusantara" {{ request('supplier') == 'PT Tekstil Nusantara' ? 'selected' : '' }}>PT Tekstil Nusantara</option>
+                                <option value="CV Garmen Jaya" {{ request('supplier') == 'CV Garmen Jaya' ? 'selected' : '' }}>CV Garmen Jaya</option>
+                                <option value="UD Konveksi Mandiri" {{ request('supplier') == 'UD Konveksi Mandiri' ? 'selected' : '' }}>UD Konveksi Mandiri</option>
+                                <option value="PT Fashion Indonesia" {{ request('supplier') == 'PT Fashion Indonesia' ? 'selected' : '' }}>PT Fashion Indonesia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Status Stok</label>
+                            <select name="status" class="form-select">
+                                <option value="">Semua Status</option>
+                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia (>5)</option>
+                                <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah (1-5)</option>
+                                <option value="critical" {{ request('status') == 'critical' ? 'selected' : '' }}>Kritis (≤3)</option>
+                                <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Habis (0)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Periode</label>
+                            <select name="period" class="form-select">
+                                <option value="all" {{ request('period') == 'all' ? 'selected' : '' }}>Semua Waktu</option>
+                                <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+                                <option value="week" {{ request('period') == 'week' ? 'selected' : '' }}>Minggu Ini</option>
+                                <option value="month" {{ request('period') == 'month' ? 'selected' : '' }}>Bulan Ini</option>
+                                <option value="year" {{ request('period') == 'year' ? 'selected' : '' }}>Tahun Ini</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Urutkan</label>
+                            <select name="sort" class="form-select">
+                                <option value="">Terbaru</option>
+                                <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Nama A-Z</option>
+                                <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Nama Z-A</option>
+                                <option value="stock-asc" {{ request('sort') == 'stock-asc' ? 'selected' : '' }}>Stok ↑</option>
+                                <option value="stock-desc" {{ request('sort') == 'stock-desc' ? 'selected' : '' }}>Stok ↓</option>
+                                <option value="category-asc" {{ request('sort') == 'category-asc' ? 'selected' : '' }}>Kategori A-Z</option>
+                                <option value="supplier-asc" {{ request('sort') == 'supplier-asc' ? 'selected' : '' }}>Supplier A-Z</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="d-flex gap-2 w-100">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="bi bi-funnel me-1"></i>Filter
+                                </button>
+                                <a href="{{ route('inventory.report') }}" class="btn btn-outline-secondary flex-fill">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

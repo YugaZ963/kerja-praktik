@@ -44,11 +44,39 @@
                     <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                 </a>
 
-                <!-- Login/Register -->
-                <div class="d-flex align-items-center">
-                    <a href="/login" class="nav-link me-2">Masuk</a>
-                    <a href="/register" class="btn btn-sm btn-outline-primary">Daftar</a>
-                </div>
+                <!-- Login/Register atau User Menu -->
+                @guest
+                    <div class="d-flex align-items-center">
+                        <a href="{{ route('login') }}" class="nav-link me-2">Masuk</a>
+                        <a href="{{ route('register') }}" class="btn btn-sm btn-outline-primary">Daftar</a>
+                    </div>
+                @else
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ route('dashboard') }}">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a></li>
+                            @if(Auth::user()->role === 'admin')
+                                <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
+                                    <i class="bi bi-box-seam me-2"></i>Inventaris
+                                </a></li>
+                            @endif
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endguest
             </div>
         </div>
     </div>
