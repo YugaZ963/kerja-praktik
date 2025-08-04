@@ -1,25 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Manajemen Inventaris Seragam Sekolah
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://img.shields.io/badge/Laravel-11-red?style=for-the-badge&logo=laravel" alt="Laravel 11">
+<img src="https://img.shields.io/badge/PHP-8.2+-blue?style=for-the-badge&logo=php" alt="PHP 8.2+">
+<img src="https://img.shields.io/badge/Bootstrap-5-purple?style=for-the-badge&logo=bootstrap" alt="Bootstrap 5">
 </p>
 
-## About Laravel
+## Tentang Project
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Sistem Manajemen Inventaris Seragam Sekolah adalah aplikasi web yang dibangun dengan Laravel 11 untuk mengelola inventaris seragam sekolah. Aplikasi ini memiliki fitur authentication dengan role-based access control yang membedakan akses antara Administrator dan User biasa.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🔐 **Authentication & Authorization**
+- **User Registration & Login** - Sistem pendaftaran dan login pengguna
+- **Role-based Access Control** - Pembedaan akses berdasarkan role (Admin/User)
+- **Dashboard** - Dashboard khusus untuk setiap role
+- **Session Management** - Pengelolaan sesi yang aman
+
+### 👨‍💼 **Admin Features**
+- **Inventory Management** - Kelola data inventaris seragam
+- **Product Management** - Kelola data produk seragam
+- **Reports** - Laporan stok dan inventaris
+- **Export to Excel/PDF** - Export laporan ke format Excel dan PDF
+- **Stock Monitoring** - Monitoring stok real-time
+
+### 👤 **User Features**
+- **Product Catalog** - Melihat katalog produk seragam
+- **Product Details** - Detail informasi produk
+- **Dashboard** - Dashboard personal user
+
+### 🛡️ **Security Features**
+- **AdminMiddleware** - Middleware khusus untuk proteksi route admin
+- **Password Hashing** - Enkripsi password yang aman
+- **CSRF Protection** - Perlindungan dari serangan CSRF
+- **Input Validation** - Validasi input yang ketat
+
+## Instalasi
+
+### Prerequisites
+- PHP 8.2 atau lebih tinggi
+- Composer
+- MySQL/MariaDB
+- Node.js & NPM (untuk asset compilation)
+
+### Langkah Instalasi
+
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/YugaZ963/kerja-praktik.git
+   cd kerja-praktik
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Database Configuration**
+   - Buat database MySQL
+   - Update konfigurasi database di file `.env`
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=nama_database
+   DB_USERNAME=username
+   DB_PASSWORD=password
+   ```
+
+5. **Database Migration & Seeding**
+   ```bash
+   php artisan migrate
+   php artisan db:seed --class=AdminUserSeeder
+   ```
+
+6. **Compile Assets**
+   ```bash
+   npm run build
+   ```
+
+7. **Start Development Server**
+   ```bash
+   php artisan serve
+   ```
+
+## Default Login Credentials
+
+### Administrator
+- **Email:** `admin@ravazka.com`
+- **Password:** `admin123`
+
+### Regular User
+- **Email:** `user@ravazka.com`
+- **Password:** `user123`
+
+## Struktur Project
+
+```
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.php
+│   │   │   ├── InventoryController.php
+│   │   │   └── ProductController.php
+│   │   └── Middleware/
+│   │       └── AdminMiddleware.php
+│   └── Models/
+│       ├── User.php
+│       ├── Inventory.php
+│       └── Product.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── resources/
+│   └── views/
+│       ├── auth/
+│       ├── inventory/
+│       └── layouts/
+└── routes/
+    └── web.php
+```
+
+## Contributing
+
+1. Fork repository ini
+2. Buat branch feature (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
 
 ## Learning Laravel
 
