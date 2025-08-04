@@ -136,7 +136,15 @@
                                     <td>{{ $item->code }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->category }}</td>
-                                    <td>{{ implode(', ', json_decode($item->sizes_available, true)) }}</td>
+                                    <td>
+                                        @if(is_string($item->sizes_available))
+                                            {{ implode(', ', json_decode($item->sizes_available, true) ?? []) }}
+                                        @elseif(is_array($item->sizes_available))
+                                            {{ implode(', ', $item->sizes_available) }}
+                                        @else
+                                            {{ $item->sizes_available ?? '-' }}
+                                        @endif
+                                    </td>
                                     <td>
                                         @if ($item->stock <= $item->min_stock)
                                             <span class="badge bg-danger">{{ $item->stock }}</span>

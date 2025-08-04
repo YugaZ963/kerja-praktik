@@ -12,6 +12,20 @@
             <p class="lead">Pilih koleksi seragam sekolah terlengkap dengan kualitas terbaik dan harga kompetitif</p>
         </div>
 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <!-- Filter Section -->
         <form method="GET" action="{{ route('customer.products') }}">
             <div class="row mb-4">
@@ -84,8 +98,9 @@
                                     <span class="fw-bold">Rp {{ $product['price'] }}{{-- number_format($product->price) --}}</span>
                                     <small class="text-muted"> {{ $product['size'] }}· {{-- $product->size --}}</small>
                                 </div>
-                                <form action="{{-- route('cart.add', $product->id) --}}" method="POST" class="d-inline">
-                                    {{-- @csrf --}}
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn btn-sm btn-primary">Tambah</button>
                                 </form>
                             </div>
@@ -142,3 +157,21 @@
             });
         </script>
     @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update cart count after adding product
+    const addToCartForms = document.querySelectorAll('form[action*="cart/add"]');
+    
+    addToCartForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            // Let the form submit normally, then update cart count after page reload
+            setTimeout(() => {
+                updateCartCount();
+            }, 100);
+        });
+    });
+});
+</script>
+@endpush

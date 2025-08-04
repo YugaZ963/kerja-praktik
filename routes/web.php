@@ -14,9 +14,8 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('about', ['titleShop' => 'RAVAZKA']);
 });
-Route::get('/contact', function () {
-    return view('contact', ['titleShop' => 'RAVAZKA']);
-});
+Route::get('/contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact/send', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 Route::get('/products', [\App\Http\Controllers\Customer\ProductController::class, 'index'])->name('customer.products');
 
 // 1. Detail produk
@@ -164,4 +163,16 @@ Route::prefix('inventory')->group(function () {
             'item' => $item
         ]);
     })->name('inventory.detail');
+});
+
+// Routes untuk fitur keranjang belanja
+Route::prefix('cart')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/add/{product}', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::put('/update/{cart}', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/remove/{cart}', [\App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/checkout', [\App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/process-order', [\App\Http\Controllers\CartController::class, 'processOrder'])->name('cart.process-order');
+    Route::get('/count', [\App\Http\Controllers\CartController::class, 'getCartCount'])->name('cart.count');
 });

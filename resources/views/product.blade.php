@@ -12,6 +12,20 @@
             <p class="lead">Informasi lengkap tentang produk kami</p>
         </div>
 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <!-- Product Detail -->
         <div class="row mb-5">
             <div class="col-md-5">
@@ -52,9 +66,13 @@
                         <i class="bi bi-arrow-left"></i> Kembali ke Produk
                     </a>
                     @if ($product->stock > 0)
-                        <button class="btn btn-primary">
-                            <i class="bi bi-cart-plus"></i> Tambah ke Keranjang
-                        </button>
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-cart-plus"></i> Tambah ke Keranjang
+                            </button>
+                        </form>
                     @endif
                 </div>
              </div>
@@ -62,3 +80,21 @@
     </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update cart count after adding product
+    const addToCartForm = document.querySelector('form[action*="cart/add"]');
+    
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(e) {
+            // Let the form submit normally, then update cart count after page reload
+            setTimeout(() => {
+                updateCartCount();
+            }, 100);
+        });
+    }
+});
+</script>
+@endpush

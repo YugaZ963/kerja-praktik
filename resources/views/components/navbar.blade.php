@@ -39,10 +39,9 @@
                 </div>
 
                 <!-- Keranjang -->
-                <a href="/cart" class="nav-link position-relative me-3">
+                <a href="{{ route('cart.index') }}" class="nav-link position-relative me-3">
                     <i class="bi bi-cart3"></i>
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                 </a>
 
                 <!-- Login/Register -->
