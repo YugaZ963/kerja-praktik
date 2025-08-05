@@ -12,6 +12,31 @@
             <p class="lead">Kelola inventaris seragam sekolah dengan mudah dan efisien</p>
         </div>
 
+        {{-- Alert Messages --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if (session('warning'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ session('warning') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <x-inventory-stats :inventory_items="$inventory_items" />
 
         <div class="row mb-4">
@@ -20,9 +45,10 @@
                     <a href="{{ route('inventory.create') }}" class="btn btn-primary me-2">
                         <i class="bi bi-plus-circle"></i> Tambah Item Baru
                     </a>
-                    <a href="{{ route('inventory.report') }}" class="btn btn-success">
+                    <a href="{{ route('inventory.report') }}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-text"></i> Laporan Stok
                     </a>
+
                 </div>
                 <div>
                     <button onclick="window.print()" class="btn btn-outline-secondary me-2">
@@ -46,7 +72,7 @@
                                     <i class="bi bi-search"></i>
                                 </span>
                                 <input type="text" class="form-control" name="search" 
-                                       placeholder="Cari berdasarkan nama, kategori, ukuran, SKU, atau deskripsi..." 
+                                       placeholder="Cari berdasarkan nama, kategori, kode, atau deskripsi..." 
                                        value="{{ request('search') }}">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search me-1"></i>Cari
@@ -69,22 +95,14 @@
                                 <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Ukuran</label>
-                            <select name="size" class="form-select">
-                                <option value="">Semua Ukuran</option>
-                                @foreach (['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6'] as $u)
-                                    <option value="{{ $u }}" {{ request('size') == $u ? 'selected' : '' }}>{{ $u }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Status Stok</label>
                             <select name="status" class="form-select">
                                 <option value="">Semua Status</option>
-                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia (>5)</option>
-                                <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah (1-5)</option>
-                                <option value="critical" {{ request('status') == 'critical' ? 'selected' : '' }}>Kritis (≤3)</option>
+                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia (>100)</option>
+                                <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah (1-100)</option>
+                                <option value="critical" {{ request('status') == 'critical' ? 'selected' : '' }}>Kritis (≤50)</option>
                                 <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Habis (0)</option>
                             </select>
                         </div>
@@ -143,7 +161,10 @@
                     <div class="col">
                         <h5 class="mb-0">Daftar Item Inventaris</h5>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-auto d-flex gap-2">
+                        <button type="button" class="btn btn-outline-info" onclick="toggleSizeBreakdown()">
+                            <i class="bi bi-rulers"></i> <span id="toggleText">Tampilkan Detail Ukuran</span>
+                        </button>
                         <form method="GET" action="{{ route('inventory.index') }}" class="input-group input-group-sm"
                             style="width:260px;">
                             <input type="text" name="search" class="form-control" placeholder="Cari item..."
@@ -154,54 +175,7 @@
                 </div>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Nama Item</th>
-                                <th>Kategori</th>
-                                <th>Ukuran</th>
-                                <th>Stok</th>
-                                <th>Harga</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($inventory_items as $item)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->name }}</td>
-                                    <td><span class="badge bg-secondary">{{ $item->category }}</span></td>
-                                    <td>{{ $item->size }}</td>
-                                    <td>
-                                        @if ($item->stock == 0)
-                                            <span class="badge bg-danger">Habis</span>
-                                        @elseif($item->stock <= 5)
-                                            <span class="badge bg-warning text-dark">{{ $item->stock }}</span>
-                                        @else
-                                            <span class="badge bg-success">{{ $item->stock }}</span>
-                                        @endif
-                                    </td>
-                                    <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('inventory.edit', $item->id) }}"
-                                            class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                                        <form action="{{ route('inventory.destroy', $item->id) }}" method="POST"
-                                            class="d-inline" onsubmit="return confirm('Hapus item ini?')">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-4">Tidak ada data</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                <x-inventory-table :inventory_items="$inventory_items" />
             </div>
             @if (method_exists($inventory_items, 'hasPages') && $inventory_items->hasPages())
                 <div class="card-footer bg-white">

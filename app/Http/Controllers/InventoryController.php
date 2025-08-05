@@ -10,7 +10,7 @@ class InventoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::query();
+        $query = Inventory::query();
         
         // Filter pencarian
         if ($request->filled('search')) {
@@ -19,8 +19,7 @@ class InventoryController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('category', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('size', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                  ->orWhere('code', 'like', "%{$search}%");
             });
         }
         
@@ -29,35 +28,30 @@ class InventoryController extends Controller
             $query->where('category', $request->category);
         }
         
-        // Filter berdasarkan ukuran
-        if ($request->filled('size')) {
-            $query->where('size', $request->size);
-        }
-        
         // Filter berdasarkan status stok
         if ($request->filled('status')) {
             switch ($request->status) {
                 case 'low':
-                    $query->whereRaw('stock <= 5')->whereRaw('stock > 0');
+                    $query->whereRaw('stock <= 100')->whereRaw('stock > 0');
                     break;
                 case 'out':
                     $query->where('stock', 0);
                     break;
                 case 'ready':
-                    $query->whereRaw('stock > 5');
+                    $query->whereRaw('stock > 100');
                     break;
                 case 'critical':
-                    $query->whereRaw('stock <= 3');
+                    $query->whereRaw('stock <= 50');
                     break;
             }
         }
         
         // Filter berdasarkan rentang harga
         if ($request->filled('price_min')) {
-            $query->where('price', '>=', $request->price_min);
+            $query->where('selling_price', '>=', $request->price_min);
         }
         if ($request->filled('price_max')) {
-            $query->where('price', '<=', $request->price_max);
+            $query->where('selling_price', '<=', $request->price_max);
         }
         
         // Filter berdasarkan tanggal
@@ -83,10 +77,10 @@ class InventoryController extends Controller
                 $query->orderBy('stock', 'desc');
                 break;
             case 'price-asc':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('selling_price', 'asc');
                 break;
             case 'price-desc':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('selling_price', 'desc');
                 break;
             case 'category-asc':
                 $query->orderBy('category', 'asc');

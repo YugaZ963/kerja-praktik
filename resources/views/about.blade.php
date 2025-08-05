@@ -73,11 +73,10 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <p class="mb-2"><strong>Didirikan:</strong> 2010</p>
-                                <p class="mb-2"><strong>Alamat:</strong> Jl. Raya Seragam No. 45, Jakarta Selatan</p>
-                                <p class="mb-2"><strong>Email:</strong> info@seragamsekolah.com</p>
-                                <p class="mb-2"><strong>Telepon:</strong> (021) 12345678</p>
-                                <p class="mb-2"><strong>NPWP:</strong> 12.345.678.9-012.345</p>
+                                <p class="mb-2"><strong>Didirikan:</strong> 2000</p>
+                                <p class="mb-2"><strong>Alamat:</strong> Pasar Baru, Bandung, Jawa Barat</p>
+                                <p class="mb-2"><strong>Email:</strong> ravazka963@gmail.com</p>
+                                <p class="mb-2"><strong>Telepon:</strong> +62 896-7775-4918</p>
                             </div>
                         </div>
                     </div>

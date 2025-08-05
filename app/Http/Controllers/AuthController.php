@@ -40,8 +40,22 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            // Redirect to dashboard for all authenticated users
-            return redirect()->intended('/dashboard')->with('success', 'Login berhasil! Selamat datang, ' . Auth::user()->name . '!');
+            $user = Auth::user();
+            
+            // Jika user adalah admin, redirect ke dashboard
+            if ($user->isAdmin()) {
+                return redirect()->intended('/dashboard')->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
+            }
+            
+            // Jika user biasa, redirect ke halaman sebelumnya atau beranda
+            $intendedUrl = $request->session()->get('url.intended', '/');
+            
+            // Pastikan tidak redirect ke dashboard untuk user biasa
+            if (str_contains($intendedUrl, '/dashboard')) {
+                $intendedUrl = '/';
+            }
+            
+            return redirect($intendedUrl)->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '!');
         }
 
         return redirect()->back()
@@ -84,8 +98,12 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        // Redirect to dashboard for all users
-        return redirect('/dashboard')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name . '!');
+        // Redirect berdasarkan role user
+        if ($user->isAdmin()) {
+            return redirect('/dashboard')->with('success', 'Registrasi berhasil! Selamat datang Admin, ' . $user->name . '!');
+        }
+        
+        return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name . '!');
     }
 
     /**

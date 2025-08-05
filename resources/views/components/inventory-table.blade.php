@@ -19,7 +19,17 @@
             @forelse ($inventory_items as $item)
                 <tr>
                     <td>{{ $item['code'] }}</td>
-                    <td>{{ $item['name'] }}</td>
+                    <td>
+                        {{ $item['name'] }}
+                        <br>
+                        <button class="btn btn-sm btn-outline-secondary size-breakdown-toggle" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#sizeBreakdown{{ $item['id'] }}" 
+                                aria-expanded="false" 
+                                style="display: none;">
+                            <i class="bi bi-rulers"></i> Detail Ukuran
+                        </button>
+                    </td>
                     <td>{{ $item['category'] }}</td>
                     <td>
                         @if ($item['stock'] <= $item['min_stock'])
@@ -36,15 +46,28 @@
                     <td>{{ $item['last_restock'] }}</td>
                     <td>
                         <div class="btn-group btn-group-sm">
-                            <a href="/inventory/{{ $item['code'] }}" class="btn btn-info">
+                            <a href="/inventory/{{ $item['code'] }}" class="btn btn-info" title="Lihat Detail">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="#" class="btn btn-primary">
+                            <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="#" class="btn btn-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
+                            <form action="{{ route('inventory.destroy', $item['id']) }}" method="POST" class="d-inline" 
+                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus item {{ $item['name'] }}?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" title="Hapus">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Size Breakdown Row -->
+                <tr class="collapse size-breakdown-row" id="sizeBreakdown{{ $item['id'] }}">
+                    <td colspan="9" class="p-0">
+                        <div class="p-3 bg-light">
+                            <x-inventory-size-breakdown :item="$item" />
                         </div>
                     </td>
                 </tr>
@@ -56,3 +79,25 @@
         </tbody>
     </table>
 </div>
+
+<script>
+function toggleSizeBreakdown() {
+    const toggleButtons = document.querySelectorAll('.size-breakdown-toggle');
+    const toggleText = document.getElementById('toggleText');
+    const isVisible = toggleButtons[0].style.display !== 'none';
+    
+    toggleButtons.forEach(button => {
+        button.style.display = isVisible ? 'none' : 'inline-block';
+    });
+    
+    if (isVisible) {
+        // Sembunyikan semua breakdown yang terbuka
+        document.querySelectorAll('.size-breakdown-row.show').forEach(row => {
+            row.classList.remove('show');
+        });
+        toggleText.textContent = 'Tampilkan Detail Ukuran';
+    } else {
+        toggleText.textContent = 'Sembunyikan Detail Ukuran';
+    }
+}
+</script>

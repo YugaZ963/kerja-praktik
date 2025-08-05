@@ -103,6 +103,74 @@
             </div>
         </div>
 
+        <!-- Size Breakdown Report -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Laporan Detail per Ukuran</h5>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="toggleAllSizeBreakdowns()">
+                    <i class="bi bi-rulers"></i> <span id="toggleAllText">Tampilkan Semua Detail</span>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Inventaris</th>
+                                <th class="text-center">Total Stok</th>
+                                <th class="text-end">Nilai Total</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $allInventoryItems = \App\Models\Inventory::all();
+                            @endphp
+                            @foreach ($allInventoryItems as $item)
+                                @php
+                                    $products = \App\Models\Product::where('inventory_id', $item->id)->get();
+                                    $totalProducts = $products->count();
+                                    $totalValue = $products->sum(function($product) use ($item) {
+                                        return $product->stock * $item->purchase_price;
+                                    });
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <strong>{{ $item->name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ $item->code }} - {{ $item->category }}</small>
+                                    </td>
+                                    <td class="text-center">{{ $item->stock }}</td>
+                                    <td class="text-end">Rp {{ number_format($totalValue, 0, ',', '.') }}</td>
+                                    <td class="text-center">
+                                        @if($totalProducts > 0)
+                                            <button class="btn btn-sm btn-outline-secondary size-breakdown-toggle-report" 
+                                                    data-bs-toggle="collapse" 
+                                                    data-bs-target="#sizeBreakdownReport{{ $item->id }}" 
+                                                    aria-expanded="false">
+                                                <i class="bi bi-rulers"></i> Detail
+                                            </button>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @if($totalProducts > 0)
+                                    <tr class="collapse size-breakdown-row-report" id="sizeBreakdownReport{{ $item->id }}">
+                                        <td colspan="4" class="p-0">
+                                            <div class="p-3 bg-light border-start border-primary border-3">
+                                                <x-inventory-size-breakdown :item="$item" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Low Stock Items -->
         <div class="card mb-4">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -142,9 +210,7 @@
                                         <a href="/inventory/{{ $item['code'] }}" class="btn btn-sm btn-info me-1">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <button class="btn btn-sm btn-primary">
-                                            <i class="bi bi-plus-circle"></i>
-                                        </button>
+
                                     </td>
                                 </tr>
                             @endforeach
@@ -249,5 +315,26 @@
                 }
             });
         });
+
+        // Function untuk toggle semua size breakdown
+        function toggleAllSizeBreakdowns() {
+            const toggleText = document.getElementById('toggleAllText');
+            const allBreakdownRows = document.querySelectorAll('.size-breakdown-row-report');
+            const isAnyVisible = Array.from(allBreakdownRows).some(row => row.classList.contains('show'));
+            
+            if (isAnyVisible) {
+                // Sembunyikan semua
+                allBreakdownRows.forEach(row => {
+                    row.classList.remove('show');
+                });
+                toggleText.textContent = 'Tampilkan Semua Detail';
+            } else {
+                // Tampilkan semua
+                allBreakdownRows.forEach(row => {
+                    row.classList.add('show');
+                });
+                toggleText.textContent = 'Sembunyikan Semua Detail';
+            }
+        }
     </script>
 @endpush
