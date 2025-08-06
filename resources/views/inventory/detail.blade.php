@@ -267,7 +267,11 @@
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
                             <strong>{{ $item['name'] }}</strong><br>
-                            Total stok saat ini: <span class="badge bg-primary">{{ $item['stock'] }}</span>
+                            Total stok semua ukuran: <span class="badge bg-primary">{{ $item['stock'] }}</span>
+                            <small class="d-block mt-1 text-muted">
+                                <i class="bi bi-info-circle-fill me-1"></i>
+                                Stok per ukuran ditampilkan di dropdown di bawah
+                            </small>
                         </div>
                         
                         <div class="mb-3">
@@ -275,9 +279,15 @@
                             <select class="form-select" id="increase_size" name="size" required>
                                 <option value="">Pilih Ukuran</option>
                                 @if($item->products && $item->products->count() > 0)
-                                    @foreach($item->products->unique('size')->sortBy('size') as $product)
-                                        <option value="{{ $product->size }}">
-                                            {{ $product->size }} (Stok: {{ $product->stock }})
+                                    @php
+                                        // Kelompokkan products per ukuran dan jumlahkan stocknya
+                                        $sizeGroups = $item->products->groupBy('size')->map(function($products) {
+                                            return $products->sum('stock');
+                                        })->sortKeys();
+                                    @endphp
+                                    @foreach($sizeGroups as $size => $totalStock)
+                                        <option value="{{ $size }}">
+                                            {{ $size }} (Stok: {{ $totalStock }})
                                         </option>
                                     @endforeach
                                 @endif
@@ -333,7 +343,7 @@
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>{{ $item['name'] }}</strong><br>
-                            Total stok saat ini: <span class="badge bg-primary">{{ $item['stock'] }}</span><br>
+                            Total stok semua ukuran: <span class="badge bg-primary">{{ $item['stock'] }}</span><br>
                             <small>Pastikan jumlah yang dikurangi tidak melebihi stok ukuran yang tersedia.</small>
                         </div>
                         
@@ -342,9 +352,15 @@
                             <select class="form-select" id="decrease_size" name="size" required onchange="updateMaxQuantity()">
                                 <option value="">Pilih Ukuran</option>
                                 @if($item->products && $item->products->count() > 0)
-                                    @foreach($item->products->unique('size')->sortBy('size') as $product)
-                                        <option value="{{ $product->size }}" data-stock="{{ $product->stock }}">
-                                            {{ $product->size }} (Stok: {{ $product->stock }})
+                                    @php
+                                        // Kelompokkan products per ukuran dan jumlahkan stocknya
+                                        $sizeGroups = $item->products->groupBy('size')->map(function($products) {
+                                            return $products->sum('stock');
+                                        })->sortKeys();
+                                    @endphp
+                                    @foreach($sizeGroups as $size => $totalStock)
+                                        <option value="{{ $size }}" data-stock="{{ $totalStock }}">
+                                            {{ $size }} (Stok: {{ $totalStock }})
                                         </option>
                                     @endforeach
                                 @endif

@@ -265,8 +265,14 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
         // Update stok produk
         $product->update(['stock' => $newStock]);
         
-        // Update last_restock inventory
-        $item->update(['last_restock' => now()->toDateString()]);
+        // Sinkronkan total stok inventory dengan jumlah stok semua products
+        $totalStock = $item->products()->sum('stock');
+        
+        // Update last_restock inventory dan total stock
+        $item->update([
+            'last_restock' => now()->toDateString(),
+            'stock' => $totalStock
+        ]);
         
         // Tambahkan ke riwayat stok
         $stockHistory = $item->stock_history ?? [];
@@ -277,7 +283,8 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
             'quantity' => $quantity,
             'notes' => $historyNotes,
             'old_stock' => $oldStock,
-            'new_stock' => $newStock
+            'new_stock' => $newStock,
+            'total_stock_after' => $totalStock
         ];
         
         $item->update(['stock_history' => $stockHistory]);

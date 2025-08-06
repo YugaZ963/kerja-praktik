@@ -146,9 +146,6 @@
                                     class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-box-arrow-up-right me-1"></i>Buka di Google Maps
                                 </a>
-                                <button onclick="getDirections()" class="btn btn-primary btn-sm mt-2">
-                                    <i class="bi bi-signpost-2 me-1"></i>Petunjuk Arah
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -156,12 +153,11 @@
             </div>
         </div>
     </div>
+@endsection
 
 @section('scripts')
     <script>
         let map;
-        let directionsService;
-        let directionsRenderer;
 
         function initMap() {
             // Koordinat toko dari controller
@@ -235,64 +231,6 @@
 
             // Buka info window secara default
             infoWindow.open(map, storeMarker);
-
-            // Inisialisasi directions service
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({
-                draggable: true,
-                panel: document.getElementById("directionsPanel")
-            });
-            directionsRenderer.setMap(map);
-        }
-
-        function getDirections() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-
-                        const storeLocation = {
-                            lat: {{ $mapsData['storeLocation']['lat'] }},
-                            lng: {{ $mapsData['storeLocation']['lng'] }}
-                        };
-
-                        const request = {
-                            origin: userLocation,
-                            destination: storeLocation,
-                            travelMode: google.maps.TravelMode.DRIVING,
-                            unitSystem: google.maps.UnitSystem.METRIC,
-                            avoidHighways: false,
-                            avoidTolls: false
-                        };
-
-                        directionsService.route(request, (result, status) => {
-                            if (status === "OK") {
-                                directionsRenderer.setDirections(result);
-
-                                // Tampilkan informasi rute
-                                const route = result.routes[0];
-                                const leg = route.legs[0];
-
-                                alert(`Jarak: ${leg.distance.text}\nWaktu tempuh: ${leg.duration.text}`);
-                            } else {
-                                alert("Tidak dapat menampilkan petunjuk arah: " + status);
-                            }
-                        });
-                    },
-                    (error) => {
-                        alert("Tidak dapat mengakses lokasi Anda. Silakan aktifkan GPS dan coba lagi.");
-                        // Fallback: buka Google Maps dengan koordinat toko
-                        window.open("{{ $mapsData['simpleDirectionsUrl'] }}", "_blank");
-                    }
-                );
-            } else {
-                alert("Browser Anda tidak mendukung geolocation.");
-                // Fallback: buka Google Maps dengan koordinat toko
-                window.open("{{ $mapsData['simpleDirectionsUrl'] }}", "_blank");
-            }
         }
 
         // Load Google Maps API
