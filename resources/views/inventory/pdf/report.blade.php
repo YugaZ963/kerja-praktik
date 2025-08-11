@@ -57,7 +57,7 @@
         }
         
         .filter-value {
-            color: #007bff;
+            color: #0d6efd;
         }
         
         table {
@@ -144,7 +144,7 @@
         }
         
         .summary-value {
-            color: #007bff;
+            color: #0d6efd;
             font-weight: bold;
         }
         

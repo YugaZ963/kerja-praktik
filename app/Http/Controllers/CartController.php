@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Product;
-use App\Services\ShippingService;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
     public function index()
     {
+        $userId = Auth::id();
         $sessionId = Session::getId();
-        $cartItems = Cart::with('product')
-            ->where('session_id', $sessionId)
-            ->get();
+        
+        $cartItems = Cart::getCartItems($userId, $sessionId);
 
         $total = $cartItems->sum('total');
         $itemCount = $cartItems->sum('quantity');
@@ -31,13 +34,22 @@ class CartController extends Controller
     public function add(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
+        $userId = Auth::id();
         $sessionId = Session::getId();
         $quantity = $request->input('quantity', 1);
 
         // Cek apakah produk sudah ada di keranjang
-        $cartItem = Cart::where('session_id', $sessionId)
-            ->where('product_id', $productId)
-            ->first();
+        $cartQuery = Cart::where('product_id', $productId);
+        
+        if ($userId) {
+            // Jika user login, cari berdasarkan user_id
+            $cartQuery->where('user_id', $userId);
+        } else {
+            // Jika guest, cari berdasarkan session_id
+            $cartQuery->where('session_id', $sessionId)->whereNull('user_id');
+        }
+        
+        $cartItem = $cartQuery->first();
 
         if ($cartItem) {
             // Update quantity jika sudah ada
@@ -58,6 +70,7 @@ class CartController extends Controller
             // Tambah item baru ke keranjang
             Cart::create([
                 'session_id' => $sessionId,
+                'user_id' => $userId,
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'price' => $product->price
@@ -96,32 +109,37 @@ class CartController extends Controller
 
     public function clear()
     {
+        $userId = Auth::id();
         $sessionId = Session::getId();
-        Cart::where('session_id', $sessionId)->delete();
+        
+        if ($userId) {
+            // Jika user login, hapus berdasarkan user_id
+            Cart::where('user_id', $userId)->delete();
+        } else {
+            // Jika guest, hapus berdasarkan session_id
+            Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
+        }
 
         return redirect()->back()->with('success', 'Keranjang berhasil dikosongkan!');
     }
 
     public function checkout()
     {
+        $userId = Auth::id();
         $sessionId = Session::getId();
-        $cartItems = Cart::with('product')
-            ->where('session_id', $sessionId)
-            ->get();
+        
+        $cartItems = Cart::getCartItems($userId, $sessionId);
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
         }
 
         $total = $cartItems->sum('total');
-        $shippingService = new ShippingService();
-        $provinces = $shippingService->getProvinces();
 
         return view('cart.checkout', [
             'titleShop' => 'RAVAZKA - Checkout',
             'cartItems' => $cartItems,
-            'total' => $total,
-            'provinces' => $provinces
+            'total' => $total
         ]);
     }
 
@@ -131,38 +149,89 @@ class CartController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
-            'province_id' => 'required|integer',
-            'city_id' => 'required|integer',
-            'shipping_service' => 'required|string',
-            'shipping_cost' => 'required|integer',
+            'payment_method' => 'required|string|in:bri,dana',
             'notes' => 'nullable|string'
         ]);
 
+        $userId = Auth::id();
         $sessionId = Session::getId();
-        $cartItems = Cart::with('product')
-            ->where('session_id', $sessionId)
-            ->get();
+        
+        $cartItems = Cart::getCartItems($userId, $sessionId);
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
         }
 
-        // Buat pesan WhatsApp
-        $message = $this->generateWhatsAppMessage($cartItems, $request->all());
-        
-        // Kosongkan keranjang setelah order
-        Cart::where('session_id', $sessionId)->delete();
+        try {
+            DB::beginTransaction();
 
-        // Redirect ke WhatsApp
-        $whatsappNumber = '6289677754918'; // Nomor WhatsApp toko
-        $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
+            // Hitung total
+            $subtotal = $cartItems->sum('total');
+            $shippingCost = 0; // Akan dihitung nanti
+            $totalAmount = $subtotal + $shippingCost;
 
-        return redirect()->away($whatsappUrl);
+            // Buat order
+            $order = Order::create([
+                'order_number' => Order::generateOrderNumber(),
+                'user_id' => Auth::check() ? Auth::id() : null,
+                'customer_name' => $request->name,
+                'customer_phone' => $request->phone,
+                'customer_address' => $request->address,
+                'notes' => $request->notes,
+                'payment_method' => $request->payment_method,
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shippingCost,
+                'total_amount' => $totalAmount,
+                'status' => Order::STATUS_PENDING
+            ]);
+
+            // Buat order items
+            foreach ($cartItems as $cartItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'product_name' => $cartItem->product->name,
+                    'product_size' => $cartItem->product->size,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->price,
+                    'total' => $cartItem->total
+                ]);
+            }
+
+            DB::commit();
+
+            // Buat pesan WhatsApp dengan nomor order
+            $message = $this->generateWhatsAppMessage($cartItems, $request->all(), $order->order_number);
+            
+            // Kosongkan keranjang setelah order
+            if ($userId) {
+                // Jika user login, hapus berdasarkan user_id
+                Cart::where('user_id', $userId)->delete();
+            } else {
+                // Jika guest, hapus berdasarkan session_id
+                Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
+            }
+
+            // Redirect ke WhatsApp
+            $whatsappNumber = '6289677754918'; // Nomor WhatsApp toko
+            $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
+
+            return redirect()->away($whatsappUrl);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.');
+        }
     }
 
-    private function generateWhatsAppMessage($cartItems, $customerData)
+    private function generateWhatsAppMessage($cartItems, $customerData, $orderNumber = null)
     {
         $message = "*PESANAN BARU - RAVAZKA*\n\n";
+        
+        if ($orderNumber) {
+            $message .= "🔖 *No. Pesanan: {$orderNumber}*\n\n";
+        }
+        
         $message .= "📋 *Detail Pesanan:*\n";
         
         $subtotal = 0;
@@ -176,12 +245,9 @@ class CartController extends Controller
             $message .= "  Subtotal: Rp " . number_format($itemSubtotal, 0, ',', '.') . "\n\n";
         }
         
-        $shippingCost = $customerData['shipping_cost'];
-        $total = $subtotal + $shippingCost;
+        $total = $subtotal;
         
         $message .= "💰 *Ringkasan Biaya:*\n";
-        $message .= "Subtotal Produk: Rp " . number_format($subtotal, 0, ',', '.') . "\n";
-        $message .= "Ongkos Kirim ({$customerData['shipping_service']}): Rp " . number_format($shippingCost, 0, ',', '.') . "\n";
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "*TOTAL: Rp " . number_format($total, 0, ',', '.') . "*\n\n";
         
@@ -194,55 +260,33 @@ class CartController extends Controller
             $message .= "Catatan: {$customerData['notes']}\n";
         }
         
+        // Informasi pembayaran
+        $message .= "\n💳 *Metode Pembayaran:*\n";
+        if ($customerData['payment_method'] === 'bri') {
+            $message .= "Bank BRI\n";
+            $message .= "No. Rekening: 1234-5678-9012-3456\n";
+            $message .= "Atas Nama: RAVAZKA STORE\n";
+        } else if ($customerData['payment_method'] === 'dana') {
+            $message .= "DANA E-Wallet\n";
+            $message .= "No. DANA: 0896-7775-4918\n";
+            $message .= "Atas Nama: RAVAZKA STORE\n";
+        }
+        
         $message .= "\n📅 Tanggal: " . date('d/m/Y H:i') . "\n";
         $message .= "\nTerima kasih telah berbelanja di RAVAZKA! 🙏";
         
         return $message;
     }
 
-    public function getCities(Request $request)
-    {
-        $provinceId = $request->get('province_id');
-        $shippingService = new ShippingService();
-        $cities = $shippingService->getCities($provinceId);
-        
-        return response()->json($cities);
-    }
 
-    public function getShippingCost(Request $request)
-    {
-        $request->validate([
-            'destination' => 'required|integer',
-            'courier' => 'required|string|in:jne,jnt'
-        ]);
-
-        $sessionId = Session::getId();
-        $cartItems = Cart::with('product')
-            ->where('session_id', $sessionId)
-            ->get();
-
-        if ($cartItems->isEmpty()) {
-            return response()->json(['error' => 'Keranjang kosong'], 400);
-        }
-
-        $shippingService = new ShippingService();
-        $weight = $shippingService->calculateCartWeight($cartItems);
-        $shippingOptions = $shippingService->getShippingCost(
-            $request->destination,
-            $weight,
-            $request->courier
-        );
-
-        return response()->json([
-            'weight' => $weight,
-            'shipping_options' => $shippingOptions
-        ]);
-    }
 
     public function getCartCount()
     {
+        $userId = Auth::id();
         $sessionId = Session::getId();
-        $count = Cart::where('session_id', $sessionId)->sum('quantity');
+        
+        $cartItems = Cart::getCartItems($userId, $sessionId);
+        $count = $cartItems->sum('quantity');
         
         return response()->json(['count' => $count]);
     }

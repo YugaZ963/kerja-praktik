@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -42,16 +44,28 @@ class AuthController extends Controller
             
             $user = Auth::user();
             
-            // Jika user adalah admin, redirect ke dashboard
-            if ($user->isAdmin()) {
-                return redirect()->intended('/dashboard')->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
-            }
+            // Merge cart session ke user cart setelah login
+            $sessionId = Session::getId();
+            Cart::mergeSessionToUser($user->id, $sessionId);
             
-            // Jika user biasa, redirect ke halaman sebelumnya atau beranda
+            // Ambil intended URL dari session
             $intendedUrl = $request->session()->get('url.intended', '/');
             
-            // Pastikan tidak redirect ke dashboard untuk user biasa
-            if (str_contains($intendedUrl, '/dashboard')) {
+            // Hapus intended URL dari session setelah diambil
+            $request->session()->forget('url.intended');
+            
+            // Jika user adalah admin
+            if ($user->isAdmin()) {
+                // Jika intended URL adalah halaman admin, gunakan itu, jika tidak ke dashboard
+                if (str_contains($intendedUrl, '/dashboard') || str_contains($intendedUrl, '/inventory')) {
+                    return redirect($intendedUrl)->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
+                } else {
+                    return redirect('/dashboard')->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
+                }
+            }
+            
+            // Jika user biasa, pastikan tidak redirect ke halaman admin
+            if (str_contains($intendedUrl, '/dashboard') || str_contains($intendedUrl, '/inventory')) {
                 $intendedUrl = '/';
             }
             
@@ -97,6 +111,10 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        // Merge cart session ke user cart setelah register
+        $sessionId = Session::getId();
+        Cart::mergeSessionToUser($user->id, $sessionId);
 
         // Redirect berdasarkan role user
         if ($user->isAdmin()) {

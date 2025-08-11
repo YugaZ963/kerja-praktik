@@ -111,7 +111,7 @@
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Ongkos Kirim</span>
-                                <span class="text-muted">Gratis</span>
+                                <span class="text-muted">Di lihat dalam Resi</span>
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">

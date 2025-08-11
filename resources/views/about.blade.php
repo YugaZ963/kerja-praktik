@@ -115,29 +115,44 @@
                         <h5 class="mb-0">Testimoni Pelanggan</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <p class="mb-1 fw-bold">SMK Negeri 1 Jakarta</p>
-                            <div class="text-warning mb-1">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
+                        @php
+                            $testimonials = \App\Models\Testimonial::where('is_approved', true)
+                                ->orderBy('created_at', 'desc')
+                                ->limit(3)
+                                ->get();
+                        @endphp
+                        
+                        @if($testimonials->count() > 0)
+                            @foreach($testimonials as $testimonial)
+                            <div class="mb-3 {{ !$loop->last ? 'border-bottom pb-3' : '' }}">
+                                <p class="small mb-1 fst-italic">"{{ $testimonial->testimonial_text }}"</p>
+                                <small class="text-muted fw-bold">- {{ $testimonial->customer_name }}</small>
                             </div>
-                            <p class="small">"Kualitas seragam sangat baik dan layanan pelanggan sangat memuaskan. Sudah
-                                bekerja sama selama 5 tahun."</p>
-                        </div>
-                        <div>
-                            <p class="mb-1 fw-bold">SMA Katolik St. Yoseph</p>
-                            <div class="text-warning mb-1">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
+                            @endforeach
+                        @else
+                            <!-- Default testimonials when no database testimonials exist -->
+                            <div class="mb-3 border-bottom pb-3">
+                                <p class="small mb-1 fst-italic">"Kualitas seragam sangat baik dan layanan pelanggan sangat memuaskan. Sudah bekerja sama selama 5 tahun."</p>
+                                <small class="text-muted fw-bold">- Kepala Sekolah SMK Negeri 1 Jakarta</small>
                             </div>
-                            <p class="small">"Desain seragam sangat modis dan sesuai dengan kebutuhan sekolah kami."</p>
+                            <div class="mb-3 border-bottom pb-3">
+                                <p class="small mb-1 fst-italic">"Desain seragam sangat modis dan sesuai dengan kebutuhan sekolah kami."</p>
+                                <small class="text-muted fw-bold">- Wakil Kepala Sekolah SMA Katolik St. Yoseph</small>
+                            </div>
+                            <div>
+                                <p class="small mb-1 fst-italic">"Pelayanan sangat profesional dan hasil jahitan rapi. Siswa-siswi merasa nyaman menggunakan seragam dari RAVAZKA."</p>
+                                <small class="text-muted fw-bold">- Koordinator Kesiswaan SMP Negeri 5 Bandung</small>
+                            </div>
+                        @endif
+                        
+                        @if($testimonials->count() > 0)
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Menampilkan {{ $testimonials->count() }} testimoni terbaru dari pelanggan kami
+                            </small>
                         </div>
+                        @endif
                     </div>
                 </div>
 

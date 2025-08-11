@@ -21,6 +21,12 @@
                             <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }}"
                                 href="/inventory">Inventaris</a>
                         </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('orders*') ? 'active' : '' }}" href="/orders">
+                                <i class="bi bi-bag-check me-1"></i>Pesanan
+                            </a>
+                        </li>
                     @endif
                 @endauth
                 <li class="nav-item">
@@ -80,6 +86,16 @@
                                     </a></li>
                                 <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
                                         <i class="bi bi-box-seam me-2"></i>Inventaris
+                                    </a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            @else
+                                <li><a class="dropdown-item" href="/orders">
+                                        <i class="bi bi-bag-check me-2"></i>Pesanan Saya
+                                    </a></li>
+                                <li><a class="dropdown-item" href="{{ route('customer.orders.track') }}">
+                                        <i class="bi bi-search me-2"></i>Lacak Pesanan
                                     </a></li>
                                 <li>
                                     <hr class="dropdown-divider">

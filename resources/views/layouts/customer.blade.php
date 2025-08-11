@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>UKM Seragam Sekolah @yield('title')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -36,8 +37,58 @@
                 .catch(error => console.error('Error updating cart count:', error));
         }
 
+        // Handle authentication errors for form submissions
+        function handleAuthError(response) {
+            if (response.status === 401) {
+                response.json().then(data => {
+                    alert(data.message || 'Silakan login terlebih dahulu untuk melanjutkan.');
+                    window.location.href = data.redirect_url || '{{ route("login") }}';
+                });
+                return true;
+            }
+            return false;
+        }
+
         // Update cart count when page loads
-        document.addEventListener('DOMContentLoaded', updateCartCount);
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            
+            // Handle add to cart forms
+            const addToCartForms = document.querySelectorAll('form[action*="cart/add"]');
+            addToCartForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => {
+                        if (handleAuthError(response)) {
+                            return;
+                        }
+                        
+                        if (response.ok) {
+                            // Reload page to show success message
+                            window.location.reload();
+                        } else {
+                            // Let the form submit normally for other errors
+                            form.submit();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Fallback to normal form submission
+                        form.submit();
+                    });
+                });
+            });
+        });
     </script>
     
     @stack('scripts')

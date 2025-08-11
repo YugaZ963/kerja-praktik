@@ -284,12 +284,12 @@
                     datasets: [{
                         data: values,
                         backgroundColor: [
-                            '#4e73df',
-                            '#1cc88a',
-                            '#36b9cc',
-                            '#f6c23e',
-                            '#e74a3b',
-                            '#858796'
+                            '#0d6efd',
+                            '#0d9d17',
+                            '#ca2068',
+                            '#fbdd15',
+                            '#6c757d',
+                            '#f8f9fa'
                         ],
                         borderWidth: 1
                     }]

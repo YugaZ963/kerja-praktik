@@ -18,8 +18,19 @@ class RequireLoginMiddleware
     {
         // Check if user is authenticated
         if (!Auth::check()) {
-            // Simpan URL yang diminta untuk redirect setelah login
-            $request->session()->put('url.intended', $request->fullUrl());
+            // Untuk AJAX request atau POST request, kembalikan response JSON
+            if ($request->expectsJson() || $request->isMethod('POST')) {
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => 'Silakan login terlebih dahulu untuk melanjutkan.',
+                    'redirect_url' => route('login')
+                ], 401);
+            }
+            
+            // Simpan URL yang diminta untuk redirect setelah login (hanya untuk GET request)
+            if ($request->isMethod('GET')) {
+                $request->session()->put('url.intended', $request->fullUrl());
+            }
             
             return redirect()->route('login')->with('info', 'Silakan login terlebih dahulu untuk melanjutkan.');
         }

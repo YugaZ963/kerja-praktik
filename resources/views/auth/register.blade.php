@@ -147,8 +147,8 @@
 }
 
 .form-control-lg:focus, .form-select-lg:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    border-color: #0d9d17;
+    box-shadow: 0 0 0 0.2rem rgba(13, 157, 23, 0.25);
 }
 
 .btn-lg {
@@ -160,7 +160,7 @@
 
 .btn-success:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    box-shadow: 0 4px 12px rgba(13, 157, 23, 0.3);
 }
 </style>
 @endsection

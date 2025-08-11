@@ -31,7 +31,7 @@
                             </div>
                             
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="card bg-light">
                                         <div class="card-body text-center">
                                             <i class="bi bi-box-seam display-4 text-primary mb-3"></i>
@@ -44,7 +44,20 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-cart-check display-4 text-warning mb-3"></i>
+                                            <h5>Kelola Pesanan</h5>
+                                            <p class="text-muted">Pantau dan kelola pesanan pelanggan</p>
+                                            <a href="{{ route('admin.orders.index') }}" class="btn btn-warning">
+                                                <i class="bi bi-arrow-right me-1"></i>
+                                                Buka Pesanan
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="card bg-light">
                                         <div class="card-body text-center">
                                             <i class="bi bi-file-text display-4 text-success mb-3"></i>

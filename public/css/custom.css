@@ -1,9 +1,44 @@
+/* Custom Color Scheme - Ravazka */
+:root {
+    /* Primary Color Palette */
+    --primary-green: #0d9d17;
+    --primary-blue: #0d6efd;
+    --primary-pink: #ca2068;
+    --primary-yellow: #fbdd15;
+    --primary-white: #fff;
+    
+    /* Derived Colors */
+    --primary-green-light: rgba(13, 157, 23, 0.1);
+    --primary-green-dark: #0a7a13;
+    --primary-blue-light: rgba(13, 110, 253, 0.1);
+    --primary-blue-dark: #0a58ca;
+    --primary-pink-light: rgba(202, 32, 104, 0.1);
+    --primary-pink-dark: #a11d52;
+    --primary-yellow-light: rgba(251, 221, 21, 0.1);
+    --primary-yellow-dark: #c9b012;
+    
+    /* Text Colors */
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    
+    /* Background Colors */
+    --bg-light: #f8fafc;
+    --bg-gray: #f1f5f9;
+    --border-color: #e5e7eb;
+    
+    /* Shadow */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
 /* Additional custom styles for inventory management */
 
 /* Hero section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+    color: var(--primary-white);
     padding: 2rem 0;
     margin-bottom: 2rem;
     border-radius: 0.5rem;
@@ -22,16 +57,17 @@
 
 /* Filter section */
 .filter-section {
-    background-color: white;
+    background-color: var(--primary-white);
     border-radius: 0.5rem;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }
 
 /* Table enhancements */
 .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: var(--primary-blue-light);
 }
 
 .table-responsive {
@@ -41,18 +77,19 @@
 
 /* Form enhancements */
 .form-section {
-    background-color: white;
+    background-color: var(--primary-white);
     border-radius: 0.5rem;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }
 
 .form-section h4 {
-    color: var(--primary-color);
+    color: var(--primary-blue);
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--light-color);
+    border-bottom: 2px solid var(--bg-light);
 }
 
 /* Button group styling */
@@ -83,23 +120,23 @@
 }
 
 .card-icon.primary {
-    background-color: rgba(13, 110, 253, 0.1);
-    color: var(--primary-color);
+    background-color: var(--primary-blue-light);
+    color: var(--primary-blue);
 }
 
 .card-icon.success {
-    background-color: rgba(25, 135, 84, 0.1);
-    color: var(--success-color);
+    background-color: var(--primary-green-light);
+    color: var(--primary-green);
 }
 
 .card-icon.warning {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: var(--warning-color);
+    background-color: var(--primary-yellow-light);
+    color: var(--primary-yellow-dark);
 }
 
 .card-icon.danger {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: var(--danger-color);
+    background-color: var(--primary-pink-light);
+    color: var(--primary-pink);
 }
 
 /* Status badges */
@@ -113,24 +150,24 @@
 }
 
 .status-active {
-    background-color: rgba(25, 135, 84, 0.1);
-    color: var(--success-color);
+    background-color: var(--primary-green-light);
+    color: var(--primary-green);
 }
 
 .status-low {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: var(--warning-color);
+    background-color: var(--primary-yellow-light);
+    color: var(--primary-yellow-dark);
 }
 
 .status-out {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: var(--danger-color);
+    background-color: var(--primary-pink-light);
+    color: var(--primary-pink);
 }
 
 /* Price formatting */
 .price-format {
     font-weight: 600;
-    color: var(--success-color);
+    color: var(--primary-green);
 }
 
 /* Responsive utilities */
@@ -162,7 +199,7 @@
     
     .card {
         box-shadow: none !important;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--border-color);
     }
 }
 

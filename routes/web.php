@@ -26,9 +26,7 @@ Route::get('/dashboard', function () {
 
 
 
-Route::get('/', function () {
-    return view('welcome', ['titleShop' => 'RAVAZKA']);
-});
+Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
 
 Route::get('/about', function () {
     return view('about', ['titleShop' => 'RAVAZKA']);
@@ -42,6 +40,20 @@ Route::get('/products/{slug}', function ($slug) {
     $product = Product::where('slug', $slug)->firstOrFail();
     return view('product', ['titleShop' => 'RAVAZKA', 'product' => $product]);
 })->name('customer.product.detail');
+
+// Customer Order Routes
+Route::prefix('orders')->name('customer.orders.')->middleware('auth')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('index');
+    Route::get('/track', [\App\Http\Controllers\Customer\OrderController::class, 'track'])->name('track');
+    Route::get('/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('show');
+    Route::post('/{order}/upload-payment', [\App\Http\Controllers\Customer\OrderController::class, 'uploadPaymentProof'])->name('upload-payment');
+    Route::post('/{order}/upload-delivery', [\App\Http\Controllers\Customer\OrderController::class, 'uploadDeliveryProof'])->name('upload-delivery');
+});
+
+// Customer Testimonial Routes
+Route::prefix('testimonials')->name('customer.testimonials.')->middleware('auth')->group(function () {
+    Route::post('/store', [\App\Http\Controllers\TestimonialController::class, 'store'])->name('store');
+});
 
 // Rute untuk manajemen inventaris (hanya admin)
 Route::prefix('inventory')->middleware('admin')->group(function () {
@@ -313,11 +325,17 @@ Route::prefix('cart')->middleware('require.login')->group(function () {
     Route::delete('/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [\App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/process-order', [\App\Http\Controllers\CartController::class, 'processOrder'])->name('cart.process-order');
-    
-    // API routes untuk ongkos kirim
-    Route::get('/api/cities', [\App\Http\Controllers\CartController::class, 'getCities'])->name('cart.api.cities');
-    Route::post('/api/shipping-cost', [\App\Http\Controllers\CartController::class, 'getShippingCost'])->name('cart.api.shipping-cost');
 });
 
 // Route untuk cart count (tidak perlu login untuk menampilkan jumlah)
 Route::get('/cart/count', [\App\Http\Controllers\CartController::class, 'getCartCount'])->name('cart.count');
+
+// Routes untuk manajemen pesanan admin
+Route::prefix('admin/orders')->middleware('admin')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+    Route::patch('/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
+    Route::post('/{order}/payment-proof', [\App\Http\Controllers\Admin\OrderController::class, 'uploadPaymentProof'])->name('admin.orders.upload-payment-proof');
+    Route::post('/{order}/delivery-proof', [\App\Http\Controllers\Admin\OrderController::class, 'uploadDeliveryProof'])->name('admin.orders.upload-delivery-proof');
+    Route::delete('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
+});
