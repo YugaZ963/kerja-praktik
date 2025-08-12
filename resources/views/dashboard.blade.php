@@ -31,7 +31,7 @@
                             </div>
                             
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="card bg-light">
                                         <div class="card-body text-center">
                                             <i class="bi bi-box-seam display-4 text-primary mb-3"></i>
@@ -44,7 +44,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="card bg-light">
                                         <div class="card-body text-center">
                                             <i class="bi bi-cart-check display-4 text-warning mb-3"></i>
@@ -57,13 +57,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+
+                                <div class="col-md-3">
                                     <div class="card bg-light">
                                         <div class="card-body text-center">
-                                            <i class="bi bi-file-text display-4 text-success mb-3"></i>
-                                            <h5>Laporan</h5>
+                                            <i class="bi bi-file-text display-4 text-info mb-3"></i>
+                                            <h5>Laporan Stok</h5>
                                             <p class="text-muted">Lihat laporan stok dan analisis</p>
-                                            <a href="{{ route('inventory.reports.stock') }}" class="btn btn-success">
+                                            <a href="{{ route('inventory.reports.stock') }}" class="btn btn-info">
                                                 <i class="bi bi-arrow-right me-1"></i>
                                                 Buka Laporan
                                             </a>

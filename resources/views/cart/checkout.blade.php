@@ -192,74 +192,7 @@
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    const paymentDetails = document.getElementById('payment-details');
-    const briDetails = document.getElementById('bri-details');
-    const danaDetails = document.getElementById('dana-details');
-    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-
-    // Handle payment option clicks
-    paymentOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            const paymentType = this.dataset.payment;
-            const radio = this.querySelector('input[type="radio"]');
-            
-            // Remove selected class from all options
-            paymentOptions.forEach(opt => opt.classList.remove('selected'));
-            
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            
-            // Check the radio button
-            radio.checked = true;
-            
-            // Show payment details
-            showPaymentDetails(paymentType);
-        });
-    });
-
-    // Handle radio button changes
-    paymentRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                const paymentType = this.value;
-                
-                // Update visual selection
-                paymentOptions.forEach(opt => opt.classList.remove('selected'));
-                this.closest('.payment-option').classList.add('selected');
-                
-                // Show payment details
-                showPaymentDetails(paymentType);
-            }
-        });
-    });
-
-    function showPaymentDetails(paymentType) {
-        // Hide all details first
-        briDetails.style.display = 'none';
-        danaDetails.style.display = 'none';
-        
-        // Show selected payment details
-        if (paymentType === 'bri') {
-            briDetails.style.display = 'block';
-        } else if (paymentType === 'dana') {
-            danaDetails.style.display = 'block';
-        }
-        
-        // Show the payment details container
-        paymentDetails.style.display = 'block';
-    }
-
-    // Check if there's a pre-selected payment method (for old input)
-    const checkedRadio = document.querySelector('input[name="payment_method"]:checked');
-    if (checkedRadio) {
-        const paymentType = checkedRadio.value;
-        checkedRadio.closest('.payment-option').classList.add('selected');
-        showPaymentDetails(paymentType);
-    }
-});
-</script>
+<!-- Load checkout specific JavaScript -->
+<script src="{{ asset('js/checkout.js') }}"></script>
 
 @endsection

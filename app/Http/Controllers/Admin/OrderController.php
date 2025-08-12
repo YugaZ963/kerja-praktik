@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -18,12 +20,8 @@ class OrderController extends Controller
         $query = Order::with(['items', 'user'])->recent();
         
         if ($status && $status !== 'all') {
-            // Untuk tab "completed", tampilkan pesanan dengan status "delivered" dan "completed"
-            if ($status === 'completed') {
-                $query->whereIn('status', [Order::STATUS_DELIVERED, Order::STATUS_COMPLETED]);
-            } else {
-                $query->byStatus($status);
-            }
+            // Filter berdasarkan status yang dipilih
+            $query->byStatus($status);
         }
         
         if ($search) {
@@ -75,6 +73,13 @@ class OrderController extends Controller
             case Order::STATUS_DELIVERED:
                 $order->update(['delivered_at' => now()]);
                 break;
+        }
+
+        // Kurangi stok produk ketika pesanan sudah sampai (delivered)
+        if ($newStatus === Order::STATUS_DELIVERED && 
+            $oldStatus !== Order::STATUS_DELIVERED &&
+            !$order->stock_reduced) {
+            $this->reduceProductStock($order);
         }
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui!');
@@ -148,6 +153,54 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan berhasil dihapus!');
     }
 
+    /**
+     * Kurangi stok produk berdasarkan order items
+     */
+    private function reduceProductStock(Order $order)
+    {
+        try {
+            foreach ($order->items as $orderItem) {
+                // Cari produk berdasarkan nama dan ukuran
+                $product = Product::where('name', $orderItem->product_name)
+                                ->where('size', $orderItem->product_size)
+                                ->first();
+
+                if ($product) {
+                    // Kurangi stok produk
+                    $newStock = max(0, $product->stock - $orderItem->quantity);
+                    $product->update(['stock' => $newStock]);
+
+                    Log::info("Stock reduced for product: {$product->name} (Size: {$product->size})", [
+                        'order_number' => $order->order_number,
+                        'product_id' => $product->id,
+                        'quantity_ordered' => $orderItem->quantity,
+                        'old_stock' => $product->stock + $orderItem->quantity,
+                        'new_stock' => $newStock
+                    ]);
+                } else {
+                    Log::warning("Product not found for stock reduction", [
+                        'order_number' => $order->order_number,
+                        'product_name' => $orderItem->product_name,
+                        'product_size' => $orderItem->product_size,
+                        'quantity' => $orderItem->quantity
+                    ]);
+                }
+            }
+            
+            // Tandai bahwa stok sudah dikurangi
+            $order->update([
+                'stock_reduced' => true,
+                'stock_reduced_at' => now()
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("Failed to reduce product stock for order: {$order->order_number}", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
     private function getStatusCounts()
     {
         return [
@@ -159,7 +212,7 @@ class OrderController extends Controller
             'packaged' => Order::byStatus(Order::STATUS_PACKAGED)->count(),
             'shipped' => Order::byStatus(Order::STATUS_SHIPPED)->count(),
             'delivered' => Order::byStatus(Order::STATUS_DELIVERED)->count(),
-            'completed' => Order::whereIn('status', [Order::STATUS_DELIVERED, Order::STATUS_COMPLETED])->count(),
+            'completed' => Order::byStatus(Order::STATUS_COMPLETED)->count(),
             'cancelled' => Order::byStatus(Order::STATUS_CANCELLED)->count(),
         ];
     }

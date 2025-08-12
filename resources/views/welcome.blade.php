@@ -72,7 +72,8 @@
                                     <small class="text-muted">{{ $order->created_at->format('d M Y') }}</small>
                                     <p class="mb-0">{{ $order->user ? $order->user->name : $order->customer_name }}</p>
                                     <small class="
-                                        @if($order->status == 'completed' || $order->status == 'delivered') text-success
+                                        @if($order->status == 'completed') text-success
+                                        @elseif($order->status == 'delivered') text-info
                                         @elseif($order->status == 'cancelled') text-danger
                                         @elseif($order->status == 'shipped') text-info
                                         @elseif($order->status == 'processing' || $order->status == 'packaged') text-warning

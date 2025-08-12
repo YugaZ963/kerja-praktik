@@ -21,6 +21,7 @@
                             <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }}"
                                 href="/inventory">Inventaris</a>
                         </li>
+
                     @else
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('orders*') ? 'active' : '' }}" href="/orders">
@@ -87,6 +88,7 @@
                                 <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
                                         <i class="bi bi-box-seam me-2"></i>Inventaris
                                     </a></li>
+
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

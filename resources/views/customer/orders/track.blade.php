@@ -186,7 +186,7 @@
                             <div class="item-preview">
                                 <div class="item-name">{{ $item->product_name }}</div>
                                 <div class="item-details">
-                                    {{ $item->quantity }}x | Ukuran: {{ $item->size ?? 'N/A' }}
+                                    {{ $item->quantity }}x | Ukuran: {{ $item->product_size ?? 'N/A' }}
                                 </div>
                             </div>
                             @endforeach

@@ -208,7 +208,7 @@
                                         <div class="item-info">
                                             <div class="item-name">{{ $item->product_name }}</div>
                                             <div class="item-details">
-                                                Ukuran: {{ $item->size ?? 'N/A' }} | 
+                                                Ukuran: {{ $item->product_size ?? 'N/A' }} | 
                                                 Qty: {{ $item->quantity }} | 
                                                 @Rp {{ number_format($item->price, 0, ',', '.') }}
                                             </div>
@@ -268,17 +268,25 @@
                                 @endif
                                 
                                 @if($order->status === 'shipped')
-                                <button type="button" class="btn-action btn-success" 
-                                        data-bs-toggle="modal" data-bs-target="#deliveryModal{{ $order->id }}">
-                                    <i class="fas fa-camera me-2"></i>
-                                    Upload Foto Barang Sampai
-                                </button>
                                 <a href="{{ route('customer.orders.track') }}?order_number={{ $order->order_number }}" 
                                    class="btn-action btn-info">
                                     <i class="fas fa-map-marker-alt me-2"></i>
                                     Lacak Pesanan
                                 </a>
                                 @elseif($order->status === 'delivered')
+                                <button type="button" class="btn-action btn-warning" 
+                                        data-bs-toggle="modal" data-bs-target="#deliveredModal{{ $order->id }}">
+                                    <i class="fas fa-camera me-2"></i>
+                                    Upload Foto Barang Sampai
+                                </button>
+                                <form action="{{ route('customer.orders.mark-completed', $order) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="btn-action btn-success" 
+                                        onclick="return confirm('Apakah Anda yakin ingin menandai pesanan ini sebagai selesai? Tindakan ini tidak dapat dibatalkan.')">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Tandai Selesai
+                                    </button>
+                                </form>
                                 <a href="{{ route('customer.orders.track') }}?order_number={{ $order->order_number }}" 
                                    class="btn-action btn-info">
                                     <i class="fas fa-map-marker-alt me-2"></i>
@@ -353,9 +361,11 @@
                     </div>
                     @endif
 
-                    <!-- Delivery Proof Upload Modal -->
-                    @if($order->status === 'shipped')
-                    <div class="modal fade" id="deliveryModal{{ $order->id }}" tabindex="-1">
+
+
+                    <!-- Delivered Proof Upload Modal -->
+                    @if($order->status === 'delivered')
+                    <div class="modal fade" id="deliveredModal{{ $order->id }}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -372,20 +382,20 @@
                                             <h6>Informasi Pesanan</h6>
                                             <div class="delivery-details">
                                                 <p><strong>Nomor Pesanan:</strong> {{ $order->order_number }}</p>
-                                                <p><strong>Status:</strong> <span class="badge bg-info">Dikirim</span></p>
-                                                <div class="alert alert-info mt-3">
-                                                    <i class="fas fa-info-circle me-2"></i>
-                                                    <strong>Petunjuk:</strong> Upload foto barang yang sudah Anda terima sebagai bukti bahwa pesanan telah sampai dengan baik.
+                                                <p><strong>Status:</strong> <span class="badge bg-success">Sudah Sampai</span></p>
+                                                <div class="alert alert-success mt-3">
+                                                    <i class="fas fa-check-circle me-2"></i>
+                                                    <strong>Konfirmasi:</strong> Upload foto barang yang sudah Anda terima sebagai bukti bahwa pesanan telah sampai dengan baik dan sesuai pesanan.
                                                 </div>
                                             </div>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label for="delivery_proof" class="form-label">
+                                            <label for="delivery_proof_delivered" class="form-label">
                                                 <i class="fas fa-image me-2"></i>
                                                 Foto Bukti Barang Sudah Sampai
                                             </label>
-                                            <input type="file" class="form-control" id="delivery_proof" name="delivery_proof" 
+                                            <input type="file" class="form-control" id="delivery_proof_delivered" name="delivery_proof" 
                                                    accept="image/*" required>
                                             <div class="form-text">
                                                 Format yang didukung: JPG, PNG, JPEG. Maksimal 2MB.
@@ -393,11 +403,11 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="delivery_notes" class="form-label">
+                                            <label for="delivery_notes_delivered" class="form-label">
                                                 <i class="fas fa-comment me-2"></i>
                                                 Catatan (Opsional)
                                             </label>
-                                            <textarea class="form-control" id="delivery_notes" name="delivery_notes" rows="3" 
+                                            <textarea class="form-control" id="delivery_notes_delivered" name="delivery_notes" rows="3" 
                                                       placeholder="Tambahkan catatan tentang kondisi barang atau pengalaman pengiriman..."></textarea>
                                         </div>
                                     </div>

@@ -26,16 +26,20 @@ class Order extends Model
         'delivered_at',
         'delivery_proof',
         'admin_notes',
-        'tracking_number'
+        'tracking_number',
+        'stock_reduced',
+        'stock_reduced_at'
     ];
 
     protected $casts = [
         'payment_verified_at' => 'datetime',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'stock_reduced_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
-        'total_amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'stock_reduced' => 'boolean'
     ];
 
     // Status constants

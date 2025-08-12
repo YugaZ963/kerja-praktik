@@ -48,6 +48,7 @@ Route::prefix('orders')->name('customer.orders.')->middleware('auth')->group(fun
     Route::get('/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('show');
     Route::post('/{order}/upload-payment', [\App\Http\Controllers\Customer\OrderController::class, 'uploadPaymentProof'])->name('upload-payment');
     Route::post('/{order}/upload-delivery', [\App\Http\Controllers\Customer\OrderController::class, 'uploadDeliveryProof'])->name('upload-delivery');
+    Route::post('/{order}/mark-completed', [\App\Http\Controllers\Customer\OrderController::class, 'markAsCompleted'])->name('mark-completed');
 });
 
 // Customer Testimonial Routes
@@ -316,8 +317,8 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
     })->name('inventory.detail');
 });
 
-// Routes untuk fitur keranjang belanja (memerlukan login)
-Route::prefix('cart')->middleware('require.login')->group(function () {
+// Routes untuk fitur keranjang belanja (mendukung guest dan user login)
+Route::prefix('cart')->group(function () {
     Route::get('/', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
     Route::post('/add/{product}', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::put('/update/{cart}', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');

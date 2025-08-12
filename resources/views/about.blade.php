@@ -86,32 +86,6 @@
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Fasilitas Kami</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex align-items-center">
-                                <i class="bi bi-check-circle text-primary me-2"></i>
-                                <span>Pengiriman Cepat</span>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <i class="bi bi-check-circle text-primary me-2"></i>
-                                <span>Pelayanan Pelanggan 24/7</span>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <i class="bi bi-check-circle text-primary me-2"></i>
-                                <span>Garansi 1 Tahun</span>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <i class="bi bi-check-circle text-primary me-2"></i>
-                                <span>Pembayaran Aman</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Testimoni Pelanggan</h5>
                     </div>
                     <div class="card-body">
