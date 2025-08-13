@@ -88,6 +88,9 @@
                                 <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
                                         <i class="bi bi-box-seam me-2"></i>Inventaris
                                     </a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.sales.index') }}">
+                                        <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
+                                    </a></li>
 
                                 <li>
                                     <hr class="dropdown-divider">

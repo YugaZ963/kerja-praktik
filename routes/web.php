@@ -340,3 +340,10 @@ Route::prefix('admin/orders')->middleware('admin')->group(function () {
     Route::post('/{order}/delivery-proof', [\App\Http\Controllers\Admin\OrderController::class, 'uploadDeliveryProof'])->name('admin.orders.upload-delivery-proof');
     Route::delete('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
 });
+
+// Sales Report Routes
+Route::prefix('admin/sales')->name('admin.sales.')->middleware(['auth'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\SalesReportController::class, 'index'])->name('index');
+    Route::get('/export-pdf', [\App\Http\Controllers\Admin\SalesReportController::class, 'exportPdf'])->name('export-pdf');
+    Route::get('/data', [\App\Http\Controllers\Admin\SalesReportController::class, 'getData'])->name('data');
+});

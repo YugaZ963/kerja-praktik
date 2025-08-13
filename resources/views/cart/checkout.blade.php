@@ -54,11 +54,11 @@
                                 <label class="form-label">Metode Pembayaran *</label>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="card payment-option" data-payment="bri">
+                                        <div class="card payment-option" data-payment="bri" onclick="selectPayment('bri')">
                                             <div class="card-body text-center">
                                                 <input type="radio" name="payment_method" value="bri" id="payment_bri" 
-                                                       class="form-check-input me-2" {{ old('payment_method') == 'bri' ? 'checked' : '' }} required>
-                                                <label for="payment_bri" class="form-check-label">
+                                                       class="form-check-input" {{ old('payment_method') == 'bri' ? 'checked' : '' }} required>
+                                                <label for="payment_bri" class="form-check-label w-100">
                                                     <i class="bi bi-bank text-primary fs-2 d-block mb-2"></i>
                                                     <strong>Bank BRI</strong>
                                                     <small class="d-block text-muted">Transfer Bank</small>
@@ -67,11 +67,11 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="card payment-option" data-payment="dana">
+                                        <div class="card payment-option" data-payment="dana" onclick="selectPayment('dana')">
                                             <div class="card-body text-center">
                                                 <input type="radio" name="payment_method" value="dana" id="payment_dana" 
-                                                       class="form-check-input me-2" {{ old('payment_method') == 'dana' ? 'checked' : '' }} required>
-                                                <label for="payment_dana" class="form-check-label">
+                                                       class="form-check-input" {{ old('payment_method') == 'dana' ? 'checked' : '' }} required>
+                                                <label for="payment_dana" class="form-check-label w-100">
                                                     <i class="bi bi-wallet2 text-success fs-2 d-block mb-2"></i>
                                                     <strong>DANA</strong>
                                                     <small class="d-block text-muted">E-Wallet</small>

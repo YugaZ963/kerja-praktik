@@ -50,21 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Phone number formatting
+    // Phone number formatting - allow user to input without auto prefix
     const phoneInput = document.getElementById('phone');
     if (phoneInput) {
         phoneInput.addEventListener('input', function() {
+            // Only remove non-numeric characters, don't add prefix automatically
             let value = this.value.replace(/\D/g, '');
-            
-            // Convert 08xx to 628xx
-            if (value.startsWith('08')) {
-                value = '62' + value.substring(1);
-            }
-            // Add 62 prefix if not present
-            else if (!value.startsWith('62') && value.length > 0) {
-                value = '62' + value;
-            }
-            
             this.value = value;
         });
     }
@@ -134,3 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Checkout script initialization complete');
 });
+
+// Function to handle payment method selection when clicking anywhere on the card
+function selectPayment(method) {
+    const radioButton = document.getElementById('payment_' + method);
+    if (radioButton) {
+        radioButton.checked = true;
+        radioButton.dispatchEvent(new Event('change'));
+    }
+}

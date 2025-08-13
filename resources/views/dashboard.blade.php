@@ -71,6 +71,19 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-graph-up display-4 text-success mb-3"></i>
+                                            <h5>Laporan Penjualan</h5>
+                                            <p class="text-muted">Analisis revenue dan performa penjualan</p>
+                                            <a href="{{ route('admin.sales.index') }}" class="btn btn-success">
+                                                <i class="bi bi-arrow-right me-1"></i>
+                                                Lihat Laporan
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         @else
                             <div class="alert alert-warning">
