@@ -1,0 +1,144 @@
+@startuml Use_Case_Diagram_RAVAZKA
+!theme plain
+title Use Case Diagram - Sistem Manajemen Inventaris Seragam Sekolah (RAVAZKA)
+
+' Actors
+actor "Guest User" as Guest
+actor "Customer" as Customer
+actor "Admin" as Admin
+actor "System" as System
+
+' System Boundary
+rectangle "RAVAZKA System" {
+  
+  ' Authentication Use Cases
+  package "Authentication" {
+    usecase "Login" as UC001
+    usecase "Register" as UC002
+    usecase "Logout" as UC003
+  }
+  
+  ' Admin Use Cases
+  package "Admin Features" {
+    usecase "Manage Inventory" as UC004
+    usecase "Manage Products" as UC005
+    usecase "Manage Orders" as UC006
+    usecase "Generate Sales Report" as UC007
+    usecase "Monitor Stock" as UC008
+    usecase "Export to PDF" as UC007a
+    usecase "Export to Excel" as UC007b
+  }
+  
+  ' Customer Use Cases
+  package "Customer Features" {
+    usecase "Browse Products" as UC009
+    usecase "View Product Details" as UC010
+    usecase "Add to Cart" as UC011
+    usecase "Manage Cart" as UC012
+    usecase "Checkout Process" as UC013
+    usecase "Track Order" as UC015
+    usecase "Mark Order as Completed" as UC016
+    usecase "Submit Testimonial" as UC017
+  }
+  
+  ' System Use Cases
+  package "System Features" {
+    usecase "WhatsApp Integration" as UC014
+    usecase "Persistent Cart" as UC018
+    usecase "Stock Management" as UC019
+    usecase "Session Management" as UC020
+  }
+}
+
+' External Systems
+actor "WhatsApp API" as WhatsApp
+actor "Payment System" as Payment
+
+' Actor Relationships
+Guest --|> Customer : <<register/login>>
+Customer --|> Admin : <<role elevation>>
+
+' Guest User Use Cases
+Guest --> UC009
+Guest --> UC010
+Guest --> UC011
+Guest --> UC002
+
+' Customer Use Cases
+Customer --> UC001
+Customer --> UC003
+Customer --> UC009
+Customer --> UC010
+Customer --> UC011
+Customer --> UC012
+Customer --> UC013
+Customer --> UC015
+Customer --> UC016
+Customer --> UC017
+
+' Admin Use Cases
+Admin --> UC001
+Admin --> UC003
+Admin --> UC004
+Admin --> UC005
+Admin --> UC006
+Admin --> UC007
+Admin --> UC008
+Admin --> UC009
+Admin --> UC010
+
+' System Use Cases
+System --> UC018
+System --> UC019
+System --> UC020
+
+' Include Relationships
+UC013 ..> UC014 : <<include>>
+UC007 ..> UC007a : <<include>>
+UC007 ..> UC007b : <<include>>
+UC011 ..> UC018 : <<include>>
+UC013 ..> UC019 : <<include>>
+
+' Extend Relationships
+UC017 ..> UC016 : <<extend>>
+UC018 ..> UC011 : <<extend>>
+UC019 ..> UC013 : <<extend>>
+
+' External System Connections
+UC014 --> WhatsApp : <<uses>>
+UC013 --> Payment : <<uses>>
+
+' Notes
+note right of UC013
+  Checkout process includes:
+  - Customer data input
+  - Payment method selection
+  - Order confirmation
+  - WhatsApp integration
+end note
+
+note right of UC007
+  Sales reports include:
+  - Revenue analysis
+  - Order statistics
+  - Product performance
+  - Export capabilities
+end note
+
+note right of UC018
+  Persistent cart features:
+  - Session-based for guests
+  - User-based for logged users
+  - Auto-merge on login
+  - Cleared after checkout
+end note
+
+note bottom of Admin
+  Admin has full access to:
+  - All customer features
+  - Administrative functions
+  - System management
+  - Reports and analytics
+end note
+
+@enduml

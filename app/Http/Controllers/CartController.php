@@ -151,6 +151,7 @@ class CartController extends Controller
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'payment_method' => 'required|string|in:bri,dana',
+            'shipping_method' => 'required|string|in:reguler,express',
             'notes' => 'nullable|string|max:500'
         ]);
 
@@ -169,7 +170,7 @@ class CartController extends Controller
 
             // Hitung total
             $subtotal = $cartItems->sum('total');
-            $shippingCost = 0;
+            $shippingCost = $validated['shipping_method'] === 'express' ? 15000 : 0;
             $totalAmount = $subtotal + $shippingCost;
 
             // Buat order
@@ -181,6 +182,7 @@ class CartController extends Controller
                 'customer_address' => $validated['address'],
                 'notes' => $validated['notes'] ?? null,
                 'payment_method' => $validated['payment_method'],
+                'shipping_method' => $validated['shipping_method'],
                 'subtotal' => $subtotal,
                 'shipping_cost' => $shippingCost,
                 'total_amount' => $totalAmount,
@@ -272,9 +274,18 @@ class CartController extends Controller
             $message .= "  Subtotal: Rp " . number_format($itemSubtotal, 0, ',', '.') . "\n\n";
         }
 
-        $total = $subtotal;
+        // Hitung shipping cost
+        $shippingCost = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 15000 : 0;
+        $total = $subtotal + $shippingCost;
 
         $message .= "💰 *Ringkasan Biaya:*\n";
+        $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        $message .= "Subtotal: Rp " . number_format($subtotal, 0, ',', '.') . "\n";
+        
+        // Tampilkan informasi pengiriman
+        $shippingLabel = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 'Express (1-2 hari)' : 'Reguler (3-5 hari)';
+        $message .= "Pengiriman ({$shippingLabel}): Rp " . number_format($shippingCost, 0, ',', '.') . "\n";
+        
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "*TOTAL: Rp " . number_format($total, 0, ',', '.') . "*\n\n";
 
@@ -282,6 +293,10 @@ class CartController extends Controller
         $message .= "Nama: {$customerData['name']}\n";
         $message .= "No. HP: {$customerData['phone']}\n";
         $message .= "Alamat: {$customerData['address']}\n";
+        
+        // Tampilkan metode pengiriman
+        $shippingMethodLabel = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 'Express (1-2 hari)' : 'Reguler (3-5 hari)';
+        $message .= "Metode Pengiriman: {$shippingMethodLabel}\n";
 
         if (!empty($customerData['notes'])) {
             $message .= "Catatan: {$customerData['notes']}\n";

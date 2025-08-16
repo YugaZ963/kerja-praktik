@@ -135,6 +135,122 @@
         @endif
     </div>
 
+    <style>
+        /* Cart Responsive Styles */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .bg-light.p-4 {
+                padding: 1.5rem !important;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .border-bottom.p-3 {
+                padding: 1rem !important;
+            }
+            
+            .row.align-items-center {
+                text-align: center;
+            }
+            
+            .col-md-2, .col-md-4, .col-md-3, .col-md-3 {
+                margin-bottom: 0.75rem;
+            }
+            
+            .col-md-2 img {
+                max-width: 80px;
+                height: auto;
+            }
+            
+            .btn-group {
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .btn-group .btn {
+                flex: 1;
+                max-width: 40px;
+            }
+            
+            .btn-group .form-control {
+                max-width: 60px;
+                text-align: center;
+            }
+            
+            .btn-sm {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .h3 {
+                font-size: 1.5rem;
+            }
+            
+            .display-1 {
+                font-size: 3rem;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card.mt-3 {
+                margin-top: 1rem !important;
+            }
+            
+            .text-end {
+                text-align: center !important;
+            }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .bg-light.p-4 {
+                padding: 2rem !important;
+            }
+            
+            .card-body {
+                padding: 1.25rem;
+            }
+            
+            .col-md-2 img {
+                max-width: 100px;
+                height: auto;
+            }
+            
+            .btn-group {
+                justify-content: center;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 992px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .col-lg-8 {
+                flex: 0 0 auto;
+                width: 65%;
+            }
+            
+            .col-lg-4 {
+                flex: 0 0 auto;
+                width: 35%;
+            }
+        }
+    </style>
+
     <script>
         function increaseQuantity(itemId, maxStock) {
             const input = document.getElementById('quantity-' + itemId);

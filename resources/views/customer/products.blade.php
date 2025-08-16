@@ -144,4 +144,165 @@
             {{ $products->withQueryString()->links('pagination::bootstrap-5') }}
         </div>
     </div>
+
+    <style>
+        /* Products Page Responsive Styles */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 2rem !important;
+            }
+            
+            .display-5 {
+                font-size: 1.8rem;
+            }
+            
+            .lead {
+                font-size: 1rem;
+            }
+            
+            .input-group-lg .form-control {
+                font-size: 0.9rem;
+            }
+            
+            .input-group-lg .btn {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .row.align-items-end.g-3 {
+                margin-bottom: 1rem;
+            }
+            
+            .col-md-2, .col-md-3 {
+                margin-bottom: 0.75rem;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .form-select, .form-control {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .col-lg-3, .col-md-4, .col-sm-6 {
+                margin-bottom: 1rem;
+            }
+            
+            .card {
+                height: auto;
+            }
+            
+            .card-img-top {
+                height: 180px;
+                object-fit: cover;
+            }
+            
+            .card-title {
+                font-size: 0.95rem;
+            }
+            
+            .text-muted {
+                font-size: 0.8rem;
+            }
+            
+            .fw-bold.text-primary {
+                font-size: 1rem;
+            }
+            
+            .btn-sm {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.5rem;
+            }
+            
+            .bi {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 3rem !important;
+            }
+            
+            .display-5 {
+                font-size: 2.2rem;
+            }
+            
+            .col-md-2, .col-md-3 {
+                flex: 0 0 auto;
+                width: 50%;
+                margin-bottom: 0.75rem;
+            }
+            
+            .col-lg-3, .col-md-4 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+            
+            .card-img-top {
+                height: 200px;
+                object-fit: cover;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 992px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .col-md-2 {
+                flex: 0 0 auto;
+                width: 20%;
+            }
+            
+            .col-md-3 {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+            
+            .col-lg-3 {
+                flex: 0 0 auto;
+                width: 33.333333%;
+            }
+            
+            .card-img-top {
+                height: 220px;
+                object-fit: cover;
+            }
+        }
+        
+        @media (min-width: 993px) and (max-width: 1200px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .col-lg-3 {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+            
+            .card-img-top {
+                height: 240px;
+                object-fit: cover;
+            }
+        }
+    </style>
 @endsection

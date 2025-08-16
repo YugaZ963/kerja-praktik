@@ -16,6 +16,7 @@ class Order extends Model
         'customer_address',
         'notes',
         'payment_method',
+        'shipping_method',
         'subtotal',
         'shipping_cost',
         'total_amount',
@@ -86,6 +87,16 @@ class Order extends Model
     public function getPaymentMethodLabel()
     {
         return $this->payment_method === 'bri' ? 'Bank BRI' : 'DANA E-Wallet';
+    }
+
+    public function getShippingMethodLabelAttribute()
+    {
+        return $this->shipping_method === 'reguler' ? 'Reguler (3-5 hari)' : 'Express (1-2 hari)';
+    }
+
+    public function getShippingMethodLabel()
+    {
+        return $this->shipping_method === 'reguler' ? 'Reguler (3-5 hari)' : 'Express (1-2 hari)';
     }
 
     // Relationships

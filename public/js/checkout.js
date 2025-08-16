@@ -134,3 +134,34 @@ function selectPayment(method) {
         radioButton.dispatchEvent(new Event('change'));
     }
 }
+
+// Function to handle shipping method selection when clicking anywhere on the card
+function selectShipping(method) {
+    const radioButton = document.getElementById('shipping_' + method);
+    if (radioButton) {
+        radioButton.checked = true;
+        radioButton.dispatchEvent(new Event('change'));
+    }
+}
+
+// Function to update shipping cost and total
+function updateShippingCost(subtotal) {
+    const shippingMethod = document.querySelector('input[name="shipping_method"]:checked');
+    const shippingCostDisplay = document.getElementById('shipping-cost-display');
+    const totalAmountDisplay = document.getElementById('total-amount-display');
+    
+    if (shippingMethod && shippingCostDisplay && totalAmountDisplay) {
+        let shippingCost = 0;
+        let shippingText = 'Gratis';
+        
+        if (shippingMethod.value === 'express') {
+            shippingCost = 15000;
+            shippingText = 'Rp 15.000';
+        }
+        
+        const totalAmount = subtotal + shippingCost;
+        
+        shippingCostDisplay.textContent = shippingText;
+        totalAmountDisplay.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalAmount);
+    }
+}

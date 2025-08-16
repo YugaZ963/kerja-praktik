@@ -94,7 +94,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'sometimes|in:admin,user',
         ]);
 
         if ($validator->fails()) {
@@ -107,7 +106,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'user', // Default to 'user' if not specified
+            'role' => 'user', // Semua registrasi baru otomatis menjadi user/customer
         ]);
 
         Auth::login($user);
@@ -116,11 +115,7 @@ class AuthController extends Controller
         $sessionId = Session::getId();
         Cart::mergeSessionToUser($user->id, $sessionId);
 
-        // Redirect berdasarkan role user
-        if ($user->isAdmin()) {
-            return redirect('/dashboard')->with('success', 'Registrasi berhasil! Selamat datang Admin, ' . $user->name . '!');
-        }
-        
+        // Semua user baru diarahkan ke halaman utama sebagai customer
         return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name . '!');
     }
 

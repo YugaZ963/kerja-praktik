@@ -98,6 +98,41 @@
                                 </div>
                             </div>
                             
+                            <!-- Metode Ongkir -->
+                            <div class="mb-3">
+                                <label class="form-label">Metode Pengiriman *</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card shipping-option" data-shipping="reguler" onclick="selectShipping('reguler')">
+                                            <div class="card-body text-center">
+                                                <input type="radio" name="shipping_method" value="reguler" id="shipping_reguler" 
+                                                       class="form-check-input" {{ old('shipping_method', 'reguler') == 'reguler' ? 'checked' : '' }} required>
+                                                <label for="shipping_reguler" class="form-check-label w-100">
+                                                    <i class="bi bi-truck text-primary fs-2 d-block mb-2"></i>
+                                                    <strong>Reguler</strong>
+                                                    <small class="d-block text-muted">3-5 hari kerja</small>
+                                                    <small class="d-block text-success fw-bold">Gratis Ongkir</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card shipping-option" data-shipping="express" onclick="selectShipping('express')">
+                                            <div class="card-body text-center">
+                                                <input type="radio" name="shipping_method" value="express" id="shipping_express" 
+                                                       class="form-check-input" {{ old('shipping_method') == 'express' ? 'checked' : '' }} required>
+                                                <label for="shipping_express" class="form-check-label w-100">
+                                                    <i class="bi bi-lightning-charge text-warning fs-2 d-block mb-2"></i>
+                                                    <strong>Express</strong>
+                                                    <small class="d-block text-muted">1-2 hari kerja</small>
+                                                    <small class="d-block text-warning fw-bold">+ Rp 15.000</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="notes" class="form-label">Catatan Tambahan</label>
                                 <textarea class="form-control" id="notes" name="notes" rows="2" 
@@ -150,11 +185,16 @@
                             <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
                         </div>
                         
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ongkos Kirim</span>
+                            <span id="shipping-cost-display">Gratis</span>
+                        </div>
+                        
                         <hr>
                         
                         <div class="d-flex justify-content-between">
                             <strong>Total Pembayaran</strong>
-                            <strong class="text-primary">Rp {{ number_format($total, 0, ',', '.') }}</strong>
+                            <strong class="text-primary" id="total-amount-display">Rp {{ number_format($total, 0, ',', '.') }}</strong>
                         </div>
                         
 
@@ -175,24 +215,159 @@
     </div>
 
 <style>
-.payment-option {
+.payment-option, .shipping-option {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid #e9ecef;
 }
 
-.payment-option:hover {
+.payment-option:hover, .shipping-option:hover {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-.payment-option.selected {
+.payment-option.selected, .shipping-option.selected {
     border-color: #0d6efd;
     background-color: #f8f9fa;
+}
+
+/* Checkout Responsive Styles */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .bg-light.p-4 {
+        padding: 1.5rem !important;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-option, .shipping-option {
+        margin-bottom: 0.75rem;
+    }
+    
+    .payment-option .card-body, .shipping-option .card-body {
+        padding: 0.75rem;
+    }
+    
+    .row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .form-control, .form-select {
+        font-size: 0.9rem;
+    }
+    
+    .h3 {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card.mt-3 {
+        margin-top: 1rem !important;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .bg-light.p-4 {
+        padding: 2rem !important;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .d-flex.justify-content-between .btn {
+        min-width: 150px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+    .container {
+        max-width: 720px;
+    }
+    
+    .col-lg-8 {
+        flex: 0 0 auto;
+        width: 65%;
+    }
+    
+    .col-lg-4 {
+        flex: 0 0 auto;
+        width: 35%;
+    }
 }
 </style>
 
 <!-- Load checkout specific JavaScript -->
 <script src="{{ asset('js/checkout.js') }}"></script>
+
+<script>
+// Initialize shipping method event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const subtotal = {{ $total }};
+    
+    // Add event listeners for shipping method changes
+    const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
+    shippingRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateShippingCost(subtotal);
+            
+            // Update card styling
+            document.querySelectorAll('.shipping-option').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`[data-shipping="${this.value}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+        });
+    });
+    
+    // Initialize with default selection
+    updateShippingCost(subtotal);
+    
+    // Set initial selected state
+    const checkedShipping = document.querySelector('input[name="shipping_method"]:checked');
+    if (checkedShipping) {
+        const selectedCard = document.querySelector(`[data-shipping="${checkedShipping.value}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+    }
+});
+</script>
 
 @endsection

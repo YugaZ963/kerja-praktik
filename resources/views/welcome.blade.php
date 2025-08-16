@@ -95,4 +95,136 @@
 
 
     </div>
+
+    <style>
+        /* Welcome Page Responsive Styles */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 2rem !important;
+            }
+            
+            .display-5 {
+                font-size: 1.8rem;
+            }
+            
+            .lead {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+            
+            .row.align-items-center {
+                text-align: center;
+            }
+            
+            .col-md-6 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .img-fluid {
+                max-width: 80%;
+                height: auto;
+            }
+            
+            .col-md-4 {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body.p-4 {
+                padding: 1.5rem !important;
+            }
+            
+            .fs-1 {
+                font-size: 2rem !important;
+            }
+            
+            .h5, h5 {
+                font-size: 1.1rem;
+            }
+            
+            .text-muted {
+                font-size: 0.9rem;
+            }
+            
+            .btn-sm {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
+            .col-md-8, .col-md-4 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 3rem !important;
+            }
+            
+            .display-5 {
+                font-size: 2.2rem;
+            }
+            
+            .col-md-4 {
+                flex: 0 0 auto;
+                width: 50%;
+                margin-bottom: 1rem;
+            }
+            
+            .col-md-6 {
+                margin-bottom: 1rem;
+            }
+            
+            .col-md-8 {
+                flex: 0 0 auto;
+                width: 100%;
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 992px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .col-md-4 {
+                flex: 0 0 auto;
+                width: 33.333333%;
+            }
+            
+            .col-md-6 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+            
+            .col-md-8 {
+                flex: 0 0 auto;
+                width: 66.666667%;
+            }
+        }
+        
+        @media (min-width: 993px) and (max-width: 1200px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+    </style>
 @endsection

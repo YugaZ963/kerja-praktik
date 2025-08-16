@@ -56,27 +56,7 @@
                         @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="role" class="form-label">
-                            <i class="bi bi-shield-check me-1"></i>
-                            Role
-                        </label>
-                        <select id="role" name="role" class="form-select form-select-lg @error('role') is-invalid @enderror">
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User/Pelanggan</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        </select>
-                        @error('role')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                        <div class="form-text">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Pilih "Admin" untuk akses penuh ke sistem inventaris
-                            </small>
-                        </div>
-                    </div>
+
 
                     <div class="mb-4">
                         <label for="password" class="form-label">

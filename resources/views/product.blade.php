@@ -79,6 +79,143 @@
         </div>
     </div>
     </div>
+
+    <style>
+        /* Product Detail Page Responsive Styles */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 2rem !important;
+            }
+            
+            .display-5 {
+                font-size: 1.8rem;
+            }
+            
+            .lead {
+                font-size: 1rem;
+            }
+            
+            .row.mb-5 {
+                margin-bottom: 2rem !important;
+            }
+            
+            .col-md-5, .col-md-7 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .card-img-top {
+                height: 250px !important;
+                object-fit: cover;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem !important;
+            }
+            
+            h3.text-primary {
+                font-size: 1.3rem;
+                margin-bottom: 1rem !important;
+            }
+            
+            h5 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .badge {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+                width: 100%;
+            }
+            
+            .btn-outline-secondary {
+                margin-bottom: 0.5rem;
+            }
+            
+            .mb-3 {
+                margin-bottom: 1rem !important;
+            }
+            
+            .mb-4 {
+                margin-bottom: 1.5rem !important;
+            }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .bg-light.p-5 {
+                padding: 3rem !important;
+            }
+            
+            .display-5 {
+                font-size: 2.2rem;
+            }
+            
+            .col-md-5, .col-md-7 {
+                margin-bottom: 1rem;
+            }
+            
+            .card-img-top {
+                height: 300px !important;
+                object-fit: cover;
+            }
+            
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            h3.text-primary {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 992px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .col-md-5 {
+                flex: 0 0 auto;
+                width: 45%;
+            }
+            
+            .col-md-7 {
+                flex: 0 0 auto;
+                width: 55%;
+            }
+            
+            .card-img-top {
+                height: 350px !important;
+                object-fit: cover;
+            }
+        }
+        
+        @media (min-width: 993px) and (max-width: 1200px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .card-img-top {
+                height: 400px !important;
+                object-fit: cover;
+            }
+        }
+    </style>
 @endsection
 
 @push('scripts')
