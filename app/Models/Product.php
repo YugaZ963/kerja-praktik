@@ -16,7 +16,8 @@ class Product extends Model
         'stock',
         'size',
         'category',
-        'inventory_id'
+        'inventory_id',
+        'image'
     ];
 
     // Relasi dengan inventory

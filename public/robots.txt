@@ -1,2 +1,36 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /products
+Allow: /products/*
+Allow: /contact
+Allow: /about
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /customer/orders
+Disallow: /customer/orders/*
+Disallow: /customer/profile
+Disallow: /customer/profile/*
+Disallow: /login
+Disallow: /register
+Disallow: /password
+Disallow: /password/*
+
+# Disallow API endpoints
+Disallow: /api
+Disallow: /api/*
+
+# Disallow storage and uploads
+Disallow: /storage
+Disallow: /storage/*
+
+# Allow important files
+Allow: /sitemap.xml
+Allow: /favicon.ico
+
+# Sitemap location
+Sitemap: https://ravazka.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

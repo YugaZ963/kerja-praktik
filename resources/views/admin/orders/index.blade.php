@@ -397,11 +397,11 @@
     :root {
         --primary-color: #0d6efd;
         --secondary-color: #6b7280;
-        --success-color: #0d9d17;
-        --warning-color: #fbdd15;
-        --danger-color: #ca2068;
+        --success-color: #0d6efd;
+        --warning-color: #fcdf10;
+        --danger-color: #cb2368;
         --info-color: #0d6efd;
-        --purple-color: #ca2068;
+        --purple-color: #cb2368;
         --light-bg: #f8fafc;
         --white: #ffffff;
         --text-dark: #1f2937;

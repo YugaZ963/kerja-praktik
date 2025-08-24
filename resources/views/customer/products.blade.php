@@ -112,7 +112,7 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="position-relative">
-                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}"
+                            <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}"
                                 class="card-img-top" alt="{{ $product->name }}" style="height:200px;object-fit:cover;">
                             @if ($product->stock <= 5 && $product->stock > 0)
                                 <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Stok

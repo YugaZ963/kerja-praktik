@@ -1,21 +1,18 @@
 /* Custom Color Scheme - Ravazka */
 :root {
-    /* Primary Color Palette */
-    --primary-green: #0d9d17;
+    /* Primary Color Palette - Updated */
     --primary-blue: #0d6efd;
-    --primary-pink: #ca2068;
-    --primary-yellow: #fbdd15;
+    --primary-pink: #cb2368;
+    --primary-yellow: #fcdf10;
     --primary-white: #fff;
     
     /* Derived Colors */
-    --primary-green-light: rgba(13, 157, 23, 0.1);
-    --primary-green-dark: #0a7a13;
     --primary-blue-light: rgba(13, 110, 253, 0.1);
     --primary-blue-dark: #0a58ca;
-    --primary-pink-light: rgba(202, 32, 104, 0.1);
+    --primary-pink-light: rgba(203, 35, 104, 0.1);
     --primary-pink-dark: #a11d52;
-    --primary-yellow-light: rgba(251, 221, 21, 0.1);
-    --primary-yellow-dark: #c9b012;
+    --primary-yellow-light: rgba(252, 223, 16, 0.1);
+    --primary-yellow-dark: #d4b914;
     
     /* Text Colors */
     --text-dark: #1f2937;
@@ -26,6 +23,11 @@
     --bg-light: #f8fafc;
     --bg-gray: #f1f5f9;
     --border-color: #e5e7eb;
+    
+    /* Success/Green alternative using blue */
+    --success-color: var(--primary-blue);
+    --success-light: var(--primary-blue-light);
+    --success-dark: var(--primary-blue-dark);
     
     /* Shadow */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -54,14 +56,14 @@ body {
 }
 
 .btn-success {
-    background-color: var(--primary-green);
-    border-color: var(--primary-green);
+    background-color: var(--success-color);
+    border-color: var(--success-color);
     color: var(--primary-white);
 }
 
 .btn-success:hover {
-    background-color: var(--primary-green-dark);
-    border-color: var(--primary-green-dark);
+    background-color: var(--success-dark);
+    border-color: var(--success-dark);
     color: var(--primary-white);
 }
 
@@ -101,13 +103,13 @@ body {
 }
 
 .btn-outline-success {
-    color: var(--primary-green);
-    border-color: var(--primary-green);
+    color: var(--success-color);
+    border-color: var(--success-color);
 }
 
 .btn-outline-success:hover {
-    background-color: var(--primary-green);
-    border-color: var(--primary-green);
+    background-color: var(--success-color);
+    border-color: var(--success-color);
     color: var(--primary-white);
 }
 
@@ -117,7 +119,7 @@ body {
 }
 
 .text-success {
-    color: var(--primary-green) !important;
+    color: var(--success-color) !important;
 }
 
 .text-warning {
@@ -139,7 +141,7 @@ body {
 }
 
 .bg-success {
-    background-color: var(--primary-green) !important;
+    background-color: var(--success-color) !important;
     color: var(--primary-white) !important;
 }
 
@@ -210,7 +212,7 @@ body {
 }
 
 .badge.bg-success {
-    background-color: var(--primary-green) !important;
+    background-color: var(--success-color) !important;
 }
 
 .badge.bg-warning {
@@ -230,9 +232,9 @@ body {
 }
 
 .alert-success {
-    background-color: var(--primary-green-light);
-    border-color: var(--primary-green);
-    color: var(--primary-green-dark);
+    background-color: var(--success-light);
+    border-color: var(--success-color);
+    color: var(--success-dark);
 }
 
 .alert-warning {
@@ -266,7 +268,7 @@ footer {
 
 /* Custom Components */
 .hero-section {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-pink) 100%);
     color: var(--primary-white);
     padding: 2rem 0;
     margin-bottom: 2rem;
@@ -309,8 +311,8 @@ footer {
 }
 
 .status-active {
-    background-color: var(--primary-green-light);
-    color: var(--primary-green);
+    background-color: var(--success-light);
+    color: var(--success-color);
 }
 
 .status-low {
@@ -341,8 +343,8 @@ footer {
 }
 
 .card-icon.success {
-    background-color: var(--primary-green-light);
-    color: var(--primary-green);
+    background-color: var(--success-light);
+    color: var(--success-color);
 }
 
 .card-icon.warning {
@@ -358,7 +360,7 @@ footer {
 /* Price Formatting */
 .price-format {
     font-weight: 600;
-    color: var(--primary-green);
+    color: var(--success-color);
 }
 
 /* Animation Utilities */

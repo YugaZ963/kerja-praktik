@@ -6,15 +6,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>UKM Seragam Sekolah @yield('title')</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>{{ $seoData['title'] ?? $title ?? 'UKM Seragam Sekolah' }}@yield('title')</title>
+    <meta name="description" content="{{ $seoData['description'] ?? 'UKM Seragam Sekolah - Toko Seragam Sekolah Terpercaya' }}">
+    <meta name="keywords" content="{{ $seoData['keywords'] ?? 'seragam sekolah, baju sekolah, UKM Seragam' }}">
+    <meta name="author" content="{{ $seoData['author'] ?? 'UKM Seragam Sekolah Team' }}">
+    <meta name="robots" content="{{ $seoData['robots'] ?? 'index, follow' }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ $seoData['canonical'] ?? request()->url() }}">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{ $seoData['title'] ?? $title ?? 'UKM Seragam Sekolah' }}">
+    <meta property="og:description" content="{{ $seoData['description'] ?? 'UKM Seragam Sekolah - Toko Seragam Sekolah Terpercaya' }}">
+    <meta property="og:image" content="{{ $seoData['image'] ?? asset('images/ukm-seragam.jpg') }}">
+    <meta property="og:url" content="{{ $seoData['url'] ?? request()->url() }}">
+    <meta property="og:type" content="{{ $seoData['type'] ?? 'website' }}">
+    <meta property="og:site_name" content="{{ $seoData['site_name'] ?? 'UKM Seragam Sekolah' }}">
+    <meta property="og:locale" content="{{ $seoData['locale'] ?? 'id_ID' }}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seoData['title'] ?? $title ?? 'UKM Seragam Sekolah' }}">
+    <meta name="twitter:description" content="{{ $seoData['description'] ?? 'UKM Seragam Sekolah - Toko Seragam Sekolah Terpercaya' }}">
+    <meta name="twitter:image" content="{{ $seoData['image'] ?? asset('images/ukm-seragam.jpg') }}">
+    
+    <!-- Structured Data -->
+    @if(isset($seoData['structured_data']))
+    <script type="application/ld+json">
+    {!! json_encode($seoData['structured_data'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+     <link rel="stylesheet" href="{{ asset('css/seo.css') }}">
     @stack('styles')
 </head>
 
 <body>
-    <div class="container">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    
+    <div class="container" id="main-content">
         {{-- @include('partials.alerts') --}}
         @yield('content')
     </div>

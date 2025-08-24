@@ -10,22 +10,60 @@ Dokumentasi ini menjelaskan struktur dan penggunaan assets dalam proyek RAVAZKA,
 public/
 ├── css/
 │   ├── app.css          # Main application styles
-│   └── custom.css        # Custom RAVAZKA styles
+│   ├── custom.css        # Custom RAVAZKA styles
+│   └── seo.css          # SEO optimization styles
 ├── js/
 │   ├── app.js           # Empty main JS file
 │   ├── checkout.js      # Checkout functionality
 │   └── main.js          # Customer-facing JavaScript
 ├── images/
-│   ├── celana-pj-sd.png
-│   ├── kemeja-sd-pdk.png
-│   ├── kemeja-sma-pdk.png
-│   ├── kemeja-smp-pdk.png
-│   ├── logo1.jpeg
-│   ├── logo2.jpeg
-│   ├── logo3.jpg
-│   ├── ravazka.jpg
-│   ├── rok-pj-sd-merah.png
-│   └── topi-sd.png
+│   ├── Product Images (Seragam Sekolah):
+│   │   ├── kemeja-sd-pdk.png        # Kemeja SD pendek
+│   │   ├── kemeja-sd-pj.png         # Kemeja SD panjang
+│   │   ├── kemeja-smp-pdk.png       # Kemeja SMP pendek
+│   │   ├── kemeja-smp-pj.png        # Kemeja SMP panjang
+│   │   ├── kemeja-sma-pdk.png       # Kemeja SMA pendek
+│   │   ├── kemeja-sma-pj.png        # Kemeja SMA panjang
+│   │   ├── celana-pj-sd.png         # Celana panjang SD
+│   │   ├── celana-pj-smp.png        # Celana panjang SMP
+│   │   ├── celana-pj-sma.png        # Celana panjang SMA
+│   │   ├── rok-pj-sd-merah.png      # Rok panjang SD merah
+│   │   ├── rok-pj-sd-coklat.png     # Rok panjang SD coklat
+│   │   ├── rok-pj-sd-hijau.png      # Rok panjang SD hijau
+│   │   ├── rok-pj-sd-hitam.png      # Rok panjang SD hitam
+│   │   ├── rok-pj-sd-putih.png      # Rok panjang SD putih
+│   │   ├── topi-sd.png              # Topi SD
+│   │   ├── topi-smp.png             # Topi SMP
+│   │   ├── topi-sma.png             # Topi SMA
+│   │   ├── sabuk-sd.png             # Sabuk SD
+│   │   ├── sabuk-smp.png            # Sabuk SMP
+│   │   └── sabuk-sma.png            # Sabuk SMA
+│   ├── Celana Variations:
+│   │   ├── celana-sd-coklat.png     # Celana SD coklat
+│   │   ├── celana-sd-hijau.png      # Celana SD hijau
+│   │   ├── celana-sd-hitam.png      # Celana SD hitam
+│   │   ├── celana-sd-putih.png      # Celana SD putih
+│   │   ├── celana-pj-smp-biru-2.png # Celana SMP biru variant
+│   │   ├── celana-pj-smp-sma-coklat.png
+│   │   ├── celana-pj-smp-sma-hijau.png
+│   │   ├── celana-pj-smp-sma-hitam.png
+│   │   ├── celana-pj-smp-sma-putih.png
+│   │   ├── celana-pdl-coklat.png    # Celana PDL coklat
+│   │   └── celana-pdl-hitam.png     # Celana PDL hitam
+│   ├── Pramuka Collection:
+│   │   ├── Kemeja-PJ-Pramuka.png    # Kemeja panjang pramuka
+│   │   ├── Kemeja-pj-sd.png         # Kemeja panjang SD pramuka
+│   │   ├── kemeja-pramuka-siaga-pdk.png
+│   │   ├── kemeja-pramuka-siaga-pdk-2.png
+│   │   ├── kemeja-pramuka-siaga-pdk(beta).png
+│   │   ├── Kerudung-pramuka.png     # Kerudung pramuka
+│   │   ├── Sabuk.png                # Sabuk pramuka
+│   │   └── Topi.png                 # Topi pramuka
+│   └── Brand Assets:
+│       ├── logo1.jpeg               # Logo variant 1
+│       ├── logo2.jpeg               # Logo variant 2
+│       ├── logo3.jpg                # Logo variant 3
+│       └── ravazka.jpg              # Main brand image
 ├── favicon.ico
 ├── index.php
 └── robots.txt
@@ -119,7 +157,49 @@ resources/
 - **Slide Up**: Upward slide animations
 - **Hover Effects**: Interactive element feedback
 
-### 3. Tailwind CSS Integration
+### 3. seo.css (SEO Optimization)
+- **Location**: `public/css/seo.css`
+- **Size**: 243 lines
+- **Purpose**: SEO-focused styling dan performance optimization
+
+#### Key Features:
+- **Breadcrumb Navigation**: SEO-friendly navigation styling
+- **Image Optimization**: Lazy loading, responsive images, hover effects
+- **Content Structure**: Semantic heading hierarchy (H1-H3)
+- **Product Cards**: Optimized product display dengan structured data support
+- **Loading States**: Skeleton loading untuk better UX
+- **Accessibility**: Skip-to-content links, focus management
+
+#### SEO Components:
+```css
+/* Breadcrumb SEO styling */
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Product image optimization */
+.product-image {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 0.5rem;
+}
+
+/* SEO content hierarchy */
+.seo-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+```
+
+#### Performance Features:
+- **Lazy Loading**: Image placeholder dengan shimmer effect
+- **Responsive Design**: Mobile-first approach
+- **Loading Skeletons**: Better perceived performance
+- **Hover Animations**: Smooth micro-interactions
+
+### 4. Tailwind CSS Integration
 - **Location**: `resources/css/app.css`
 - **Purpose**: Tailwind CSS configuration dengan custom font
 - **Font**: Instrument Sans sebagai primary font family
@@ -214,33 +294,68 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 ## Image Assets
 
-### Product Images
-- **celana-pj-sd.png**: Celana panjang SD
-- **kemeja-sd-pdk.png**: Kemeja SD pendek
-- **kemeja-sma-pdk.png**: Kemeja SMA pendek
-- **kemeja-smp-pdk.png**: Kemeja SMP pendek
-- **rok-pj-sd-merah.png**: Rok panjang SD merah
-- **topi-sd.png**: Topi SD
+### Product Categories
+
+#### 1. Seragam Sekolah Reguler
+**Kemeja Collection**:
+- `kemeja-sd-pdk.png` / `kemeja-sd-pj.png`: Kemeja SD (pendek/panjang)
+- `kemeja-smp-pdk.png` / `kemeja-smp-pj.png`: Kemeja SMP (pendek/panjang)
+- `kemeja-sma-pdk.png` / `kemeja-sma-pj.png`: Kemeja SMA (pendek/panjang)
+
+**Celana Collection**:
+- `celana-pj-sd.png`: Celana panjang SD
+- `celana-pj-smp.png`: Celana panjang SMP
+- `celana-pj-sma.png`: Celana panjang SMA
+- Multi-color variants: coklat, hijau, hitam, putih, biru
+- PDL variants: `celana-pdl-coklat.png`, `celana-pdl-hitam.png`
+
+**Rok Collection**:
+- `rok-pj-sd-[color].png`: Rok panjang SD dalam berbagai warna
+- Available colors: merah, coklat, hijau, hitam, putih
+
+**Aksesoris Collection**:
+- `topi-[level].png`: Topi untuk SD, SMP, SMA
+- `sabuk-[level].png`: Sabuk untuk SD, SMP, SMA
+
+#### 2. Koleksi Pramuka
+- `Kemeja-PJ-Pramuka.png`: Kemeja panjang pramuka
+- `kemeja-pramuka-siaga-pdk.png`: Kemeja pramuka siaga
+- `Kerudung-pramuka.png`: Kerudung pramuka
+- `Sabuk.png` / `Topi.png`: Aksesoris pramuka
 
 ### Brand Assets
-- **logo1.jpeg**: Logo variant 1
-- **logo2.jpeg**: Logo variant 2
-- **logo3.jpg**: Logo variant 3
-- **ravazka.jpg**: Main brand image
+- **logo1.jpeg**: Logo variant 1 (primary)
+- **logo2.jpeg**: Logo variant 2 (alternative)
+- **logo3.jpg**: Logo variant 3 (compact)
+- **ravazka.jpg**: Main brand hero image
 
-### Image Optimization
-- **Format**: PNG untuk produk (transparency support)
-- **Format**: JPEG untuk logos dan brand images
-- **Naming**: Descriptive filenames dengan kebab-case
-- **Size**: Optimized untuk web delivery
+### Image Optimization Strategy
+- **Format**: PNG untuk produk (transparency & quality)
+- **Format**: JPEG untuk brand assets (compression efficiency)
+- **Naming Convention**: `category-level-variant-color.extension`
+- **Size Optimization**: Web-optimized untuk fast loading
+- **Responsive Support**: Multiple sizes untuk different devices
+- **SEO Optimization**: Descriptive alt text dan structured filenames
 
 ## Asset Loading Strategy
 
 ### CSS Loading
 1. **Bootstrap Icons**: CDN loading untuk icon set
-2. **app.css**: Core styles loaded first
-3. **custom.css**: Brand-specific overrides
-4. **Inline Styles**: Component-specific styles dalam Blade templates
+2. **app.css**: Core application styles loaded first
+3. **custom.css**: Brand-specific RAVAZKA overrides
+4. **seo.css**: SEO optimization dan performance styles
+5. **Inline Styles**: Component-specific styles dalam Blade templates
+
+#### Loading Priority:
+```html
+<!-- Critical CSS -->
+<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+<link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+<link href="{{ asset('css/seo.css') }}" rel="stylesheet">
+
+<!-- External CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+```
 
 ### JavaScript Loading
 1. **Bootstrap JS**: CDN loading untuk components

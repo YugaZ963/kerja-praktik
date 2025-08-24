@@ -45,41 +45,42 @@
                         <div class="card-body p-0">
                             @foreach($cartItems as $item)
                                 <div class="border-bottom p-3">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-2">
+                                    <div class="cart-item-row">
+                                        <div class="cart-item-image">
                                             <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
-                                                 class="img-fluid rounded" alt="{{ $item->product->name }}" style="height: 80px; object-fit: cover;">
+                                                 class="img-fluid rounded" alt="{{ $item->product->name }}">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="cart-item-details">
                                             <h6 class="mb-1">{{ $item->product->name }}</h6>
                                             <small class="text-muted">{{ $item->product->category }} - {{ $item->product->size }}</small>
-                                            <br>
-                                            <span class="text-primary fw-bold">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                            <div class="mt-1">
+                                                <span class="text-primary fw-bold">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                            </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex align-items-center">
+                                        <div class="cart-item-quantity">
+                                            <form action="{{ route('cart.update', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="decreaseQuantity({{ $item->id }})">-</button>
-                                                <input type="number" name="quantity" id="quantity-{{ $item->id }}" value="{{ $item->quantity }}" 
-                                                       min="1" max="{{ $item->product->stock }}" class="form-control form-control-sm mx-2 text-center" style="width: 60px;">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity({{ $item->id }}, {{ $item->product->stock }})">+</button>
-                                                <button type="submit" class="btn btn-sm btn-primary ms-2">Update</button>
+                                                <div class="quantity-controls">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="decreaseQuantity({{ $item->id }})">-</button>
+                                                    <input type="number" name="quantity" id="quantity-{{ $item->id }}" value="{{ $item->quantity }}" 
+                                                           min="1" max="{{ $item->product->stock }}" class="form-control form-control-sm">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity({{ $item->id }}, {{ $item->product->stock }})">+</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                                </div>
                                             </form>
-                                            <small class="text-muted">Stok: {{ $item->product->stock }}</small>
+                                            <small class="text-muted d-block text-center">Stok: {{ $item->product->stock }}</small>
                                         </div>
-                                        <div class="col-md-2">
-                                            <div class="text-end">
-                                                <div class="fw-bold">Rp {{ number_format($item->total, 0, ',', '.') }}</div>
-                                                <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger mt-1" 
-                                                            onclick="return confirm('Hapus produk dari keranjang?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                        <div class="cart-item-total">
+                                            <div class="fw-bold mb-2">Rp {{ number_format($item->total, 0, ',', '.') }}</div>
+                                            <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('Hapus produk dari keranjang?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -137,56 +138,121 @@
 
     <style>
         /* Cart Responsive Styles */
-        @media (max-width: 576px) {
+        .cart-item-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .cart-item-image {
+            flex: 0 0 auto;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .cart-item-quantity {
+            flex: 0 0 auto;
+            min-width: 180px;
+        }
+        
+        .cart-item-total {
+            flex: 0 0 auto;
+            min-width: 120px;
+            text-align: right;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quantity-controls .btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-controls input {
+            width: 60px;
+            text-align: center;
+        }
+        
+        /* Mobile Styles (< 768px) */
+        @media (max-width: 767.98px) {
             .container {
-                padding-left: 10px;
-                padding-right: 10px;
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
             }
             
             .bg-light.p-4 {
                 padding: 1.5rem !important;
+                margin-bottom: 1rem !important;
             }
             
             .card-body {
-                padding: 1rem;
+                padding: 0.75rem;
             }
             
             .border-bottom.p-3 {
                 padding: 1rem !important;
             }
             
-            .row.align-items-center {
+            .cart-item-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+            
+            .cart-item-image,
+            .cart-item-details,
+            .cart-item-quantity,
+            .cart-item-total {
+                width: 100%;
                 text-align: center;
             }
             
-            .col-md-2, .col-md-4, .col-md-3, .col-md-3 {
+            .cart-item-image img {
+                max-width: 80px;
+                height: 80px;
+                object-fit: cover;
+            }
+            
+            .cart-item-details h6 {
+                margin-bottom: 0.25rem;
+                font-size: 0.95rem;
+            }
+            
+            .cart-item-details small {
+                display: block;
+                margin-bottom: 0.25rem;
+            }
+            
+            .quantity-controls {
+                justify-content: center;
                 margin-bottom: 0.75rem;
             }
             
-            .col-md-2 img {
-                max-width: 80px;
+            .quantity-controls .btn-primary {
+                margin-left: 0.5rem;
+                padding: 0.25rem 0.75rem;
                 height: auto;
+                width: auto;
             }
             
-            .btn-group {
-                flex-direction: row;
-                justify-content: center;
-                width: 100%;
-            }
-            
-            .btn-group .btn {
-                flex: 1;
-                max-width: 40px;
-            }
-            
-            .btn-group .form-control {
-                max-width: 60px;
-                text-align: center;
-            }
-            
-            .btn-sm {
-                font-size: 0.8rem;
-                padding: 0.25rem 0.5rem;
+            .cart-item-total {
+                border-top: 1px solid #dee2e6;
+                padding-top: 0.75rem;
+                margin-top: 0.5rem;
             }
             
             .h3 {
@@ -197,57 +263,113 @@
                 font-size: 3rem;
             }
             
-            .card {
+            .col-lg-8,
+            .col-lg-4 {
                 margin-bottom: 1rem;
             }
             
-            .card.mt-3 {
-                margin-top: 1rem !important;
-            }
-            
-            .text-end {
-                text-align: center !important;
+            .btn-outline-danger {
+                width: 100%;
+                margin-top: 1rem;
             }
         }
         
-        @media (min-width: 577px) and (max-width: 768px) {
+        /* Tablet Styles (768px - 991.98px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
             .container {
-                padding-left: 15px;
-                padding-right: 15px;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
             
             .bg-light.p-4 {
                 padding: 2rem !important;
             }
             
-            .card-body {
-                padding: 1.25rem;
+            .cart-item-row {
+                align-items: center;
             }
             
-            .col-md-2 img {
-                max-width: 100px;
-                height: auto;
+            .cart-item-image {
+                flex: 0 0 100px;
             }
             
-            .btn-group {
-                justify-content: center;
+            .cart-item-image img {
+                width: 90px;
+                height: 90px;
+                object-fit: cover;
+            }
+            
+            .cart-item-details {
+                flex: 1;
+                padding-right: 1rem;
+            }
+            
+            .cart-item-quantity {
+                flex: 0 0 200px;
+            }
+            
+            .cart-item-total {
+                flex: 0 0 140px;
+            }
+            
+            .quantity-controls {
+                justify-content: flex-start;
             }
         }
         
-        @media (min-width: 769px) and (max-width: 992px) {
-            .container {
-                max-width: 720px;
+        /* Desktop Styles (≥ 992px) */
+        @media (min-width: 992px) {
+            .cart-item-row {
+                align-items: center;
             }
             
-            .col-lg-8 {
-                flex: 0 0 auto;
-                width: 65%;
+            .cart-item-image {
+                flex: 0 0 120px;
             }
             
-            .col-lg-4 {
-                flex: 0 0 auto;
-                width: 35%;
+            .cart-item-image img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
             }
+            
+            .cart-item-details {
+                flex: 1;
+                padding-right: 1rem;
+            }
+            
+            .cart-item-quantity {
+                flex: 0 0 220px;
+            }
+            
+            .cart-item-total {
+                flex: 0 0 150px;
+            }
+            
+            .quantity-controls {
+                justify-content: flex-start;
+            }
+        }
+        
+        /* Additional improvements */
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        .btn-outline-secondary:hover {
+            color: #fff;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .alert {
+            border-radius: 0.375rem;
         }
     </style>
 

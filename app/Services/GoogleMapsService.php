@@ -34,7 +34,7 @@ class GoogleMapsService
     public static function getDirectionsUrl(): string
     {
         // URL Google Maps spesifik untuk Pasar Baru, Bandung
-        return "https://www.google.com/maps/place/Pasar+Baru/@-6.9175278,107.6017623,17z/data=!4m10!1m2!2m1!1spasar+baru+bandung!3m6!1s0x2e68e7b221d5a3fb:0x973f88ac86b287cb!8m2!3d-6.9174201!4d107.604071!15sChJwYXNhciBiYXJ1IGJhbmR1bmeSAQ9zaG9wcGluZ19jZW50ZXKqAToQATIeEAEiGpqO-8GFwkw9c-Hnd-paBfu99tFHOZjdvceDMhYQAiIScGFzYXIgYmFydSBiYW5kdW5n4AEA!16s%2Fg%2F11fm4_3t0k?entry=ttu&g_ep=EgoyMDI1MDczMC4wIKXMDSoASAFQAw%3D%3D";
+        return "https://www.google.com/maps/place/Pasar+Baru,+Bandung/@-6.9175278,107.6017623,17z";
     }
 
     /**

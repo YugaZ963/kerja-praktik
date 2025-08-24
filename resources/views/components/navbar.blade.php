@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+<nav class="navbar navbar-expand-lg navbar-light bg-white mb-3 shadow-sm">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="{{ asset('images/ravazka.jpg') }}" alt="Logo" height="20">
@@ -61,11 +61,19 @@
                 </div>
 
                 <!-- Keranjang -->
-                <a href="{{ route('cart.index') }}" class="nav-link position-relative me-3">
-                    <i class="bi bi-cart3"></i>
-                    <span id="cart-count"
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                </a>
+                @auth
+                    <a href="{{ route('cart.index') }}" class="nav-link position-relative me-3">
+                        <i class="bi bi-cart3"></i>
+                        <span id="cart-count"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="nav-link position-relative me-3" 
+                       title="Silakan login untuk mengakses keranjang" data-bs-toggle="tooltip">
+                        <i class="bi bi-cart3 text-muted"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">0</span>
+                    </a>
+                @endauth
 
                 <!-- Login/Register atau User Menu -->
                 @guest
@@ -80,7 +88,30 @@
                             <i class="bi bi-person-circle me-1"></i>
                             {{ Auth::user()->name }}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">
+                            <!-- Profile Information -->
+                            <li class="px-3 py-2">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-person-circle me-2 text-primary" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.1rem;">{{ Auth::user()->name }}</div>
+                                        <small class="text-muted">{{ Auth::user()->email }}</small>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    @if(Auth::user()->isAdmin())
+                                        <span class="badge bg-primary">Administrator</span>
+                                    @else
+                                        <span class="badge bg-secondary">User/Pelanggan</span>
+                                    @endif
+                                </div>
+                                <div class="mb-0">
+                                    <small class="text-muted">Bergabung: {{ Auth::user()->created_at->format('d M Y') }}</small>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Navigation Menu -->
                             @if (Auth::user()->isAdmin())
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">
                                         <i class="bi bi-speedometer2 me-2"></i>Dashboard
@@ -88,10 +119,9 @@
                                 <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
                                         <i class="bi bi-box-seam me-2"></i>Inventaris
                                     </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.sales.index') }}">
+                                <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">
                                         <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
                                     </a></li>
-
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -124,6 +154,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     const searchInput = document.getElementById('searchInput');
     const searchForm = document.getElementById('searchForm');
     const searchDropdown = document.getElementById('searchDropdown');

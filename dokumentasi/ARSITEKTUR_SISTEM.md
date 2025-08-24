@@ -54,15 +54,28 @@ Sistem RAVAZKA adalah aplikasi web e-commerce untuk toko seragam sekolah yang di
 ```
 resources/views/
 ├── layouts/           # Template dasar
-│   ├── app.blade.php  # Main layout
-│   └── guest.blade.php# Guest layout
+│   └── app.blade.php  # Main layout dengan navbar & footer
 ├── components/        # Reusable components
 │   ├── navbar.blade.php
 │   └── footer.blade.php
 ├── auth/             # Authentication views
+│   ├── login.blade.php
+│   └── register.blade.php
 ├── admin/            # Admin interface
+│   ├── dashboard.blade.php
+│   ├── inventory/    # Inventory management
+│   ├── orders/       # Order management
+│   └── sales/        # Sales reports
 ├── customer/         # Customer interface
-└── inventory/        # Inventory management
+│   └── orders/       # Customer order views
+├── cart/             # Shopping cart
+│   ├── index.blade.php
+│   └── checkout.blade.php
+├── public/           # Public pages
+│   ├── welcome.blade.php
+│   ├── about.blade.php
+│   └── products.blade.php
+└── partials/         # Partial views
 ```
 
 ### **Backend Layer**
@@ -70,10 +83,36 @@ resources/views/
 app/
 ├── Http/
 │   ├── Controllers/   # Request handlers
+│   │   ├── Admin/     # Admin controllers
+│   │   │   ├── OrderController.php
+│   │   │   └── SalesReportController.php
+│   │   ├── Customer/  # Customer controllers
+│   │   │   ├── OrderController.php
+│   │   │   └── ProductController.php
+│   │   ├── AuthController.php
+│   │   ├── CartController.php
+│   │   ├── InventoryController.php
+│   │   ├── ProductController.php
+│   │   ├── TestimonialController.php
+│   │   └── WelcomeController.php
 │   └── Middleware/    # Request filters
 ├── Models/           # Data entities
+│   ├── User.php      # User model dengan roles
+│   ├── Product.php   # Product model
+│   ├── Inventory.php # Inventory model
+│   ├── Cart.php      # Shopping cart model
+│   ├── Order.php     # Order model
+│   ├── OrderItem.php # Order items model
+│   └── Testimonial.php # Testimonial model
 ├── Services/         # Business logic
+│   └── GoogleMapsService.php
+├── Helpers/          # Helper classes
+│   ├── BreadcrumbHelper.php
+│   └── ImageHelper.php
+├── Exports/          # Excel exports
+│   └── InventoryExport.php
 └── Providers/        # Service providers
+    └── AppServiceProvider.php
 ```
 
 ### **Data Layer**
@@ -130,28 +169,66 @@ User Request → Middleware → Controller → Model → Database
 ### **Database Relations**
 ```
 Users ──┐
-        ├── Orders ── OrderItems ── Products
-        └── Carts ─────────────────┘
-                                   │
-Inventories ───────────────────────┘
-     │
-     └── Categories (implicit)
+        ├── Orders ── OrderItems ── Products ── Inventories
+        ├── Carts ─────────────────┘              │
+        └── Testimonials                          │
+                                                  │
+Categories (implicit) ────────────────────────────┘
+
+# Detailed Relations:
+# Users (1:N) → Orders
+# Users (1:N) → Carts (persistent cart)
+# Users (1:N) → Testimonials
+# Orders (1:N) → OrderItems
+# Products (1:1) → Inventories
+# OrderItems (N:1) → Products
+# Carts (N:1) → Products
 ```
+
+## 🚀 Fitur Sistem Terkini
+
+### **E-Commerce Features**
+- ✅ **Product Catalog**: Multi-category dengan filtering
+- ✅ **Shopping Cart**: Session & user-based persistence
+- ✅ **Checkout Process**: Multi-step dengan validasi
+- ✅ **Order Management**: Status tracking & updates
+- ✅ **Payment Integration**: Bank Transfer & E-Wallet
+- ✅ **WhatsApp Integration**: Auto order confirmation
+- ✅ **Testimonial System**: Customer feedback
+
+### **Admin Dashboard**
+- ✅ **Analytics Dashboard**: Real-time statistics
+- ✅ **Inventory Management**: CRUD dengan stock monitoring
+- ✅ **Order Processing**: Status updates & payment proof
+- ✅ **Sales Reports**: PDF/Excel export dengan charts
+- ✅ **Product Management**: Multi-size & category support
+- ✅ **User Management**: Role-based access control
+
+### **Security & Performance**
+- ✅ **Authentication**: Laravel Sanctum dengan roles
+- ✅ **Authorization**: Middleware-based permissions
+- ✅ **Data Validation**: Form requests & rules
+- ✅ **CSRF Protection**: Built-in Laravel security
+- ✅ **Session Management**: Database-driven sessions
+- ✅ **Caching Strategy**: File-based caching
 
 ## 🚀 Deployment Architecture
 
 ### **Development Environment**
-- **Web Server**: Laravel Development Server
-- **Database**: MySQL (via Laragon)
-- **Cache**: File-based
-- **Session**: Database
+- **Web Server**: Laravel Development Server (php artisan serve)
+- **Database**: MySQL (via Laragon/XAMPP)
+- **Cache**: File-based caching
+- **Session**: Database sessions
+- **Assets**: Vite development server
 
 ### **Production Ready Features**
 - ✅ Environment Configuration (.env)
-- ✅ Database Migrations
+- ✅ Database Migrations & Seeders
 - ✅ Asset Compilation (Vite)
-- ✅ Error Handling
-- ✅ Logging System
+- ✅ Error Handling & Logging
+- ✅ Performance Optimization
+- ✅ Security Best Practices
+- ✅ Backup & Recovery Strategy
 
 ## 📈 Scalability Considerations
 

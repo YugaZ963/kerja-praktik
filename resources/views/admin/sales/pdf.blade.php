@@ -102,12 +102,12 @@
         
         .currency {
             font-weight: bold;
-            color: #2e7d32;
+            color: #0d6efd;
         }
         
         .rank {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: #fcdf10;
+            color: #c9b012;
             padding: 2px 6px;
             border-radius: 3px;
             font-weight: bold;
@@ -169,7 +169,7 @@
         @if($revenueGrowth != 0)
         <p style="text-align: center; margin-top: 10px;">
             <strong>Pertumbuhan Revenue:</strong> 
-            <span style="color: {{ $revenueGrowth > 0 ? '#2e7d32' : '#d32f2f' }};">
+            <span style="color: {{ $revenueGrowth > 0 ? '#0d6efd' : '#cb2368' }};">
                 {{ $revenueGrowth > 0 ? '+' : '' }}{{ round($revenueGrowth, 1) }}%
             </span>
             dari bulan sebelumnya

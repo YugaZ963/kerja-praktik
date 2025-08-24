@@ -42,6 +42,7 @@
                             <th class="text-center">Stok</th>
                             <th class="text-end">Nilai</th>
                             <th class="text-center">Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -65,6 +66,14 @@
                                         <span class="badge bg-success">Tersedia</span>
                                     @endif
                                 </td>
+                                <td class="text-center">
+                                    <!-- Tombol Edit Produk -->
+                                    <a href="{{ route('inventory.edit-products-by-size', ['inventory' => $item->id ?? $item['id'], 'size' => $breakdown['size']]) }}" 
+                                       class="btn btn-sm btn-outline-warning"
+                                       title="Edit Produk">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -73,6 +82,7 @@
                             <th>Total</th>
                             <th class="text-center">{{ array_sum(array_column($sizeBreakdown, 'stock')) }}</th>
                             <th class="text-end">Rp {{ number_format(array_sum(array_column($sizeBreakdown, 'total_value')), 0, ',', '.') }}</th>
+                            <th></th>
                             <th></th>
                         </tr>
                     </tfoot>

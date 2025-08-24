@@ -5,8 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'Dashboard')</title>
+    
+    <!-- SEO Meta Tags for Admin -->
+     <title>{{ $title ?? config('app.name', 'Laravel') }} - Admin Panel @yield('title')</title>
+     <meta name="description" content="Admin panel untuk mengelola toko seragam sekolah RAVAZKA">
+     <meta name="robots" content="noindex, nofollow">
+     <meta name="author" content="RAVAZKA Team">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -59,16 +63,61 @@
                             @endif
                         @else
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <i class="bi bi-person-circle me-1"></i>
                                     {{ Auth::user()->name }}
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="min-width: 280px;">
+                                    <!-- Profile Information -->
+                                    <div class="px-3 py-2">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-person-circle me-2 text-primary" style="font-size: 2rem;"></i>
+                                            <div>
+                                                <div class="fw-bold" style="font-size: 1.1rem;">{{ Auth::user()->name }}</div>
+                                                <small class="text-muted">{{ Auth::user()->email }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            @if(Auth::user()->isAdmin())
+                                                <span class="badge bg-primary">Administrator</span>
+                                            @else
+                                                <span class="badge bg-secondary">User/Pelanggan</span>
+                                            @endif
+                                        </div>
+                                        <div class="mb-0">
+                                            <small class="text-muted">Bergabung: {{ Auth::user()->created_at->format('d M Y') }}</small>
+                                        </div>
+                                    </div>
+                                    <hr class="dropdown-divider">
+                                    
+                                    <!-- Navigation Menu -->
+                                    @if (Auth::user()->isAdmin())
+                                        <a class="dropdown-item" href="{{ route('dashboard') }}">
+                                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('inventory.index') }}">
+                                            <i class="bi bi-box-seam me-2"></i>Inventaris
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('admin.orders.index') }}">
+                                            <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
+                                        </a>
+                                        <hr class="dropdown-divider">
+                                    @else
+                                        <a class="dropdown-item" href="/orders">
+                                            <i class="bi bi-bag-check me-2"></i>Pesanan Saya
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('customer.orders.track') }}">
+                                            <i class="bi bi-search me-2"></i>Lacak Pesanan
+                                        </a>
+                                        <hr class="dropdown-divider">
+                                    @endif
+                                    
+                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        <i class="bi bi-box-arrow-right me-2"></i>{{ __('Logout') }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
