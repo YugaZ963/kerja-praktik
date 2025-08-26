@@ -80,52 +80,44 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="stock" class="form-label">Stok Awal</label>
-                        <input type="number" class="form-control" id="stock" name="stock" min="0" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="min_stock" class="form-label">Stok Minimal</label>
-                        <input type="number" class="form-control" id="min_stock" name="min_stock" min="1" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="purchase_price" class="form-label">Harga Beli (Rp)</label>
-                        <input type="number" class="form-control" id="purchase_price" name="purchase_price" min="0" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="selling_price" class="form-label">Harga Jual (Rp)</label>
-                        <input type="number" class="form-control" id="selling_price" name="selling_price" min="0" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="supplier" class="form-label">Supplier</label>
-                        <input type="text" class="form-control" id="supplier" name="supplier" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="location" class="form-label">Lokasi Penyimpanan</label>
-                        <input type="text" class="form-control" id="location" name="location" required>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label">Ukuran yang Tersedia</label>
-                        <div class="row g-2">
-                            @foreach (['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6'] as $size)
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="sizes_available[]" value="{{ $size }}" id="size-{{ $size }}">
-                                        <label class="form-check-label" for="size-{{ $size }}">{{ $size }}</label>
-                                    </div>
-                                </div>
-                            @endforeach
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Info:</strong> Stok akan dikelola melalui data produk, tidak perlu diisi di sini.
                         </div>
                     </div>
 
                     <div class="col-12">
-                        <label for="description" class="form-label">Deskripsi</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Info:</strong> Harga beli, harga jual, dan ukuran akan dikelola melalui data produk. Ukuran akan otomatis muncul ketika produk ditambahkan, diubah, atau dihapus.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="supplier" class="form-label">Supplier</label>
+                        <input type="text" class="form-control @error('supplier') is-invalid @enderror" id="supplier" name="supplier" value="{{ old('supplier') }}" placeholder="Masukkan nama supplier">
+                        @error('supplier')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Kosongkan jika tidak diketahui</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">Lokasi Penyimpanan</label>
+                        <input type="text" class="form-control @error('location') is-invalid @enderror" id="location" name="location" value="{{ old('location') }}" placeholder="Contoh: Rak A-1">
+                        @error('location')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Kosongkan jika belum ditentukan</small>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="description" class="form-label">Deskripsi <span class="text-danger">*</span></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3" required placeholder="Masukkan deskripsi detail item inventaris...">{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Deskripsi wajib diisi untuk memudahkan identifikasi item</small>
                     </div>
 
                     <div class="col-12 mt-4">

@@ -96,7 +96,10 @@ class InventoryController extends Controller
         $inventory_items = $query->paginate(15)->withQueryString();
         
         return view('admin.inventory.index', [
-            'titleShop' => 'RAVAZKA - Inventaris',
+            'titleShop' => '📦 Manajemen Inventaris - Admin RAVAZKA | Kelola Stok Seragam',
+            'title' => '📦 Manajemen Inventaris - Admin RAVAZKA | Kelola Stok Seragam',
+            'metaDescription' => '🔧 Panel admin untuk mengelola inventaris seragam sekolah RAVAZKA. Monitor stok, harga, supplier, dan status inventaris dengan filter lengkap dan laporan real-time.',
+            'metaKeywords' => 'inventaris RAVAZKA, manajemen stok seragam, admin inventaris, monitor stok, supplier seragam',
             'inventory_items' => $inventory_items
         ]);
     }
@@ -171,7 +174,10 @@ class InventoryController extends Controller
         $inventory_items = $query->paginate(15)->withQueryString();
         
         return view('admin.inventory.report', [
-            'titleShop' => 'RAVAZKA - Laporan Inventaris',
+            'titleShop' => '📊 Laporan Inventaris - Admin RAVAZKA | Analisis Stok Seragam',
+            'title' => '📊 Laporan Inventaris - Admin RAVAZKA | Analisis Stok Seragam',
+            'metaDescription' => '📈 Laporan lengkap inventaris seragam sekolah RAVAZKA. Analisis stok, nilai inventaris, status supplier, dan tren penjualan untuk pengambilan keputusan bisnis.',
+            'metaKeywords' => 'laporan inventaris RAVAZKA, analisis stok seragam, report admin, nilai inventaris, tren stok',
             'inventory_items' => $inventory_items
         ]);
     }
@@ -337,9 +343,7 @@ class InventoryController extends Controller
                 ]);
             }
 
-            // Update total stok inventaris
-            $totalStock = Product::where('inventory_id', $inventoryId)->sum('stock');
-            $inventory->update(['stock' => $totalStock]);
+            // Inventory stock akan otomatis terupdate melalui Product model event listeners
 
             return redirect()->route('inventory.index')
                 ->with('success', "Berhasil menambah {$addStock} stok untuk ukuran {$size}");
@@ -382,9 +386,7 @@ class InventoryController extends Controller
             // Kurangi stok
             $product->decrement('stock', $reduceStock);
 
-            // Update total stok inventaris
-            $totalStock = Product::where('inventory_id', $inventoryId)->sum('stock');
-            $inventory->update(['stock' => $totalStock]);
+            // Inventory stock akan otomatis terupdate melalui Product model event listeners
 
             return redirect()->route('inventory.index')
                 ->with('success', "Berhasil mengurangi {$reduceStock} stok untuk ukuran {$size}");

@@ -10,6 +10,10 @@
         <div class="bg-light p-5 rounded mb-4 text-center">
             <h1 class="display-5 fw-bold text-primary">Manajemen Inventaris</h1>
             <p class="lead">Kelola inventaris seragam sekolah dengan mudah dan efisien</p>
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Info:</strong> Stok inventaris dikelola otomatis melalui data produk. Tambah/kurangi stok dengan mengelola produk di setiap ukuran.
+            </div>
         </div>
 
         {{-- Alert Messages --}}
@@ -37,13 +41,17 @@
             </div>
         @endif
 
-        <x-inventory-stats :inventory_items="$inventory_items" />
 
+
+        {{-- Action Buttons --}}
         <div class="row mb-4">
             <div class="col-md-12 d-flex justify-content-between flex-wrap gap-2">
                 <div>
-                    <a href="{{ route('inventory.report') }}" class="btn btn-success me-2">
-                        <i class="bi bi-file-earmark-text"></i> Laporan Stok
+                    <a href="{{ route('inventory.create') }}" class="btn btn-success me-2">
+                        <i class="bi bi-box"></i> Tambah Item Inventaris
+                    </a>
+                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle"></i> Tambah Produk
                     </a>
 
                 </div>
@@ -78,62 +86,43 @@
                         </div>
                     </div>
                     
-                    <!-- Advanced Filters -->
+                    <!-- Basic Filters -->
                     <div class="row g-3">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Kategori</label>
                             <select name="category" class="form-select">
                                 <option value="">Semua Kategori</option>
-                                <option value="Kemeja Sekolah" {{ request('category') == 'Kemeja Sekolah' ? 'selected' : '' }}>Kemeja Sekolah</option>
-                                <option value="Kemeja Batik" {{ request('category') == 'Kemeja Batik' ? 'selected' : '' }}>Kemeja Batik</option>
-                                <option value="Kemeja Batik Koko" {{ request('category') == 'Kemeja Batik Koko' ? 'selected' : '' }}>Kemeja Batik Koko</option>
-                                <option value="Kemeja Padang" {{ request('category') == 'Kemeja Padang' ? 'selected' : '' }}>Kemeja Padang</option>
-                                <option value="Rok Sekolah" {{ request('category') == 'Rok Sekolah' ? 'selected' : '' }}>Rok Sekolah</option>
-                                <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
+                                <option value="Kemeja" {{ request('category') == 'Kemeja' ? 'selected' : '' }}>Kemeja</option>
+                                <option value="Celana" {{ request('category') == 'Celana' ? 'selected' : '' }}>Celana</option>
+                                <option value="Rok" {{ request('category') == 'Rok' ? 'selected' : '' }}>Rok</option>
+                                <option value="Aksesoris" {{ request('category') == 'Aksesoris' ? 'selected' : '' }}>Aksesoris</option>
                             </select>
                         </div>
-
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Status Stok</label>
-                            <select name="status" class="form-select">
+                            <select name="stock_status" class="form-select">
                                 <option value="">Semua Status</option>
-                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia (>100)</option>
-                                <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah (1-100)</option>
-                                <option value="critical" {{ request('status') == 'critical' ? 'selected' : '' }}>Kritis (≤50)</option>
-                                <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Habis (0)</option>
+                                <option value="available" {{ request('stock_status') == 'available' ? 'selected' : '' }}>Tersedia</option>
+                                <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Stok Rendah</option>
+                                <option value="out" {{ request('stock_status') == 'out' ? 'selected' : '' }}>Habis</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Rentang Harga</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" name="price_min" 
-                                       placeholder="Min" value="{{ request('price_min') }}">
-                                <span class="input-group-text">-</span>
-                                <input type="number" class="form-control" name="price_max" 
-                                       placeholder="Max" value="{{ request('price_max') }}">
-                            </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Supplier</label>
+                            <select name="supplier" class="form-select">
+                                <option value="">Semua Supplier</option>
+                                <option value="PT. Seragam Nusantara" {{ request('supplier') == 'PT. Seragam Nusantara' ? 'selected' : '' }}>PT. Seragam Nusantara</option>
+                                <option value="CV. Tekstil Jaya" {{ request('supplier') == 'CV. Tekstil Jaya' ? 'selected' : '' }}>CV. Tekstil Jaya</option>
+                                <option value="UD. Konveksi Mandiri" {{ request('supplier') == 'UD. Konveksi Mandiri' ? 'selected' : '' }}>UD. Konveksi Mandiri</option>
+                            </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Tanggal</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" name="date_from" 
-                                       value="{{ request('date_from') }}">
-                                <span class="input-group-text">-</span>
-                                <input type="date" class="form-control" name="date_to" 
-                                       value="{{ request('date_to') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Urutkan</label>
                             <select name="sort" class="form-select">
-                                <option value="">Terbaru</option>
-                                <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Nama A-Z</option>
-                                <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Nama Z-A</option>
-                                <option value="stock-asc" {{ request('sort') == 'stock-asc' ? 'selected' : '' }}>Stok ↑</option>
-                                <option value="stock-desc" {{ request('sort') == 'stock-desc' ? 'selected' : '' }}>Stok ↓</option>
-                                <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>Harga ↑</option>
-                                <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>Harga ↓</option>
-                                <option value="category-asc" {{ request('sort') == 'category-asc' ? 'selected' : '' }}>Kategori A-Z</option>
+                                <option value="" {{ request('sort') == '' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nama A-Z</option>
+                                <option value="category" {{ request('sort') == 'category' ? 'selected' : '' }}>Kategori</option>
+                                <option value="stock" {{ request('sort') == 'stock' ? 'selected' : '' }}>Stok</option>
                             </select>
                         </div>
                     </div>
@@ -156,7 +145,7 @@
             <div class="card-header bg-white">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h5 class="mb-0">Daftar Item Inventaris</h5>
+                        <h5 class="mb-0">Daftar Inventaris</h5>
                     </div>
                     <div class="col-auto d-flex gap-2">
                         <button type="button" class="btn btn-outline-info" onclick="toggleSizeBreakdown()">
@@ -164,7 +153,7 @@
                         </button>
                         <form method="GET" action="{{ route('inventory.index') }}" class="input-group input-group-sm"
                             style="width:260px;">
-                            <input type="text" name="search" class="form-control" placeholder="Cari item..."
+                            <input type="text" name="search" class="form-control" placeholder="Cari inventaris..."
                                 value="{{ request('search') }}">
                             <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
                         </form>
@@ -252,5 +241,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function toggleSizeBreakdown() {
+    const sizeBreakdowns = document.querySelectorAll('.size-breakdown');
+    const toggleText = document.getElementById('toggleText');
+    const isVisible = sizeBreakdowns[0] && sizeBreakdowns[0].style.display !== 'none';
+    
+    sizeBreakdowns.forEach(breakdown => {
+        breakdown.style.display = isVisible ? 'none' : 'table-row';
+    });
+    
+    toggleText.textContent = isVisible ? 'Tampilkan Detail Ukuran' : 'Sembunyikan Detail Ukuran';
+}
 </script>
 @endpush

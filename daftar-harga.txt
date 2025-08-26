@@ -370,3 +370,6 @@ M   10000
 L   10000
 XL  10000
 All Size 10000
+
+ukuran topi dan sabuk cuman ada 2 ukuran kecil dan besar, 
+Klo kerudung ukurannya S,M,L,XL

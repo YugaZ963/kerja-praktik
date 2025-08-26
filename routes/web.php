@@ -87,23 +87,36 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
             'code' => 'required|string|max:50|unique:inventories,code',
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:100',
-            'stock' => 'required|integer|min:0',
-            'min_stock' => 'required|integer|min:0',
-            'purchase_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
             'supplier' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
-            'sizes_available' => 'nullable|array',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
         ]);
         
-        // Konversi sizes_available ke JSON jika ada
-        if (isset($validated['sizes_available'])) {
-            $validated['sizes_available'] = json_encode($validated['sizes_available']);
+        // Set nilai default (akan dikelola melalui produk)
+        $validated['stock'] = 0;
+        $validated['min_stock'] = 1;
+        $validated['purchase_price'] = 0;
+        $validated['selling_price'] = 0;
+        $validated['sizes_available'] = json_encode([]);
+        
+        // Set default values untuk field yang kosong
+        if (empty($validated['supplier'])) {
+            $validated['supplier'] = 'Supplier Tidak Diketahui';
+        }
+        if (empty($validated['location'])) {
+            $validated['location'] = 'Lokasi Tidak Ditentukan';
         }
         
-        // Set tanggal restock terakhir
+        // Set tanggal restock terakhir dan stock_history
         $validated['last_restock'] = now()->toDateString();
+        $validated['stock_history'] = [
+            [
+                'date' => now()->toDateString(),
+                'type' => 'initial',
+                'quantity' => 0,
+                'note' => 'Inventaris dibuat - stok akan dikelola melalui data produk'
+            ]
+        ];
         
         // Buat item inventory baru
         $item = Inventory::create($validated);
@@ -154,13 +167,19 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
             'category' => 'required|string|max:100',
             'stock' => 'required|integer|min:0',
             'min_stock' => 'required|integer|min:0',
-            'purchase_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
             'supplier' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
-            'sizes_available' => 'nullable|string',
             'description' => 'nullable|string',
         ]);
+        
+        // Harga akan dikelola melalui produk, jangan ubah nilai yang sudah ada
+        // Hanya update jika tidak ada produk terkait atau untuk keperluan khusus
+        if (!$item->products()->exists()) {
+            $validated['purchase_price'] = $item->purchase_price ?? 0;
+            $validated['selling_price'] = $item->selling_price ?? 0;
+        }
+        
+        // Ukuran akan otomatis dikelola melalui produk, tidak perlu diubah manual
         
         // Update item
         $item->update($validated);
@@ -186,48 +205,7 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
             ->with('success', "Item inventaris '{$itemName}' dan semua produk terkait berhasil dihapus.");
     })->name('inventory.destroy');
 
-    // Halaman laporan inventaris
-    Route::get('/reports/stock', function () {
-        // Mengambil semua kategori unik dari database
-        $categories = Inventory::select('category')->distinct()->get()->pluck('category');
-        
-        // Menyiapkan data kategori
-        $categoryData = [];
-        foreach ($categories as $category) {
-            $items = Inventory::where('category', $category)->get();
-            $categoryData[$category] = [
-                'total_items' => $items->count(),
-                'total_stock' => $items->sum('stock'),
-                'total_value' => $items->sum(function($item) {
-                    return $item->stock * $item->purchase_price;
-                }),
-            ];
-        }
-        
-        return view('admin.inventory.reports.stock', [
-            'titleShop' => 'RAVAZKA - Laporan Stok',
-            'report_date' => date('Y-m-d'),
-            'categories' => $categoryData,
-            'low_stock_items' => Inventory::whereRaw('stock <= min_stock * 1.5')
-                ->get()
-                ->map(function($item) {
-                    $status = 'Aman';
-                    if ($item->stock <= $item->min_stock) {
-                        $status = 'Kritis';
-                    } elseif ($item->stock <= $item->min_stock * 1.5) {
-                        $status = 'Rendah';
-                    }
-                    
-                    return [
-                        'code' => $item->code,
-                        'name' => $item->name,
-                        'current_stock' => $item->stock,
-                        'min_stock' => $item->min_stock,
-                        'status' => $status,
-                    ];
-                }),
-        ]);
-    })->name('inventory.reports.stock');
+
     
     // Route untuk adjust stock (tambah/kurang stok per ukuran)
     Route::post('/adjust-stock/{id}', function ($id) {
@@ -301,7 +279,13 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
         ]);
         
         // Tambahkan ke riwayat stok
-        $stockHistory = $item->stock_history ?? [];
+        $stockHistory = $item->stock_history;
+        
+        // Pastikan stock_history adalah array
+        if (!is_array($stockHistory)) {
+            $stockHistory = [];
+        }
+        
         $stockHistory[] = [
             'date' => now()->format('Y-m-d H:i:s'),
             'type' => $historyType,
@@ -330,6 +314,14 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
     })->name('inventory.detail');
 });
 
+// Routes untuk tampilan terpadu produk dan inventaris
+Route::prefix('admin/unified')->middleware('admin')->name('admin.unified.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\UnifiedController::class, 'index'])->name('index');
+    Route::get('/export', [\App\Http\Controllers\Admin\UnifiedController::class, 'export'])->name('export');
+    Route::get('/report', [\App\Http\Controllers\Admin\UnifiedController::class, 'report'])->name('report');
+    Route::get('/{inventory}/products', [\App\Http\Controllers\Admin\UnifiedController::class, 'getProducts'])->name('products');
+});
+
 // Routes untuk manajemen produk admin
 Route::prefix('admin/products')->middleware('admin')->name('admin.products.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('index');
@@ -340,8 +332,21 @@ Route::prefix('admin/products')->middleware('admin')->name('admin.products.')->g
     Route::put('/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('update');
     Route::delete('/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('destroy');
     Route::delete('/bulk-destroy', [\App\Http\Controllers\Admin\ProductController::class, 'bulkDestroy'])->name('bulk-destroy');
+    Route::post('/{product}/adjust-stock', [\App\Http\Controllers\Admin\ProductController::class, 'adjustStock'])->name('adjust-stock');
     Route::get('/inventory/{inventory}/products', [\App\Http\Controllers\Admin\ProductController::class, 'getByInventory'])->name('by-inventory');
+    
+    // Routes untuk manajemen produk dari inventaris
+    Route::prefix('manage')->name('manage.')->group(function () {
+        Route::get('/quantity/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'manageQuantity'])->name('quantity');
+        Route::post('/quantity/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'updateQuantity'])->name('quantity.update');
+        Route::get('/edit/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'manageEdit'])->name('edit');
+        Route::post('/edit/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'updateProductInfo'])->name('edit.update');
+        Route::delete('/delete/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'deleteBySize'])->name('delete');
+    });
 });
+
+// Route untuk bulk delete produk dan inventaris
+
 
 // Routes untuk fitur keranjang belanja (memerlukan login)
 Route::prefix('cart')->middleware('require.login')->group(function () {

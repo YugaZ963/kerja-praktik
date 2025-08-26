@@ -111,7 +111,6 @@
                                                     <i class="bi bi-truck text-primary fs-2 d-block mb-2"></i>
                                                     <strong>Reguler</strong>
                                                     <small class="d-block text-muted">3-5 hari kerja</small>
-                                                    <small class="d-block text-success fw-bold">Gratis Ongkir</small>
                                                 </label>
                                             </div>
                                         </div>
@@ -125,7 +124,6 @@
                                                     <i class="bi bi-lightning-charge text-warning fs-2 d-block mb-2"></i>
                                                     <strong>Express</strong>
                                                     <small class="d-block text-muted">1-2 hari kerja</small>
-                                                    <small class="d-block text-warning fw-bold">+ Rp 15.000</small>
                                                 </label>
                                             </div>
                                         </div>
@@ -186,8 +184,8 @@
                         </div>
                         
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Ongkos Kirim</span>
-                            <span id="shipping-cost-display">Gratis</span>
+                            <span>Estimasi Pengiriman</span>
+                            <span id="shipping-estimate-display">3-5 hari kerja</span>
                         </div>
                         
                         <hr>
@@ -342,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
     shippingRadios.forEach(radio => {
         radio.addEventListener('change', function() {
-            updateShippingCost(subtotal);
+            updateShippingEstimate(subtotal);
             
             // Update card styling
             document.querySelectorAll('.shipping-option').forEach(card => {
@@ -357,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize with default selection
-    updateShippingCost(subtotal);
+    updateShippingEstimate(subtotal);
     
     // Set initial selected state
     const checkedShipping = document.querySelector('input[name="shipping_method"]:checked');

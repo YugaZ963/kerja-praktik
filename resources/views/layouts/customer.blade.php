@@ -38,8 +38,8 @@
     {!! json_encode($seoData['structured_data'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
     @endif
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
      <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
      <link rel="stylesheet" href="{{ asset('css/seo.css') }}">
@@ -55,7 +55,6 @@
         @yield('content')
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/main.js') }}"></script>
     
     <script>
@@ -125,6 +124,56 @@
                 });
             });
         });
+    </script>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all dropdowns on the page
+        const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+        console.log('Initializing dropdowns:', dropdownElements.length);
+        
+        dropdownElements.forEach(function(element) {
+            try {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                    new bootstrap.Dropdown(element);
+                    console.log('Dropdown initialized:', element);
+                } else {
+                    console.error('Bootstrap not loaded properly');
+                }
+            } catch (error) {
+                console.error('Error initializing dropdown:', error, element);
+            }
+        });
+        
+        // Re-initialize dropdowns when content is dynamically added
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) {
+                        const newDropdowns = node.querySelectorAll('[data-bs-toggle="dropdown"]');
+                        newDropdowns.forEach(function(element) {
+                            try {
+                                if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                                    new bootstrap.Dropdown(element);
+                                }
+                            } catch (error) {
+                                console.error('Error initializing dynamic dropdown:', error);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
     </script>
     
     @stack('scripts')

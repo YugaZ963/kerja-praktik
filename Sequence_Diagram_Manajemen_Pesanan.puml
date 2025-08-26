@@ -1,0 +1,141 @@
+@startuml Sequence_Diagram_Manajemen_Pesanan
+!theme plain
+
+' Styling parameters
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundCorner 10
+skinparam maxMessageSize 60
+skinparam sequenceParticipant underline
+
+skinparam participant {
+    BackgroundColor #E8F4FD
+    BorderColor #2E86AB
+    FontName Arial
+    FontSize 12
+    FontStyle bold
+}
+
+skinparam sequence {
+    ArrowColor #2E86AB
+    ActorBorderColor #2E86AB
+    LifeLineBorderColor #2E86AB
+    LifeLineBackgroundColor #F0F8FF
+    ParticipantBorderColor #2E86AB
+    ParticipantBackgroundColor #E8F4FD
+    ParticipantFontName Arial
+    ParticipantFontSize 12
+    ParticipantFontColor #000000
+    ActorBackgroundColor #E8F4FD
+    ActorFontColor #000000
+    ActorFontSize 12
+    ActorFontName Arial
+    ArrowFontName Arial
+    ArrowFontSize 10
+    ArrowFontColor #000000
+    GroupBackgroundColor #F0F8FF
+    GroupBorderColor #2E86AB
+    GroupHeaderFontSize 12
+    GroupHeaderFontStyle bold
+}
+
+skinparam note {
+    BackgroundColor #FFFACD
+    BorderColor #DAA520
+    FontSize 10
+}
+
+title **Sequence Diagram - Manajemen Pesanan (REQ-APITS-F-04)**
+
+actor Admin
+participant "Interface\n(Web UI)" as Interface
+participant "OrderController" as Controller
+participant "Database" as DB
+participant "NotificationService" as Notification
+
+== Akses Halaman Manajemen Pesanan ==
+Admin -> Interface: Mengakses halaman Manajemen Pesanan
+Interface -> Controller: getOrdersPage()
+Controller -> DB: SELECT * FROM orders
+DB --> Controller: List semua pesanan
+Controller -> DB: SELECT status, COUNT(*) FROM orders GROUP BY status
+DB --> Controller: Counter jumlah pesanan per status
+Controller --> Interface: Data pesanan + counter status
+Interface --> Admin: Tampilkan halaman dengan daftar pesanan
+
+== Pencarian Pesanan ==
+Admin -> Interface: Input pencarian (nomor pesanan/nama/telepon)
+Interface -> Controller: searchOrders(searchTerm)
+Controller -> DB: SELECT * FROM orders WHERE order_number LIKE '%searchTerm%' \n OR customer_name LIKE '%searchTerm%' \n OR customer_phone LIKE '%searchTerm%'
+DB --> Controller: Hasil pencarian pesanan
+Controller --> Interface: Data pesanan yang sesuai
+Interface --> Admin: Tampilkan hasil pencarian
+
+== Filter Pesanan Berdasarkan Status ==
+Admin -> Interface: Pilih filter status
+Interface -> Controller: filterOrdersByStatus(status)
+Controller -> DB: SELECT * FROM orders WHERE status = 'selectedStatus'
+DB --> Controller: Pesanan dengan status tertentu
+Controller --> Interface: Data pesanan terfilter
+Interface --> Admin: Tampilkan pesanan sesuai filter
+
+== Melihat Detail Pesanan ==
+Admin -> Interface: Klik tombol Detail pesanan
+Interface -> Controller: getOrderDetails(orderId)
+Controller -> DB: SELECT * FROM orders WHERE id = orderId
+DB --> Controller: Data pesanan lengkap
+Controller -> DB: SELECT * FROM order_items WHERE order_id = orderId
+DB --> Controller: Item pesanan
+Controller -> DB: SELECT * FROM order_status_history WHERE order_id = orderId
+DB --> Controller: Riwayat status pesanan
+Controller --> Interface: Detail lengkap pesanan
+Interface --> Admin: Tampilkan modal/halaman detail pesanan
+
+== Update Status Pesanan ==
+Admin -> Interface: Klik tombol Edit status
+Interface --> Admin: Tampilkan form update status
+Admin -> Interface: Pilih status baru + tambah catatan admin
+Interface -> Controller: updateOrderStatus(orderId, newStatus, adminNote)
+
+Controller -> DB: BEGIN TRANSACTION
+Controller -> DB: UPDATE orders SET status = 'newStatus', \n admin_note = 'adminNote', updated_at = NOW() \n WHERE id = orderId
+DB --> Controller: Status updated
+
+Controller -> DB: INSERT INTO order_status_history \n (order_id, old_status, new_status, admin_note, timestamp)
+DB --> Controller: Riwayat tercatat
+
+alt Status berubah ke 'delivered'
+    Controller -> DB: UPDATE inventory SET stock = stock - quantity \n WHERE product_id IN (SELECT product_id FROM order_items WHERE order_id = orderId)
+    DB --> Controller: Stok berkurang otomatis
+end
+
+Controller -> DB: COMMIT TRANSACTION
+Controller -> Notification: sendStatusNotification(customerId, newStatus)
+Notification --> Controller: Notifikasi terkirim
+
+Controller --> Interface: Status berhasil diupdate
+Interface --> Admin: Tampilkan pesan sukses + refresh data
+
+== Menghapus Pesanan ==
+Admin -> Interface: Klik tombol Hapus pesanan
+Interface --> Admin: Konfirmasi penghapusan
+Admin -> Interface: Konfirmasi hapus
+Interface -> Controller: deleteOrder(orderId)
+Controller -> DB: BEGIN TRANSACTION
+Controller -> DB: DELETE FROM order_items WHERE order_id = orderId
+DB --> Controller: Item pesanan dihapus
+Controller -> DB: DELETE FROM order_status_history WHERE order_id = orderId
+DB --> Controller: Riwayat status dihapus
+Controller -> DB: DELETE FROM orders WHERE id = orderId
+DB --> Controller: Pesanan dihapus
+Controller -> DB: COMMIT TRANSACTION
+Controller --> Interface: Pesanan berhasil dihapus
+Interface --> Admin: Tampilkan pesan sukses + refresh halaman
+
+note over Admin, DB
+**Kondisi Akhir:**
+Admin berhasil mengelola pesanan pelanggan
+dan status pesanan terupdate sesuai alur bisnis
+end note
+
+@enduml

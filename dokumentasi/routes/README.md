@@ -156,7 +156,6 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
     
     // Reports
     Route::get('/report', [InventoryController::class, 'report'])->name('inventory.report');
-    Route::get('/reports/stock', function () { /* ... */ })->name('inventory.reports.stock');
     
     // Stock management
     Route::post('/adjust-stock/{id}', function ($id) { /* ... */ })->name('inventory.adjust-stock');
@@ -183,7 +182,7 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
 | Method | URI | Action | Description |
 |--------|-----|--------|--------------|
 | GET | `/inventory/report` | report | Laporan inventaris |
-| GET | `/inventory/reports/stock` | stockReport | Laporan stok detail |
+
 | POST | `/inventory/adjust-stock/{id}` | adjustStock | Adjust stok per ukuran |
 | GET | `/inventory/export` | export | Export data Excel |
 | GET | `/inventory/{code}` | detail | Detail item by code |

@@ -32,6 +32,11 @@ class ProductController extends Controller
         if ($request->filled('size')) {
             $query->where('size', strtoupper($request->size));
         }
+        
+        // Filter berdasarkan inventory
+        if ($request->filled('inventory')) {
+            $query->where('inventory_id', $request->inventory);
+        }
 
         // Filter harga
         if ($request->filled('price_min')) {
@@ -82,9 +87,18 @@ class ProductController extends Controller
 
         $products = $query->paginate(12);
 
+        // Get categories and sizes for filters
+        $categories = Product::distinct()->pluck('category');
+        $sizes = Product::distinct()->pluck('size');
+
         return view('customer.products', [
-            'titleShop' => 'RAVAZKA - Produk',
-            'products' => $products
+            'titleShop' => '📚 Katalog Seragam Sekolah Lengkap - RAVAZKA | Semua Jenjang Tersedia',
+            'title' => '📚 Katalog Seragam Sekolah Lengkap - RAVAZKA | Semua Jenjang Tersedia',
+            'metaDescription' => '🛍️ Jelajahi koleksi lengkap seragam sekolah RAVAZKA! Tersedia untuk SD, SMP, SMA dengan berbagai ukuran dan model terbaru. ✅ Kualitas terjamin ✅ Harga bersaing ✅ Stok lengkap.',
+            'metaKeywords' => 'katalog seragam lengkap, daftar produk seragam, RAVAZKA terpercaya, beli seragam online, seragam sekolah berkualitas',
+            'products' => $products,
+            'categories' => $categories,
+            'sizes' => $sizes
         ])->with('active', 'products');
     }
 }

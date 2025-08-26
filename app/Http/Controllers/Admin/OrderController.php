@@ -35,13 +35,28 @@ class OrderController extends Controller
         $orders = $query->paginate(15);
         $statusCounts = $this->getStatusCounts();
         
-        return view('admin.orders.index', compact('orders', 'statusCounts', 'status', 'search'));
+        return view('admin.orders.index', [
+            'titleShop' => '📋 Manajemen Pesanan - Admin RAVAZKA | Kelola Order Seragam',
+            'title' => '📋 Manajemen Pesanan - Admin RAVAZKA | Kelola Order Seragam',
+            'metaDescription' => '🛒 Panel admin untuk mengelola pesanan seragam sekolah RAVAZKA. Monitor status pesanan, verifikasi pembayaran, dan kelola pengiriman dengan sistem tracking lengkap.',
+            'metaKeywords' => 'manajemen pesanan RAVAZKA, admin order seragam, kelola pesanan, status pembayaran, tracking pengiriman',
+            'orders' => $orders,
+            'statusCounts' => $statusCounts,
+            'status' => $status,
+            'search' => $search
+        ]);
     }
 
     public function show(Order $order)
     {
         $order->load(['items.product', 'user']);
-        return view('admin.orders.show', compact('order'));
+        return view('admin.orders.show', [
+            'titleShop' => '🔍 Detail Pesanan - Admin RAVAZKA | Info Lengkap Order',
+            'title' => '🔍 Detail Pesanan - Admin RAVAZKA | Info Lengkap Order',
+            'metaDescription' => '📋 Lihat detail lengkap pesanan seragam sekolah di panel admin RAVAZKA. Informasi pelanggan, item pesanan, status pembayaran, dan riwayat pengiriman.',
+            'metaKeywords' => 'detail pesanan RAVAZKA, info order seragam, admin pesanan, status pembayaran, detail pelanggan',
+            'order' => $order
+        ]);
     }
 
     public function updateStatus(Request $request, Order $order)

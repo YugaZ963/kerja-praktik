@@ -49,7 +49,7 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.products.update', $product->id) }}" id="productForm">
+                        <form method="POST" action="{{ route('admin.products.update', $product->id) }}" id="productForm" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             
@@ -64,10 +64,11 @@
                                         <option value="">-- Pilih Item Inventaris --</option>
                                         @foreach($inventories as $inventory)
                                             <option value="{{ $inventory->id }}" 
-                                                    {{ (old('inventory_id', $product->inventory_id) == $inventory->id) ? 'selected' : '' }}
-                                                    data-category="{{ $inventory->category }}"
-                                                    data-name="{{ $inventory->name }}"
-                                                    data-selling-price="{{ $inventory->selling_price }}">
+                                                data-category="{{ $inventory->category }}"
+                                                data-name="{{ $inventory->name }}"
+                                                data-selling-price="{{ $inventory->selling_price }}"
+                                                data-sizes="{{ json_encode($inventory->sizes_available) }}"
+                                                {{ (old('inventory_id', $product->inventory_id) == $inventory->id) ? 'selected' : '' }}>
                                                 {{ $inventory->name }} ({{ $inventory->category }}) - Rp {{ number_format($inventory->selling_price, 0, ',', '.') }}
                                             </option>
                                         @endforeach
@@ -111,9 +112,7 @@
                                     </label>
                                     <select name="size" id="size" class="form-select @error('size') is-invalid @enderror" required>
                                         <option value="">-- Pilih Ukuran --</option>
-                                        @foreach(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'] as $size)
-                                            <option value="{{ $size }}" {{ (old('size', $product->size) == $size) ? 'selected' : '' }}>{{ $size }}</option>
-                                        @endforeach
+                                        <!-- Ukuran akan diisi secara dinamis berdasarkan inventory -->
                                     </select>
                                     @error('size')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -161,17 +160,67 @@
                                     @enderror
                                 </div>
 
-                                {{-- Image --}}
+                                {{-- Image Upload --}}
                                 <div class="col-md-12 mb-3">
-                                    <label for="image" class="form-label fw-semibold">
-                                        <i class="bi bi-image text-primary"></i> Nama File Gambar
+                                    <label for="image_file" class="form-label fw-semibold">
+                                        <i class="bi bi-image text-primary"></i> Upload Gambar Produk
                                     </label>
-                                    <input type="text" name="image" id="image" class="form-control @error('image') is-invalid @enderror" 
-                                           value="{{ old('image', $product->image) }}" placeholder="Contoh: kemeja-sd-pdk.png">
-                                    @error('image')
+                                    <input type="file" name="image_file" id="image_file" class="form-control @error('image_file') is-invalid @enderror" 
+                                           accept="image/*" onchange="previewImage(this)">
+                                    @error('image_file')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Masukkan nama file gambar yang ada di folder public/images/</small>
+                                    <small class="form-text text-muted">Format yang didukung: JPEG, PNG, JPG, GIF. Maksimal 2MB.</small>
+                                    
+                                    {{-- Current Image Display --}}
+                                    <div class="mt-3">
+                                        <div class="row">
+                                            @if($product->image)
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Gambar Saat Ini:</label>
+                                                    <div class="border rounded p-2 text-center">
+                                                        @if(file_exists(public_path('images/products/' . $product->image)))
+                                                            <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
+                                                                 class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                                                        @elseif(file_exists(public_path('images/' . $product->image)))
+                                                            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
+                                                                 class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                                                        @else
+                                                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                                                 style="height: 150px; border-radius: 8px;">
+                                                                <i class="bi bi-image text-muted fs-2"></i>
+                                                            </div>
+                                                        @endif
+                                                        <small class="text-muted d-block mt-1">{{ $product->image }}</small>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Preview Gambar Baru:</label>
+                                                <div class="border rounded p-2 text-center" id="imagePreview" style="display: none;">
+                                                    <img id="previewImg" src="#" alt="Preview" 
+                                                         class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                                                </div>
+                                                <div class="border rounded p-2 text-center bg-light" id="noPreview" 
+                                                     style="height: 150px; display: flex; align-items: center; justify-content: center;">
+                                                    <span class="text-muted">Pilih gambar untuk preview</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Hidden field for manual image name (fallback) --}}
+                                    <div class="mt-3">
+                                        <label for="image" class="form-label fw-semibold">
+                                            <i class="bi bi-pencil text-secondary"></i> Atau Masukkan Nama File Manual
+                                        </label>
+                                        <input type="text" name="image" id="image" class="form-control @error('image') is-invalid @enderror" 
+                                               value="{{ old('image', $product->image) }}" placeholder="Contoh: kemeja-sd-pdk.png">
+                                        @error('image')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">Kosongkan jika menggunakan upload file di atas</small>
+                                    </div>
                                 </div>
 
                                 {{-- Description --}}
@@ -312,13 +361,16 @@
             const categoryInput = document.getElementById('category');
             const priceInput = document.getElementById('price');
 
-            // Auto-fill when inventory is selected (but don't override existing values)
+            // Update form fields when inventory is selected
             inventorySelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
+                const sizeSelect = document.getElementById('size');
+                
                 if (selectedOption.value) {
                     const inventoryName = selectedOption.dataset.name;
                     const inventoryCategory = selectedOption.dataset.category;
                     const sellingPrice = selectedOption.dataset.sellingPrice;
+                    const availableSizes = selectedOption.dataset.sizes;
 
                     // Only update if current values are empty or user confirms
                     if (!nameInput.value || confirm('Apakah Anda ingin mengubah nama produk sesuai dengan inventaris yang dipilih?')) {
@@ -327,6 +379,14 @@
                     
                     if (!categoryInput.value || confirm('Apakah Anda ingin mengubah kategori produk sesuai dengan inventaris yang dipilih?')) {
                         categoryInput.value = inventoryCategory;
+                    }
+                    
+                    // Update size options based on inventory
+                    updateSizeOptions(availableSizes);
+                    
+                    // Add size suffix if size is selected
+                    if (sizeSelect.value) {
+                        nameInput.value = inventoryName + ' - ' + sizeSelect.value;
                     }
                     
                     // Price suggestion (don't auto-change)
@@ -343,8 +403,75 @@
                         
                         priceInput.parentNode.parentNode.appendChild(suggestion);
                     }
+                } else {
+                    // Clear size options if no inventory selected
+                    sizeSelect.innerHTML = '<option value="">-- Pilih Ukuran --</option>';
                 }
             });
+            
+            // Function to update size options
+            function updateSizeOptions(sizesData) {
+                const sizeSelect = document.getElementById('size');
+                const currentSize = '{{ old("size", $product->size) }}';
+                sizeSelect.innerHTML = '<option value="">-- Pilih Ukuran --</option>';
+                
+                if (sizesData) {
+                    let sizes = [];
+                    
+                    // Handle both JSON string and array formats
+                    if (typeof sizesData === 'string') {
+                        try {
+                            sizes = JSON.parse(sizesData);
+                        } catch (e) {
+                            // If not JSON, try splitting by comma
+                            sizes = sizesData.split(',').map(s => s.trim());
+                        }
+                    } else if (Array.isArray(sizesData)) {
+                        sizes = sizesData;
+                    }
+                    
+                    sizes.forEach(function(size) {
+                        if (size) { // Skip empty sizes
+                            const option = document.createElement('option');
+                            option.value = size;
+                            option.textContent = size;
+                            if (size === currentSize) {
+                                option.selected = true;
+                            }
+                            sizeSelect.appendChild(option);
+                        }
+                    });
+                }
+            }
+            
+            // Initialize size options on page load
+            const selectedInventoryOption = inventorySelect.options[inventorySelect.selectedIndex];
+            if (selectedInventoryOption && selectedInventoryOption.value) {
+                const availableSizes = selectedInventoryOption.dataset.sizes;
+                updateSizeOptions(availableSizes);
+            }
         });
+        
+        // Function to preview selected image
+        function previewImage(input) {
+            const preview = document.getElementById('previewImg');
+            const previewContainer = document.getElementById('imagePreview');
+            const noPreviewContainer = document.getElementById('noPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    noPreviewContainer.style.display = 'none';
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                previewContainer.style.display = 'none';
+                noPreviewContainer.style.display = 'flex';
+            }
+        }
     </script>
 @endsection

@@ -93,20 +93,24 @@ class SalesReportController extends Controller
         // Alias totalSales as totalRevenue for view compatibility
         $totalRevenue = $totalSales;
         
-        return view('admin.sales.index', compact(
-            'startDate',
-            'endDate', 
-            'totalSales',
-            'totalRevenue',
-            'totalOrders',
-            'totalProducts',
-            'topProducts',
-            'dailySales',
-            'averageOrderValue',
-            'revenueGrowth',
-            'categorySales',
-            'completedOrders'
-        ));
+        return view('admin.sales.index', [
+            'titleShop' => '📊 Laporan Penjualan - Admin RAVAZKA | Analisis Bisnis Seragam',
+            'title' => '📊 Laporan Penjualan - Admin RAVAZKA | Analisis Bisnis Seragam',
+            'metaDescription' => '📈 Dashboard laporan penjualan lengkap RAVAZKA. Analisis revenue, produk terlaris, tren penjualan harian, dan performa kategori seragam sekolah untuk insight bisnis.',
+            'metaKeywords' => 'laporan penjualan RAVAZKA, analisis bisnis seragam, dashboard sales, revenue report, tren penjualan',
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'totalSales' => $totalSales,
+            'totalRevenue' => $totalRevenue,
+            'totalOrders' => $totalOrders,
+            'totalProducts' => $totalProducts,
+            'topProducts' => $topProducts,
+            'dailySales' => $dailySales,
+            'averageOrderValue' => $averageOrderValue,
+            'revenueGrowth' => $revenueGrowth,
+            'categorySales' => $categorySales,
+            'completedOrders' => $completedOrders
+        ]);
     }
     
     public function exportPdf(Request $request)

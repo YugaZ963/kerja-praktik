@@ -84,14 +84,11 @@
                         <input type="number" class="form-control" id="min_stock" name="min_stock" min="1" value="{{ $item->min_stock }}" required>
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="purchase_price" class="form-label">Harga Beli (Rp)</label>
-                        <input type="number" class="form-control" id="purchase_price" name="purchase_price" min="0" value="{{ $item->purchase_price }}" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="selling_price" class="form-label">Harga Jual (Rp)</label>
-                        <input type="number" class="form-control" id="selling_price" name="selling_price" min="0" value="{{ $item->selling_price }}" required>
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Info:</strong> Harga beli, harga jual, dan ukuran akan dikelola melalui data produk. Ukuran akan otomatis muncul ketika produk ditambahkan, diubah, atau dihapus.
+                        </div>
                     </div>
 
                     <div class="col-md-6">
@@ -102,23 +99,6 @@
                     <div class="col-md-6">
                         <label for="location" class="form-label">Lokasi Penyimpanan</label>
                         <input type="text" class="form-control" id="location" name="location" value="{{ $item->location }}" required>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label">Ukuran yang Tersedia</label>
-                        <div class="row g-2">
-                            @php
-                                $availableSizes = is_array($item->sizes_available) ? $item->sizes_available : json_decode($item->sizes_available, true);
-                            @endphp
-                            @foreach (['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6'] as $size)
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="sizes_available[]" value="{{ $size }}" id="size-{{ $size }}" {{ in_array($size, $availableSizes) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="size-{{ $size }}">{{ $size }}</label>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
                     </div>
 
                     <div class="col-12">

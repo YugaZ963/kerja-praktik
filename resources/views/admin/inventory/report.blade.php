@@ -169,8 +169,6 @@
                                 <th>Kategori</th>
                                 <th>Ukuran</th>
                                 <th>Stok</th>
-                                <th>Harga Beli</th>
-                                <th>Harga Jual</th>
                                 <th>Supplier</th>
                                 <th>Terakhir Diperbarui</th>
                             </tr>
@@ -199,14 +197,12 @@
                                             <span class="badge bg-success">{{ $item->stock }}</span>
                                         @endif
                                     </td>
-                                    <td>Rp {{ number_format($item->purchase_price, 0, ',', '.') }}</td>
-                                    <td>Rp {{ number_format($item->selling_price, 0, ',', '.') }}</td>
                                     <td>{{ $item->supplier }}</td>
                                     <td>{{ $item->last_restock }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">Tidak ada data inventaris</td>
+                                    <td colspan="7" class="text-center py-4">Tidak ada data inventaris</td>
                                 </tr>
                             @endforelse
                         </tbody>

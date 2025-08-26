@@ -1,0 +1,27 @@
+@startuml Sequence_Diagram_Logout
+!theme plain
+title Sequence Diagram - Logout Process
+
+actor "Admin/Customer" as User
+participant "Interface" as UI
+participant "System" as System
+database "Database" as DB
+
+User -> UI: klik logout button
+activate UI
+UI -> System: processLogout()
+activate System
+
+System -> System: destroySession()
+System -> System: revokeToken()
+System -> DB: close()
+activate DB
+deactivate DB
+
+System -> UI: redirect to login page
+UI -> User: redirect to login/public page
+
+deactivate System
+deactivate UI
+
+@enduml

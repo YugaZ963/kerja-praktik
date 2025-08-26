@@ -4,15 +4,13 @@
     <table class="table table-striped table-hover">
         <thead class="table-primary">
             <tr>
-                <th>Kode</th>
-                <th>Nama Item</th>
-                <th>Kategori</th>
-                <th>Stok</th>
-                <th>Harga Beli</th>
-                <th>Harga Jual</th>
-                <th>Supplier</th>
-                <th>Terakhir Diperbarui</th>
-                <th>Aksi</th>
+                <th style="min-width: 100px;">Kode</th>
+                <th style="min-width: 200px;">Nama Item</th>
+                <th style="min-width: 100px;">Kategori</th>
+                <th style="min-width: 80px;">Stok</th>
+                <th style="min-width: 120px;" class="d-none d-md-table-cell">Supplier</th>
+                <th style="min-width: 120px;" class="d-none d-lg-table-cell">Terakhir Diperbarui</th>
+                <th style="min-width: 150px;">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -40,25 +38,41 @@
                             <span class="badge bg-success">{{ $item['stock'] }}</span>
                         @endif
                     </td>
-                    <td>Rp {{ number_format($item['purchase_price']) }}</td>
-                    <td>Rp {{ number_format($item['selling_price']) }}</td>
-                    <td>{{ $item['supplier'] }}</td>
-                    <td>{{ $item['last_restock'] }}</td>
+                    <td class="d-none d-md-table-cell">{{ $item['supplier'] }}</td>
+                    <td class="d-none d-lg-table-cell">{{ $item['last_restock'] }}</td>
                     <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="/inventory/{{ $item['code'] }}" class="btn btn-info" title="Lihat Detail">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                        <div class="d-flex flex-wrap gap-1">
+                            <!-- Mobile: Stack buttons vertically -->
+                            <div class="d-block d-md-none w-100">
+                                <div class="btn-group-vertical btn-group-sm w-100" role="group">
+                                    <a href="/inventory/{{ $item['code'] }}" class="btn btn-info btn-sm" title="Lihat Detail">
+                                        <i class="bi bi-eye me-1"></i>Detail
+                                    </a>
+                                    <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary btn-sm" title="Edit">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </a>
 
+                                </div>
+                            </div>
+                            
+                            <!-- Desktop: Horizontal button group -->
+                            <div class="d-none d-md-flex">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="/inventory/{{ $item['code'] }}" class="btn btn-info" title="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary" title="Edit Inventaris">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
                 <!-- Size Breakdown Row -->
                 <tr class="collapse size-breakdown-row" id="sizeBreakdown{{ $item['id'] }}">
-                    <td colspan="9" class="p-0">
+                    <td colspan="7" class="p-0">
                         <div class="p-3 bg-light">
                             <x-inventory-size-breakdown :item="$item" />
                         </div>
@@ -66,7 +80,13 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="text-center">Tidak ada data inventaris</td>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                            <p class="mb-0">Tidak ada data inventaris</p>
+                            <small>Silakan tambah item inventaris baru</small>
+                        </div>
+                    </td>
                 </tr>
             @endforelse
         </tbody>
@@ -313,5 +333,8 @@ console.log('Inventory table functions loaded:', {
     deleteProducts: typeof window.deleteProducts,
     updateProduct: typeof window.updateProduct,
     deleteSingleProduct: typeof window.deleteSingleProduct
+});
+
+// Dropdown initialization is handled globally in customer.blade.php layout
 });
 </script>

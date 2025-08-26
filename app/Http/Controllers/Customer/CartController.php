@@ -25,7 +25,10 @@ class CartController extends Controller
         $itemCount = $cartItems->sum('quantity');
 
         return view('cart.index', [
-            'titleShop' => 'RAVAZKA - Keranjang Belanja',
+            'titleShop' => '🛒 Keranjang Belanja - RAVAZKA | Review Pesanan Seragam Anda',
+            'title' => '🛒 Keranjang Belanja - RAVAZKA | Review Pesanan Seragam Anda',
+            'metaDescription' => '🛍️ Review dan kelola pesanan seragam sekolah Anda di keranjang RAVAZKA. Ubah jumlah, hapus item, atau lanjutkan ke checkout dengan mudah dan aman.',
+            'metaKeywords' => 'keranjang belanja RAVAZKA, review pesanan seragam, checkout seragam sekolah, kelola pesanan',
             'cartItems' => $cartItems,
             'total' => $total,
             'itemCount' => $itemCount
@@ -138,7 +141,10 @@ class CartController extends Controller
         $total = $cartItems->sum('total');
 
         return view('cart.checkout', [
-            'titleShop' => 'RAVAZKA - Checkout',
+            'titleShop' => '💳 Checkout Pesanan - RAVAZKA | Selesaikan Pembelian Seragam',
+            'title' => '💳 Checkout Pesanan - RAVAZKA | Selesaikan Pembelian Seragam',
+            'metaDescription' => '✅ Selesaikan pembelian seragam sekolah Anda di RAVAZKA. Isi data pengiriman, pilih metode pembayaran, dan konfirmasi pesanan melalui WhatsApp.',
+            'metaKeywords' => 'checkout RAVAZKA, beli seragam sekolah, pembayaran seragam, konfirmasi pesanan WhatsApp',
             'cartItems' => $cartItems,
             'total' => $total
         ]);
@@ -171,8 +177,8 @@ class CartController extends Controller
 
             // Hitung total
             $subtotal = $cartItems->sum('total');
-            $shippingCost = $validated['shipping_method'] === 'express' ? 15000 : 0;
-            $totalAmount = $subtotal + $shippingCost;
+            $shippingCost = 0; // Ongkir gratis untuk semua metode pengiriman
+            $totalAmount = $subtotal;
 
             // Buat order
             $order = Order::create([
@@ -275,17 +281,16 @@ class CartController extends Controller
             $message .= "  Subtotal: Rp " . number_format($itemSubtotal, 0, ',', '.') . "\n\n";
         }
 
-        // Hitung shipping cost
-        $shippingCost = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 15000 : 0;
-        $total = $subtotal + $shippingCost;
+        // Total sama dengan subtotal karena ongkir gratis untuk semua metode
+        $total = $subtotal;
 
         $message .= "💰 *Ringkasan Biaya:*\n";
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "Subtotal: Rp " . number_format($subtotal, 0, ',', '.') . "\n";
         
-        // Tampilkan informasi pengiriman
+        // Tampilkan informasi pengiriman tanpa harga
         $shippingLabel = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 'Express (1-2 hari)' : 'Reguler (3-5 hari)';
-        $message .= "Pengiriman ({$shippingLabel}): Rp " . number_format($shippingCost, 0, ',', '.') . "\n";
+        $message .= "Pengiriman: {$shippingLabel} - GRATIS\n";
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "*TOTAL: Rp " . number_format($total, 0, ',', '.') . "*\n\n";

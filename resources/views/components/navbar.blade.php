@@ -179,10 +179,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Prevent dropdown close ketika klik di dalam form
-    document.querySelector('.dropdown-menu').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
+    // Prevent dropdown close ketika klik di dalam search form saja
+    const searchDropdownMenu = document.querySelector('#searchDropdown + .dropdown-menu');
+    if (searchDropdownMenu) {
+        searchDropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
     
     // Quick search - redirect langsung jika input kosong
     searchForm.addEventListener('submit', function(e) {

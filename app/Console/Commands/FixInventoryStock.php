@@ -99,7 +99,13 @@ class FixInventoryStock extends Command
                 $inventory->update(['stock' => $correctStock]);
                 
                 // Update stock history
-                $stockHistory = $inventory->stock_history ?? [];
+                $stockHistory = $inventory->stock_history;
+                
+                // Pastikan stock_history adalah array
+                if (!is_array($stockHistory)) {
+                    $stockHistory = [];
+                }
+                
                 $stockHistory[] = [
                     'date' => now()->toDateString(),
                     'type' => 'correction',

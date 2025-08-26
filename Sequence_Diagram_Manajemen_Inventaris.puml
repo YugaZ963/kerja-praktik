@@ -1,0 +1,120 @@
+@startuml Sequence_Diagram_Manajemen_Inventaris
+!theme plain
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 60
+skinparam sequenceParticipant underline
+skinparam sequenceActorBorderThickness 2
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceLifeLineBackgroundColor #EEEEEE
+skinparam sequenceParticipantBackgroundColor #FFFFFF
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceArrowColor black
+skinparam sequenceGroupBorderColor black
+skinparam sequenceGroupBackgroundColor #F0F8FF
+
+title Sequence Diagram - Manajemen Inventaris
+
+actor Admin as A
+participant "Interface" as I
+participant "InventoryController" as IC
+database "Database" as DB
+
+== Akses Halaman Inventaris ==
+A -> I: akses halaman inventaris
+I -> IC: getInventoryList()
+IC -> DB: SELECT * FROM inventories
+DB --> IC: inventory data
+IC --> I: inventory list with pagination
+I --> A: tampilkan halaman inventaris\ndengan tabel data
+
+== Pencarian Data ==
+A -> I: input kata kunci pencarian
+I -> IC: searchInventory(keyword)
+IC -> DB: SELECT * FROM inventories\nWHERE nama LIKE '%keyword%'\nOR kategori LIKE '%keyword%'\nOR kode LIKE '%keyword%'\nOR deskripsi LIKE '%keyword%'
+DB --> IC: filtered results
+IC --> I: search results
+I --> A: tampilkan hasil pencarian
+
+== Filter Data ==
+A -> I: pilih filter (kategori/status stok/harga)
+I -> IC: filterInventory(category, stockStatus, priceRange)
+IC -> DB: SELECT * FROM inventories\nWHERE kategori = ? AND\nstok BETWEEN ? AND ? AND\nharga BETWEEN ? AND ?
+DB --> IC: filtered data
+IC --> I: filtered results
+I --> A: tampilkan data terfilter
+
+== Sorting Data ==
+A -> I: pilih sorting (nama/stok/harga)
+I -> IC: sortInventory(sortBy, sortOrder)
+IC -> DB: SELECT * FROM inventories\nORDER BY ? ASC/DESC
+DB --> IC: sorted data
+IC --> I: sorted results
+I --> A: tampilkan data terurut
+
+== Tambah Item Baru ==
+A -> I: klik tombol tambah
+I --> A: tampilkan form input
+A -> I: isi form (kode, nama, kategori,\nstok, harga beli/jual, supplier)
+I -> IC: createInventory(inventoryData)
+IC -> IC: validateInput()
+alt validasi berhasil
+    IC -> DB: INSERT INTO inventories\n(kode, nama, kategori, stok,\nharga_beli, harga_jual, supplier)
+    DB --> IC: success
+    IC --> I: success message
+    I --> A: feedback sukses
+else validasi gagal
+    IC --> I: error message
+    I --> A: feedback error
+end
+
+== Edit Item Existing ==
+A -> I: klik tombol edit
+I -> IC: getInventoryById(id)
+IC -> DB: SELECT * FROM inventories WHERE id = ?
+DB --> IC: inventory data
+IC --> I: inventory details
+I --> A: tampilkan form edit dengan data
+A -> I: ubah data dan submit
+I -> IC: updateInventory(id, updatedData)
+IC -> IC: validateUniqueCode()
+alt validasi berhasil
+    IC -> DB: UPDATE inventories SET\nnama=?, kategori=?, stok=?\nWHERE id=?
+    DB --> IC: success
+    IC --> I: success message
+    I --> A: feedback sukses
+else validasi gagal
+    IC --> I: error message
+    I --> A: feedback error
+end
+
+== Hapus Item ==
+A -> I: klik tombol hapus
+I --> A: konfirmasi penghapusan
+A -> I: konfirmasi hapus
+I -> IC: deleteInventory(id)
+IC -> DB: DELETE FROM products\nWHERE inventory_id = ?
+DB --> IC: cascade delete success
+IC -> DB: DELETE FROM inventories\nWHERE id = ?
+DB --> IC: delete success
+IC --> I: success message
+I --> A: feedback sukses penghapusan
+
+== Lihat Detail Item ==
+A -> I: klik detail item
+I -> IC: getInventoryDetail(id)
+IC -> DB: SELECT * FROM inventories\nWHERE id = ?
+DB --> IC: inventory detail
+IC -> DB: SELECT * FROM stock_history\nWHERE inventory_id = ?
+DB --> IC: stock history
+IC --> I: detail lengkap dengan\nbreakdown ukuran dan riwayat
+I --> A: tampilkan detail item
+
+note over A, DB
+  Kondisi Akhir:
+  Data inventaris berhasil dikelola
+  sesuai operasi yang dipilih admin
+  dengan feedback yang sesuai
+end note
+
+@enduml

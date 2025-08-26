@@ -1,0 +1,41 @@
+@startuml Sequence_Diagram_Login
+!theme plain
+title Sequence Diagram - Login Process
+
+actor "Admin/Customer" as User
+participant "Interface" as UI
+participant "System" as System
+database "Database" as DB
+
+User -> UI: akses formLogin()
+activate UI
+UI -> User: getUsername(), getPassword()
+deactivate UI
+
+User -> UI: input credentials
+activate UI
+UI -> System: validateCredentials(username, password)
+activate System
+
+System -> DB: open()
+activate DB
+DB --> System: connection established
+
+System -> DB: execute("SELECT * FROM users WHERE username=? AND password=?")
+DB --> System: hasil query
+deactivate DB
+
+alt credentials valid
+    System -> System: createSession()
+    System -> System: generateToken()
+    System -> UI: redirect to dashboard (jika valid)
+    UI -> User: redirect to dashboard (jika valid)
+else credentials invalid
+    System -> UI: show error message
+    UI -> User: tampilkan pesan error
+end
+
+deactivate System
+deactivate UI
+
+@enduml

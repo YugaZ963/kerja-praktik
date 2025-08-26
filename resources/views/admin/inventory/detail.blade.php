@@ -89,9 +89,22 @@
                         <div class="row mb-3">
                             <div class="col-md-4 fw-bold">Ukuran Tersedia</div>
                             <div class="col-md-8">
-                                @foreach ($item['sizes_available'] as $size)
-                                    <span class="badge bg-info me-1">{{ $size }}</span>
-                                @endforeach
+                                @php
+                                    $sizes = $item->sizes_available;
+                                    if (is_string($sizes)) {
+                                        $sizes = json_decode($sizes, true) ?? [];
+                                    }
+                                    if (!is_array($sizes)) {
+                                        $sizes = [];
+                                    }
+                                @endphp
+                                @if(count($sizes) > 0)
+                                    @foreach ($sizes as $size)
+                                        <span class="badge bg-info me-1">{{ $size }}</span>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">Tidak ada ukuran tersedia</span>
+                                @endif
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -105,21 +118,109 @@
                     </div>
                 </div>
 
-                <!-- Size Breakdown -->
-                <x-inventory-size-breakdown :item="$item" />
+
+
+                <!-- Kelola Produk Per Ukuran -->
+                <div class="card mt-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-box-seam text-primary me-2"></i>Kelola Produk Per Ukuran - {{ $item['name'] }}
+                        </h5>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomProductModal">
+                            <i class="bi bi-plus-circle me-1"></i>Tambah Produk Baru
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            $sizes = $item->sizes_available;
+                            if (is_string($sizes)) {
+                                $sizes = json_decode($sizes, true) ?? [];
+                            }
+                            if (!is_array($sizes)) {
+                                $sizes = [];
+                            }
+                        @endphp
+                        
+                        @if(count($sizes) > 0)
+                            <div class="row">
+                                @foreach ($sizes as $size)
+                                    @php
+                                        // Ambil produk untuk ukuran ini
+                                        $sizeProducts = $item->products ? $item->products->where('size', $size) : collect();
+                                        $totalStock = $sizeProducts->sum('stock');
+                                    @endphp
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card border-primary">
+                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">
+                                                    <i class="bi bi-rulers me-1"></i>Ukuran {{ $size }}
+                                                </h6>
+                                                <span class="badge bg-light text-dark">{{ $sizeProducts->count() }} Produk</span>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <span class="text-muted">Total Stok:</span>
+                                                        <span class="badge bg-info fs-6">{{ $totalStock }} unit</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                @if($sizeProducts->count() > 0)
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted mb-2">Daftar Produk:</h6>
+                                                        @foreach($sizeProducts as $product)
+                                                            <div class="border rounded p-2 mb-2 bg-light">
+                                                                <div class="d-flex justify-content-between align-items-start">
+                                                                    <div class="flex-grow-1">
+                                                                        <div class="fw-bold text-primary">{{ $product->name }}</div>
+                                                                        <small class="text-muted">Stok: {{ $product->stock }} | Harga: Rp {{ number_format($product->price, 0, ',', '.') }}</small>
+                                                                    </div>
+                                                                    <div class="btn-group btn-group-sm" role="group">
+                                                                        <a href="{{ route('admin.products.edit', $product->id) }}" 
+                                                                           class="btn btn-outline-primary" title="Edit Produk">
+                                                                            <i class="bi bi-pencil"></i>
+                                                                        </a>
+                                                                        <button type="button" class="btn btn-outline-danger" 
+                                                                                onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')" 
+                                                                                title="Hapus Produk">
+                                                                            <i class="bi bi-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <div class="text-center text-muted py-3">
+                                                        <i class="bi bi-box display-6 mb-2"></i>
+                                                        <p class="mb-0">Belum ada produk untuk ukuran ini</p>
+                                                    </div>
+                                                @endif
+                                                
+                                                {{-- Tombol tambah produk per ukuran dihapus sesuai permintaan --}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-rulers display-4 mb-3"></i>
+                                <h5>Belum Ada Ukuran Tersedia</h5>
+                                <p class="mb-3">Silakan edit item inventaris untuk menambahkan ukuran yang tersedia.</p>
+                                <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary">
+                                    <i class="bi bi-pencil me-1"></i>Edit Item Inventaris
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
 
                 <!-- Stock History -->
                 <div class="card mt-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Riwayat Stok</h5>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#increaseStockModal">
-                                <i class="bi bi-plus-circle"></i> Tambah Stok
-                            </button>
-                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#decreaseStockModal">
-                                <i class="bi bi-dash-circle"></i> Kurangi Stok
-                            </button>
-                        </div>
+
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -248,143 +349,130 @@
         </div>
     </div>
 
-    <!-- Modal Tambah Stok -->
-    <div class="modal fade" id="increaseStockModal" tabindex="-1" aria-labelledby="increaseStockModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+
+
+
+
+    {{-- Modal Tambah Produk Baru Kustom --}}
+    <div class="modal fade" id="addCustomProductModal" tabindex="-1" aria-labelledby="addCustomProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('inventory.adjust-stock', $item['id']) }}" method="POST">
+                <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="adjustment_type" value="increase">
+                    <input type="hidden" name="inventory_id" value="{{ $item['id'] }}">
+                    <input type="hidden" name="category" value="{{ $item['category'] }}">
                     
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="increaseStockModalLabel">
-                            <i class="bi bi-plus-circle text-success me-2"></i>Tambah Stok
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="addCustomProductModalLabel">
+                            <i class="bi bi-plus-circle me-2"></i>Tambah Produk Baru - {{ $item['name'] }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     
                     <div class="modal-body">
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            <strong>{{ $item['name'] }}</strong><br>
-                            Total stok semua ukuran: <span class="badge bg-primary">{{ $item['stock'] }}</span>
-                            <small class="d-block mt-1 text-muted">
-                                <i class="bi bi-info-circle-fill me-1"></i>
-                                Stok per ukuran ditampilkan di dropdown di bawah
-                            </small>
+                            <strong>Item Inventaris:</strong> {{ $item['name'] }}<br>
+                            <strong>Kategori:</strong> {{ $item['category'] }} (Otomatis terisi)
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="increase_size" class="form-label">Ukuran</label>
-                            <select class="form-select" id="increase_size" name="size" required>
-                                <option value="">Pilih Ukuran</option>
-                                @if($item->products && $item->products->count() > 0)
-                                    @php
-                                        // Kelompokkan products per ukuran dan jumlahkan stocknya
-                                        $sizeGroups = $item->products->groupBy('size')->map(function($products) {
-                                            return $products->sum('stock');
-                                        })->sortKeys();
-                                    @endphp
-                                    @foreach($sizeGroups as $size => $totalStock)
-                                        <option value="{{ $size }}">
-                                            {{ $size }} (Stok: {{ $totalStock }})
-                                        </option>
-                                    @endforeach
-                                @endif
-                                <!-- Opsi untuk ukuran baru -->
-                                <option value="S">S (Ukuran Baru)</option>
-                                <option value="M">M (Ukuran Baru)</option>
-                                <option value="L">L (Ukuran Baru)</option>
-                                <option value="XL">XL (Ukuran Baru)</option>
-                                <option value="XXL">XXL (Ukuran Baru)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="increase_quantity" class="form-label">Jumlah yang akan ditambahkan</label>
-                            <input type="number" class="form-control" id="increase_quantity" name="quantity" 
-                                   min="1" required placeholder="Masukkan jumlah">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="increase_notes" class="form-label">Keterangan (Opsional)</label>
-                            <textarea class="form-control" id="increase_notes" name="notes" rows="3" 
-                                      placeholder="Contoh: Restock dari supplier, Penyesuaian stok, dll."></textarea>
+                        <div class="row">
+                            {{-- Nama Produk --}}
+                            <div class="col-md-12 mb-3">
+                                <label for="custom_name" class="form-label fw-semibold">
+                                    <i class="bi bi-tag text-primary"></i> Nama Produk
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="name" id="custom_name" class="form-control" 
+                                       required placeholder="Contoh: Topi Sekolah Merah Ukuran XL">
+                            </div>
+
+                            {{-- Ukuran --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="custom_size" class="form-label fw-semibold">
+                                    <i class="bi bi-rulers text-primary"></i> Ukuran
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="size" id="custom_size" class="form-control" 
+                                       required placeholder="Contoh: XL, XXL, Custom">
+                                <small class="form-text text-muted">Masukkan ukuran kustom jika tidak ada di daftar standar</small>
+                            </div>
+
+                            {{-- Harga Jual --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="custom_price" class="form-label fw-semibold">
+                                    <i class="bi bi-currency-dollar text-primary"></i> Harga Jual
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" name="price" id="custom_price" class="form-control" 
+                                           required min="0" step="1000" placeholder="0">
+                                </div>
+                            </div>
+
+                            {{-- Stok --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="custom_stock" class="form-label fw-semibold">
+                                    <i class="bi bi-box text-primary"></i> Stok
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" name="stock" id="custom_stock" class="form-control" 
+                                       required min="0" placeholder="0">
+                            </div>
+
+                            {{-- Berat --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="custom_weight" class="form-label fw-semibold">
+                                    <i class="bi bi-speedometer text-primary"></i> Berat (gram)
+                                </label>
+                                <input type="number" name="weight" id="custom_weight" class="form-control" 
+                                       min="0" step="0.1" placeholder="0">
+                                <small class="form-text text-muted">Opsional - untuk keperluan pengiriman</small>
+                            </div>
+
+                            {{-- Upload Gambar --}}
+                            <div class="col-md-12 mb-3">
+                                <label for="custom_image_file" class="form-label fw-semibold">
+                                    <i class="bi bi-image text-primary"></i> Upload Gambar Produk
+                                </label>
+                                <input type="file" name="image_file" id="custom_image_file" class="form-control" 
+                                       accept="image/jpeg,image/png,image/jpg,image/gif" onchange="previewCustomImage(event)">
+                                <small class="form-text text-muted">Format yang didukung: JPEG, PNG, JPG, GIF. Maksimal 2MB</small>
+                                
+                                {{-- Image Preview --}}
+                                <div class="mt-3">
+                                    <img id="customImagePreview" src="" alt="Preview Gambar" 
+                                         style="max-width: 200px; max-height: 200px; display: none; border: 1px solid #ddd; border-radius: 5px;">
+                                </div>
+                                
+                                {{-- Fallback for manual image name input --}}
+                                <div class="mt-3">
+                                    <label for="custom_image" class="form-label fw-semibold">
+                                        <i class="bi bi-pencil text-secondary"></i> Atau Masukkan Nama File Gambar Manual
+                                    </label>
+                                    <input type="text" name="image" id="custom_image" class="form-control" 
+                                           placeholder="Contoh: topi-sekolah-xl.png">
+                                    <small class="form-text text-muted">Opsional - jika tidak mengupload file, masukkan nama file gambar yang ada di folder public/images/</small>
+                                </div>
+                            </div>
+
+                            {{-- Deskripsi --}}
+                            <div class="col-md-12 mb-3">
+                                <label for="custom_description" class="form-label fw-semibold">
+                                    <i class="bi bi-card-text text-primary"></i> Deskripsi
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="description" id="custom_description" class="form-control" 
+                                          rows="4" required placeholder="Masukkan deskripsi produk..."></textarea>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-success">
-                            <i class="bi bi-plus-circle me-1"></i>Tambah Stok
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Kurangi Stok -->
-    <div class="modal fade" id="decreaseStockModal" tabindex="-1" aria-labelledby="decreaseStockModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('inventory.adjust-stock', $item['id']) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="adjustment_type" value="decrease">
-                    
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="decreaseStockModalLabel">
-                            <i class="bi bi-dash-circle text-warning me-2"></i>Kurangi Stok
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            <strong>{{ $item['name'] }}</strong><br>
-                            Total stok semua ukuran: <span class="badge bg-primary">{{ $item['stock'] }}</span><br>
-                            <small>Pastikan jumlah yang dikurangi tidak melebihi stok ukuran yang tersedia.</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="decrease_size" class="form-label">Ukuran</label>
-                            <select class="form-select" id="decrease_size" name="size" required onchange="updateMaxQuantity()">
-                                <option value="">Pilih Ukuran</option>
-                                @if($item->products && $item->products->count() > 0)
-                                    @php
-                                        // Kelompokkan products per ukuran dan jumlahkan stocknya
-                                        $sizeGroups = $item->products->groupBy('size')->map(function($products) {
-                                            return $products->sum('stock');
-                                        })->sortKeys();
-                                    @endphp
-                                    @foreach($sizeGroups as $size => $totalStock)
-                                        <option value="{{ $size }}" data-stock="{{ $totalStock }}">
-                                            {{ $size }} (Stok: {{ $totalStock }})
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="decrease_quantity" class="form-label">Jumlah yang akan dikurangi</label>
-                            <input type="number" class="form-control" id="decrease_quantity" name="quantity" 
-                                   min="1" required placeholder="Masukkan jumlah">
-                            <div class="form-text" id="max-quantity-text">Pilih ukuran terlebih dahulu</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="decrease_notes" class="form-label">Keterangan (Opsional)</label>
-                            <textarea class="form-control" id="decrease_notes" name="notes" rows="3" 
-                                      placeholder="Contoh: Barang rusak, Penjualan, Penyesuaian stok, dll."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-dash-circle me-1"></i>Kurangi Stok
+                            <i class="bi bi-check-circle me-1"></i>Simpan Produk
                         </button>
                     </div>
                 </form>
@@ -393,31 +481,49 @@
     </div>
 
     <script>
-        function updateMaxQuantity() {
-            const sizeSelect = document.getElementById('decrease_size');
-            const quantityInput = document.getElementById('decrease_quantity');
-            const maxQuantityText = document.getElementById('max-quantity-text');
+        // Fungsi untuk preview gambar kustom
+        function previewCustomImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('customImagePreview');
             
-            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
-            
-            if (selectedOption.value && selectedOption.dataset.stock) {
-                const maxStock = parseInt(selectedOption.dataset.stock);
-                quantityInput.max = maxStock;
-                maxQuantityText.textContent = `Maksimal: ${maxStock} unit`;
-                
-                if (maxStock === 0) {
-                    quantityInput.disabled = true;
-                    maxQuantityText.textContent = 'Stok ukuran ini habis';
-                    maxQuantityText.className = 'form-text text-danger';
-                } else {
-                    quantityInput.disabled = false;
-                    maxQuantityText.className = 'form-text';
-                }
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
             } else {
-                quantityInput.max = '';
-                quantityInput.disabled = true;
-                maxQuantityText.textContent = 'Pilih ukuran terlebih dahulu';
-                maxQuantityText.className = 'form-text';
+                preview.style.display = 'none';
+            }
+        }
+
+        // Fungsi untuk menghapus produk
+        function deleteProduct(productId, productName) {
+            if (confirm(`Apakah Anda yakin ingin menghapus produk "${productName}"?\n\nTindakan ini tidak dapat dibatalkan.`)) {
+                // Buat form untuk menghapus produk
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/products/${productId}`;
+                form.style.display = 'none';
+                
+                // Tambahkan CSRF token
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                // Tambahkan method DELETE
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                form.appendChild(methodInput);
+                
+                // Submit form
+                document.body.appendChild(form);
+                form.submit();
             }
         }
     </script>

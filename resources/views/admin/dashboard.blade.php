@@ -45,6 +45,19 @@
                             <div class="col-12 col-sm-6 col-lg-4">
                                 <div class="card bg-gradient-primary text-white border-0 shadow-sm h-100 admin-card">
                                     <div class="card-body text-center p-3 p-md-4">
+                                        <i class="bi bi-grid-3x3-gap display-6 mb-3"></i>
+                                        <h5 class="card-title mb-2">Tampilan Terpadu</h5>
+                                        <p class="card-text small opacity-75 mb-3">Kelola produk dan inventaris dalam satu tampilan</p>
+                                        <a href="{{ route('admin.unified.index') }}" class="btn btn-light btn-sm">
+                                            <i class="bi bi-arrow-right me-1"></i>
+                                            Buka Tampilan Terpadu
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="card bg-gradient-secondary text-white border-0 shadow-sm h-100 admin-card">
+                                    <div class="card-body text-center p-3 p-md-4">
                                         <i class="bi bi-box-seam display-6 mb-3"></i>
                                         <h5 class="card-title mb-2">Kelola Inventaris</h5>
                                         <p class="card-text small opacity-75 mb-3">Tambah, edit, dan hapus item inventaris</p>
@@ -52,6 +65,25 @@
                                             <i class="bi bi-arrow-right me-1"></i>
                                             Buka Inventaris
                                         </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="card bg-gradient-primary text-white border-0 shadow-sm h-100 admin-card">
+                                    <div class="card-body text-center p-3 p-md-4">
+                                        <i class="bi bi-box display-6 mb-3"></i>
+                                        <h5 class="card-title mb-2">Kelola Produk</h5>
+                                        <p class="card-text small opacity-75 mb-3">Tambah, edit, dan kelola produk seragam</p>
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <a href="{{ route('admin.products.create') }}" class="btn btn-light btn-sm">
+                                                <i class="bi bi-plus-circle me-1"></i>
+                                                Tambah Produk
+                                            </a>
+                                            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-light btn-sm">
+                                                <i class="bi bi-list me-1"></i>
+                                                Kelola
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -68,19 +100,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="card bg-gradient-info text-white border-0 shadow-sm h-100 admin-card">
-                                    <div class="card-body text-center p-3 p-md-4">
-                                        <i class="bi bi-file-text display-6 mb-3"></i>
-                                        <h5 class="card-title mb-2">Laporan Stok</h5>
-                                        <p class="card-text small opacity-75 mb-3">Lihat laporan stok dan analisis</p>
-                                        <a href="{{ route('inventory.reports.stock') }}" class="btn btn-light btn-sm">
-                                            <i class="bi bi-arrow-right me-1"></i>
-                                            Buka Laporan
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-12 col-sm-6 col-lg-4">
                                 <div class="card bg-gradient-success text-white border-0 shadow-sm h-100 admin-card">
                                     <div class="card-body text-center p-3 p-md-4">

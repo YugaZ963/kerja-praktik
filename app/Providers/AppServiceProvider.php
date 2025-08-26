@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
 use App\Helpers\BreadcrumbHelper;
 use App\Helpers\ImageHelper;
+use App\Models\Product;
+use App\Observers\ProductObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register model observers
+        Product::observe(ProductObserver::class);
+        
         // Share breadcrumbs with all views
         View::composer('*', function ($view) {
             $breadcrumbs = BreadcrumbHelper::generate();

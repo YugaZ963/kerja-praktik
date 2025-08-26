@@ -1,0 +1,96 @@
+@startuml Activity_Diagram_Manajemen_Pesanan
+!theme plain
+skinparam activityBackgroundColor White
+skinparam activityBorderColor Black
+skinparam activityFontSize 9
+skinparam activityArrowColor Black
+skinparam activityArrowThickness 1
+skinparam activityDiamondBackgroundColor #E6E6FA
+skinparam activityDiamondBorderColor Black
+skinparam activityStartColor Black
+skinparam activityEndColor Black
+skinparam partitionBackgroundColor #F0F8FF
+skinparam partitionBorderColor Black
+skinparam swimlaneBackgroundColor #FAFAFA
+skinparam swimlaneBorderColor Black
+
+title Activity Diagram - Manajemen Pesanan
+
+|Admin|
+start
+:Admin login dan berada\ndi dashboard admin;
+:Mengakses halaman\nManajemen Pesanan;
+
+|Sistem|
+:Menampilkan halaman\nManajemen Pesanan;
+:Menampilkan daftar\nsemua pesanan;
+:Menampilkan counter\njumlah pesanan\nuntuk setiap status;
+
+|Admin|
+if (Ingin mencari pesanan?) then (Ya)
+  :Mencari pesanan berdasarkan\nnomor pesanan, nama pelanggan,\natau nomor telepon;
+  |Sistem|
+  :Memproses pencarian;
+  :Menampilkan hasil\nyang sesuai;
+else (Tidak)
+endif
+
+|Admin|
+if (Ingin memfilter pesanan?) then (Ya)
+  :Memfilter pesanan\nberdasarkan status\n(Pending, Menunggu Verifikasi,\nPembayaran Terverifikasi,\nDiproses, Dikemas, Dikirim,\nSudah Sampai, Selesai,\nDibatalkan);
+  |Sistem|
+  :Memfilter pesanan\nberdasarkan status\nyang dipilih;
+else (Tidak)
+endif
+
+|Admin|
+if (Ingin melihat detail pesanan?) then (Ya)
+  :Mengklik tombol Detail;
+  |Sistem|
+  :Menampilkan detail lengkap\npesanan termasuk informasi\npelanggan, item pesanan,\ndan riwayat status;
+else (Tidak)
+endif
+
+|Admin|
+if (Ingin mengupdate status pesanan?) then (Ya)
+  :Mengklik tombol Edit;
+  :Memilih status baru;
+  :Menambahkan catatan admin;
+  |Sistem|
+  :Memvalidasi perubahan status;
+  :Menyimpan ke database;
+  :Mengirim notifikasi\nkepada pelanggan;
+  :Mencatat riwayat perubahan\nstatus dengan timestamp;
+  if (Status berubah ke 'delivered'?) then (Ya)
+    :Mengurangi stok otomatis;
+  else (Tidak)
+  endif
+else (Tidak)
+endif
+
+|Admin|
+if (Ingin menghapus pesanan?) then (Ya)
+  :Menghapus pesanan;
+  |Sistem|
+  :Memproses penghapusan\npesanan dari database;
+else (Tidak)
+endif
+
+|Admin|
+if (Selesai mengelola pesanan?) then (Ya)
+  stop
+else (Tidak)
+  :Kembali ke halaman\nManajemen Pesanan;
+  |Sistem|
+  :Menampilkan halaman\nManajemen Pesanan\nyang terupdate;
+endif
+
+note right
+  Kondisi Akhir:
+  Admin berhasil mengelola
+  pesanan pelanggan dan
+  status pesanan terupdate
+  sesuai dengan alur bisnis
+end note
+
+@enduml

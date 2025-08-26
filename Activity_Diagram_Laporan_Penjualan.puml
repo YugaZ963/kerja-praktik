@@ -1,0 +1,99 @@
+@startuml Activity_Diagram_Laporan_Penjualan
+!theme plain
+
+' Styling parameters
+skinparam backgroundColor #FFFFFF
+skinparam activityBackgroundColor #E8F4FD
+skinparam activityBorderColor #2E86AB
+skinparam activityFontName Arial
+skinparam activityFontSize 10
+skinparam activityFontColor #000000
+skinparam activityArrowColor #2E86AB
+skinparam activityArrowFontName Arial
+skinparam activityArrowFontSize 9
+skinparam activityArrowFontColor #000000
+skinparam activityDiamondBackgroundColor #FFE4B5
+skinparam activityDiamondBorderColor #DAA520
+skinparam activityDiamondFontName Arial
+skinparam activityDiamondFontSize 9
+skinparam activityStartColor #32CD32
+skinparam activityEndColor #FF6347
+skinparam activityBarColor #2E86AB
+skinparam partitionBackgroundColor #F0F8FF
+skinparam partitionBorderColor #2E86AB
+skinparam noteBackgroundColor #FFFACD
+skinparam noteBorderColor #DAA520
+skinparam noteFontSize 9
+
+title **Activity Diagram - Laporan Penjualan (REQ-APITS-F-05)**
+
+|#LightBlue|Admin|
+start
+:Admin sudah login dan berada\ndi dashboard admin;
+
+:Admin mengklik menu\n"Laporan Penjualan"\ndari dashboard;
+
+|#LightGreen|Sistem|
+:Sistem menampilkan halaman\nlaporan penjualan dengan\ndashboard analisis;
+
+:Sistem menampilkan 4 kartu ringkasan:\n- Total Revenue\n- Total Pesanan\n- Rata-rata Order\n- Produk Terjual;
+
+:Sistem menampilkan grafik tren\npenjualan harian dengan data\nrevenue dan jumlah pesanan;
+
+:Sistem menampilkan grafik\npie chart penjualan\nper kategori;
+
+:Sistem menampilkan tabel\nproduk terlaris dengan ranking,\nnama produk, unit terjual,\ndan revenue;
+
+:Sistem menampilkan tabel\npenjualan per kategori dengan\npersentase dan progress bar;
+
+:Sistem menampilkan tabel\npesanan selesai terbaru\ndengan detail customer\ndan total;
+
+|#LightBlue|Admin|
+:Admin melihat ringkasan\npenjualan (total revenue,\ntotal pesanan, rata-rata\norder, produk terjual);
+
+:Admin menganalisis grafik\ntren penjualan harian dan\npenjualan per kategori;
+
+:Admin melihat tabel produk\nterlaris dan pesanan\nselesai terbaru;
+
+if (Admin ingin mengubah\nperiode laporan?) then (Ya)
+    :Admin mengklik\n"Filter Tanggal";
+    
+    |#LightGreen|Sistem|
+    :Sistem menampilkan modal\nfilter dengan input tanggal\ndan tombol quick select;
+    
+    |#LightBlue|Admin|
+    :Admin memilih rentang tanggal\natau quick select:\n- Hari ini\n- 7 hari\n- Bulan ini\n- Tahun ini;
+    
+    |#LightGreen|Sistem|
+    :Sistem memfilter data\nberdasarkan rentang\ntanggal yang dipilih;
+    
+    :Sistem memperbarui semua\nkomponen dashboard:\n- Kartu ringkasan\n- Grafik tren\n- Grafik pie chart\n- Tabel produk terlaris\n- Tabel penjualan kategori\n- Tabel pesanan terbaru;
+    
+    |#LightBlue|Admin|
+else (Tidak)
+endif
+
+if (Admin ingin export laporan?) then (Ya)
+    :Admin mengklik\n"Export PDF";
+    
+    |#LightGreen|Sistem|
+    :Sistem menghasilkan file\nPDF laporan penjualan\nuntuk diunduh;
+    
+    :Sistem menyediakan\nlink download PDF\nlaporan penjualan;
+    
+    |#LightBlue|Admin|
+    :Admin mengunduh\nlaporan PDF;
+else (Tidak)
+endif
+
+note right
+**Kondisi Akhir:**
+Admin berhasil melihat dan menganalisis
+laporan penjualan dengan berbagai
+visualisasi data dan dapat mengexport
+laporan dalam format PDF
+end note
+
+stop
+
+@enduml

@@ -17,7 +17,10 @@ class AboutController extends Controller
             ->get();
 
         return view('public.about', [
-            'titleShop' => 'RAVAZKA',
+            'titleShop' => '🏢 Tentang Kami - RAVAZKA | Sejarah & Visi Seragam Sekolah Terpercaya',
+            'title' => '🏢 Tentang Kami - RAVAZKA | Sejarah & Visi Seragam Sekolah Terpercaya',
+            'metaDescription' => '📖 Kenali lebih dekat RAVAZKA, produsen seragam sekolah terpercaya dengan pengalaman bertahun-tahun. Komitmen kualitas, pelayanan terbaik, dan kepuasan pelanggan.',
+            'metaKeywords' => 'tentang RAVAZKA, sejarah perusahaan seragam, visi misi RAVAZKA, produsen seragam terpercaya, profil perusahaan',
             'testimonials' => $testimonials
         ]);
     }

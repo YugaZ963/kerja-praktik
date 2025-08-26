@@ -162,9 +162,8 @@ class ComprehensiveProductSeeder extends Seeder
 
         // KEMEJA PADANG
         $kemejaPadangSizes = [
-            '14' => 66000, '15' => 68000, '16' => 70000, 'S' => 75000,
-            'M' => 75000, 'L' => 75000, 'XL' => 77000, 'L3' => 79000,
-            'L4' => 81000, 'L5' => 83000, 'L6' => 85000
+            '14' => 66000, '15' => 68000, '16' => 70000, 'SML' => 75000,
+            'XL' => 77000, 'L3' => 79000, 'L4' => 81000, 'L5' => 83000, 'L6' => 85000
         ];
         
         foreach ($kemejaPadangSizes as $size => $price) {
@@ -396,7 +395,7 @@ class ComprehensiveProductSeeder extends Seeder
 
         // ROK PANJANG SPAN
         $rokPanjangSpanSizes = [
-            'S' => 66000, 'M' => 66000, 'L' => 66000, 'XL' => 69000,
+            'SML' => 66000, 'XL' => 69000,
             'L3' => 72000, 'L4' => 75000, 'L5' => 78000, 'L6' => 81000
         ];
         
@@ -417,7 +416,7 @@ class ComprehensiveProductSeeder extends Seeder
 
         // ROK REMPEL BAPING / FULL
         $rokRempelSizes = [
-            'S' => 76000, 'M' => 76000, 'L' => 76000, 'XL' => 79000,
+            'SML' => 76000, 'XL' => 79000,
             'L3' => 82000, 'L4' => 85000, 'L5' => 88000, 'L6' => 91000
         ];
         
@@ -568,7 +567,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // TOPI SD
-        $topiSizes = ['S', 'M', 'L', 'XL'];
+        $topiSizes = ['Kecil', 'Besar'];
         foreach ($topiSizes as $size) {
             Product::create([
                 'name' => 'TOPI SD ' . $size,
@@ -633,7 +632,8 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // KERUDUNG SD
-        foreach ($topiSizes as $size) {
+        $kerudungSizes = ['S', 'M', 'L', 'XL'];
+        foreach ($kerudungSizes as $size) {
             Product::create([
                 'name' => 'KERUDUNG SD ' . $size,
                 'slug' => 'kerudung-sd-' . strtolower($size),
@@ -649,7 +649,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // KERUDUNG SMP
-        foreach ($topiSizes as $size) {
+        foreach ($kerudungSizes as $size) {
             Product::create([
                 'name' => 'KERUDUNG SMP ' . $size,
                 'slug' => 'kerudung-smp-' . strtolower($size),
@@ -665,7 +665,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // KERUDUNG SMA
-        foreach ($topiSizes as $size) {
+        foreach ($kerudungSizes as $size) {
             Product::create([
                 'name' => 'KERUDUNG SMA ' . $size,
                 'slug' => 'kerudung-sma-' . strtolower($size),
@@ -681,7 +681,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // KERUDUNG PRAMUKA
-        foreach ($topiSizes as $size) {
+        foreach ($kerudungSizes as $size) {
             Product::create([
                 'name' => 'KERUDUNG PRAMUKA ' . $size,
                 'slug' => 'kerudung-pramuka-' . strtolower($size),
@@ -697,7 +697,8 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // SABUK SD
-        foreach ($topiSizes as $size) {
+        $sabukSizes = ['Kecil', 'Besar'];
+        foreach ($sabukSizes as $size) {
             Product::create([
                 'name' => 'SABUK SD ' . $size,
                 'slug' => 'sabuk-sd-' . strtolower($size),
@@ -713,7 +714,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // SABUK SMP
-        foreach ($topiSizes as $size) {
+        foreach ($sabukSizes as $size) {
             Product::create([
                 'name' => 'SABUK SMP ' . $size,
                 'slug' => 'sabuk-smp-' . strtolower($size),
@@ -729,7 +730,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // SABUK SMA
-        foreach ($topiSizes as $size) {
+        foreach ($sabukSizes as $size) {
             Product::create([
                 'name' => 'SABUK SMA ' . $size,
                 'slug' => 'sabuk-sma-' . strtolower($size),
@@ -745,7 +746,7 @@ class ComprehensiveProductSeeder extends Seeder
         }
 
         // SABUK PRAMUKA
-        foreach ($topiSizes as $size) {
+        foreach ($sabukSizes as $size) {
             Product::create([
                 'name' => 'SABUK PRAMUKA ' . $size,
                 'slug' => 'sabuk-pramuka-' . strtolower($size),

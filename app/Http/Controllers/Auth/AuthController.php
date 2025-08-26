@@ -18,7 +18,12 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'titleShop' => '🔐 Masuk Akun - RAVAZKA | Login Seragam Sekolah Online',
+            'title' => '🔐 Masuk Akun - RAVAZKA | Login Seragam Sekolah Online',
+            'metaDescription' => '🚪 Masuk ke akun RAVAZKA Anda untuk berbelanja seragam sekolah dengan mudah. Akses keranjang tersimpan, riwayat pesanan, dan checkout yang lebih cepat.',
+            'metaKeywords' => 'login RAVAZKA, masuk akun seragam, belanja seragam online, akun pelanggan RAVAZKA'
+        ]);
     }
 
     /**
@@ -83,7 +88,12 @@ class AuthController extends Controller
      */
     public function showRegisterForm()
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'titleShop' => '📝 Daftar Akun Baru - RAVAZKA | Registrasi Seragam Sekolah',
+            'title' => '📝 Daftar Akun Baru - RAVAZKA | Registrasi Seragam Sekolah',
+            'metaDescription' => '✨ Buat akun RAVAZKA gratis untuk berbelanja seragam sekolah dengan mudah. Dapatkan akses ke keranjang tersimpan, riwayat pesanan, dan penawaran khusus.',
+            'metaKeywords' => 'daftar RAVAZKA, registrasi seragam sekolah, buat akun baru, member RAVAZKA'
+        ]);
     }
 
     /**
@@ -125,7 +135,12 @@ class AuthController extends Controller
      */
     public function showAdminRegisterForm()
     {
-        return view('auth.admin-register');
+        return view('auth.admin-register', [
+            'titleShop' => '👨‍💼 Registrasi Admin - RAVAZKA | Daftar Administrator Baru',
+            'title' => '👨‍💼 Registrasi Admin - RAVAZKA | Daftar Administrator Baru',
+            'metaDescription' => '🔧 Form registrasi khusus administrator RAVAZKA. Buat akun admin baru untuk mengelola sistem, inventaris, dan pesanan seragam sekolah.',
+            'metaKeywords' => 'registrasi admin RAVAZKA, daftar administrator, akun admin baru, manajemen sistem'
+        ]);
     }
 
     /**

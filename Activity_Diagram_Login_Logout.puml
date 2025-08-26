@@ -1,0 +1,50 @@
+@startuml Activity_Diagram_Login_Logout
+!theme plain
+title Activity Diagram - Login dan Logout
+
+|#LightBlue|Admin/Customer|
+|#LightGreen|Sistem|
+
+start
+
+|Admin/Customer|
+:Membuka Halaman Login;
+
+:Memasukkan Email dan Password;
+
+:Menekan Tombol Login;
+
+if (Kredensial Valid?) then (Ya)
+  |Sistem|
+  :Sistem Menampilkan Form Login;
+  :Sistem Membaca Input;
+  :Sistem Memvalidasi Kredensial;
+  :Sistem Membuat Sesi dan Token;
+  :Redirect ke Halaman Utama
+  sesuai Role;
+else (Tidak)
+  |Sistem|
+  :Tampilkan Pesan Error
+  "Login Gagal";
+  stop
+endif
+
+|Admin/Customer|
+:Mengklik Tombol/Menu Logout;
+
+if (Konfirmasi Logout?) then (Ya)
+  |Sistem|
+  :Sistem Memproses Logout;
+  :Sistem Menghapus Sesi
+  dan Token Akses;
+  :Redirect ke Halaman Login
+  atau Halaman Publik;
+  stop
+else (Tidak)
+  |Sistem|
+  :Kembali ke Halaman
+  Sebelumnya;
+  stop
+endif
+
+@enduml

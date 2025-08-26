@@ -144,24 +144,20 @@ function selectShipping(method) {
     }
 }
 
-// Function to update shipping cost and total
-function updateShippingCost(subtotal) {
+// Function to update shipping estimate
+function updateShippingEstimate(subtotal) {
     const shippingMethod = document.querySelector('input[name="shipping_method"]:checked');
-    const shippingCostDisplay = document.getElementById('shipping-cost-display');
+    const shippingEstimateDisplay = document.getElementById('shipping-estimate-display');
     const totalAmountDisplay = document.getElementById('total-amount-display');
     
-    if (shippingMethod && shippingCostDisplay && totalAmountDisplay) {
-        let shippingCost = 0;
-        let shippingText = 'Gratis';
+    if (shippingMethod && shippingEstimateDisplay && totalAmountDisplay) {
+        let estimateText = '3-5 hari kerja';
         
         if (shippingMethod.value === 'express') {
-            shippingCost = 15000;
-            shippingText = 'Rp 15.000';
+            estimateText = '1-2 hari kerja';
         }
         
-        const totalAmount = subtotal + shippingCost;
-        
-        shippingCostDisplay.textContent = shippingText;
-        totalAmountDisplay.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalAmount);
+        shippingEstimateDisplay.textContent = estimateText;
+        totalAmountDisplay.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
     }
 }

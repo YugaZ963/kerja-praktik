@@ -36,7 +36,15 @@ class OrderController extends Controller
         // Get status counts for tabs
         $statusCounts = $this->getStatusCounts($user->id);
         
-        return view('customer.orders.index', compact('orders', 'status', 'statusCounts'));
+        return view('customer.orders.index', [
+            'titleShop' => '📦 Pesanan Saya - RAVAZKA | Riwayat Order Seragam Sekolah',
+            'title' => '📦 Pesanan Saya - RAVAZKA | Riwayat Order Seragam Sekolah',
+            'metaDescription' => '🛍️ Lihat riwayat pesanan seragam sekolah Anda di RAVAZKA. Cek status pembayaran, pengiriman, dan tracking pesanan dengan mudah dan real-time.',
+            'metaKeywords' => 'pesanan RAVAZKA, riwayat order seragam, status pesanan, tracking pengiriman, history belanja',
+            'orders' => $orders,
+            'status' => $status,
+            'statusCounts' => $statusCounts
+        ]);
     }
     
     /**
@@ -51,7 +59,13 @@ class OrderController extends Controller
                      ->with(['items.product'])
                      ->firstOrFail();
         
-        return view('customer.orders.show', compact('order'));
+        return view('customer.orders.show', [
+            'titleShop' => '🔍 Detail Pesanan - RAVAZKA | Info Lengkap Order Seragam',
+            'title' => '🔍 Detail Pesanan - RAVAZKA | Info Lengkap Order Seragam',
+            'metaDescription' => '📋 Detail lengkap pesanan seragam sekolah Anda di RAVAZKA. Informasi produk, harga, status pembayaran, dan tracking pengiriman secara real-time.',
+            'metaKeywords' => 'detail pesanan RAVAZKA, info order seragam, status pembayaran, tracking pesanan, detail produk',
+            'order' => $order
+        ]);
     }
     
     /**
@@ -67,7 +81,13 @@ class OrderController extends Controller
                           ->first();
         }
         
-        return view('customer.orders.track', compact('order'));
+        return view('customer.orders.track', [
+            'titleShop' => '🚚 Lacak Pesanan - RAVAZKA | Tracking Order Seragam Sekolah',
+            'title' => '🚚 Lacak Pesanan - RAVAZKA | Tracking Order Seragam Sekolah',
+            'metaDescription' => '📍 Lacak pesanan seragam sekolah Anda di RAVAZKA dengan nomor order. Pantau status pengiriman dan estimasi waktu tiba secara real-time.',
+            'metaKeywords' => 'lacak pesanan RAVAZKA, tracking order seragam, status pengiriman, nomor resi, estimasi tiba',
+            'order' => $order
+        ]);
     }
     
     /**

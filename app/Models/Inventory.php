@@ -59,4 +59,75 @@ class Inventory extends Model
         $this->update(['stock' => $totalStock]);
         return $totalStock;
     }
+
+    // Method untuk update data inventaris berdasarkan produk
+    public function updateFromProducts()
+    {
+        $products = $this->products();
+        
+        // Update total stock
+        $totalStock = $products->sum('stock');
+        
+        // Hitung harga rata-rata berdasarkan produk yang ada
+        $totalValue = $products->selectRaw('SUM(price * stock) as total_value')->value('total_value');
+        $averagePrice = $totalStock > 0 ? $totalValue / $totalStock : $this->selling_price;
+        
+        // Ambil kategori dari produk pertama (asumsi semua produk dalam inventory sama kategorinya)
+        $category = $products->first()?->category ?? $this->category;
+        
+        // Update data inventory
+        $this->update([
+            'stock' => $totalStock,
+            'selling_price' => round($averagePrice, 2),
+            'category' => $category
+        ]);
+        
+        return [
+            'stock' => $totalStock,
+            'selling_price' => $averagePrice,
+            'category' => $category
+        ];
+    }
+
+    // Method untuk mendapatkan status stok
+    public function getStockStatus()
+    {
+        if ($this->stock <= 0) {
+            return 'habis';
+        } elseif ($this->stock <= $this->min_stock) {
+            return 'rendah';
+        } else {
+            return 'tersedia';
+        }
+    }
+
+    // Accessor untuk status stok
+    public function getStockStatusAttribute()
+    {
+        return $this->getStockStatus();
+    }
+
+    // Method untuk mendapatkan total nilai inventaris
+    public function getTotalValue()
+    {
+        return $this->stock * $this->selling_price;
+    }
+
+    // Accessor untuk total nilai inventaris
+    public function getTotalValueAttribute()
+    {
+        return $this->getTotalValue();
+    }
+
+    // Method untuk mendapatkan jumlah ukuran yang tersedia
+    public function getAvailableSizesCount()
+    {
+        return $this->products()->distinct('size')->count('size');
+    }
+
+    // Accessor untuk jumlah ukuran yang tersedia
+    public function getAvailableSizesCountAttribute()
+    {
+        return $this->getAvailableSizesCount();
+    }
 }
