@@ -1,0 +1,113 @@
+@startuml Sequence_Diagram_Keranjang_Belanja
+!theme plain
+title Sequence Diagram - Keranjang Belanja (REQ-APITS-F-08)
+
+actor "Customer" as Customer
+participant "Product Detail" as Product
+participant "Cart Page" as Cart
+participant "Cart System" as System
+participant "Stock Validator" as Validator
+database "Database" as DB
+
+Customer -> Product: pilih ukuran dan quantity
+activate Product
+Product -> Validator: validateStock(productId, quantity)
+activate Validator
+Validator -> DB: checkAvailableStock()
+activate DB
+DB --> Validator: stok tersedia
+deactivate DB
+Validator -> Product: validasi berhasil
+deactivate Validator
+Product -> Customer: tampilkan form "Tambah ke Keranjang"
+deactivate Product
+
+Customer -> Product: klik "Tambah ke Keranjang"
+activate Product
+Product -> System: addToCart(productId, size, quantity)
+activate System
+System -> DB: saveCartItem()
+activate DB
+DB --> System: item tersimpan
+deactivate DB
+System -> Product: berhasil ditambahkan
+Product -> Customer: notifikasi sukses
+deactivate System
+deactivate Product
+
+Customer -> Cart: akses halaman keranjang
+activate Cart
+Cart -> System: loadCartItems()
+activate System
+System -> DB: getCartItems(userId/sessionId)
+activate DB
+DB --> System: daftar item keranjang
+deactivate DB
+System -> Cart: data keranjang lengkap
+Cart -> Customer: tampilkan daftar produk + kontrol quantity
+deactivate System
+deactivate Cart
+
+alt ubah quantity
+    Customer -> Cart: ubah quantity item
+    activate Cart
+    Cart -> Validator: validateMaxStock(productId, newQuantity)
+    activate Validator
+    Validator -> DB: checkStockLimit()
+    activate DB
+    DB --> Validator: stok mencukupi
+    deactivate DB
+    Validator -> Cart: validasi berhasil
+    deactivate Validator
+    Cart -> System: updateQuantity(itemId, newQuantity)
+    activate System
+    System -> DB: updateCartItem()
+    activate DB
+    DB --> System: quantity diperbarui
+    deactivate DB
+    System -> Cart: hitung ulang subtotal
+    Cart -> Customer: tampilkan total baru
+    deactivate System
+    deactivate Cart
+end
+
+alt hapus item
+    Customer -> Cart: klik tombol hapus item
+    activate Cart
+    Cart -> System: removeFromCart(itemId)
+    activate System
+    System -> DB: deleteCartItem()
+    activate DB
+    DB --> System: item dihapus
+    deactivate DB
+    System -> Cart: item berhasil dihapus
+    Cart -> Customer: update keranjang tanpa item
+    deactivate System
+    deactivate Cart
+end
+
+alt kosongkan keranjang
+    Customer -> Cart: klik "Kosongkan Keranjang"
+    activate Cart
+    Cart -> System: clearCart()
+    activate System
+    System -> DB: deleteAllCartItems()
+    activate DB
+    DB --> System: keranjang dikosongkan
+    deactivate DB
+    System -> Cart: keranjang kosong
+    Cart -> Customer: tampilkan keranjang kosong
+    deactivate System
+    deactivate Cart
+end
+
+Customer -> Cart: klik "Checkout"
+activate Cart
+Cart -> System: prepareCheckout()
+activate System
+System -> Cart: ringkasan pesanan siap
+Cart -> Customer: redirect ke halaman checkout
+deactivate System
+deactivate Cart
+
+@enduml

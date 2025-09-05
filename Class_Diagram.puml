@@ -41,7 +41,7 @@ class User {
   --
   +carts()
   +orders()
-  +testimonials()
+  +isAdmin(): bool
 }
 
 class Product {
@@ -102,7 +102,6 @@ class Cart {
   --
   +product()
   +user()
-  +getTotalAttribute()
   +getCartItems()
 }
 
@@ -111,6 +110,7 @@ class Order {
   +order_number: String
   +user_id: Integer
   +customer_name: String
+  +customer_email: String
   +customer_phone: String
   +customer_address: Text
   +notes: Text
@@ -133,8 +133,10 @@ class Order {
   +updated_at: DateTime
   --
   +user()
-  +orderItems()
-  +testimonials()
+  +items()
+  +getStatusLabelAttribute()
+  +getPaymentMethodLabelAttribute()
+  +getShippingMethodLabel()
 }
 
 class OrderItem {
@@ -153,21 +155,7 @@ class OrderItem {
   +product()
 }
 
-class Testimonial {
-  +id: int
-  +user_id: Integer
-  +order_id: Integer
-  +customer_name: String
-  +institution_name: String
-  +testimonial_text: Text
-  +rating: Integer
-  +is_approved: Boolean
-  +created_at: DateTime
-  +updated_at: DateTime
-  --
-  +user()
-  +order()
-}
+
 
 ' Compact layout positioning similar to reference image
 ' Position classes in a more structured grid layout
@@ -179,21 +167,16 @@ Product -[hidden]down-> OrderItem
 User -[hidden]down-> Cart
 User -[hidden]right-> Order
 Order -[hidden]right-> OrderItem
-Order -[hidden]down-> Testimonial
-
 ' Additional positioning for better alignment and spacing
 Cart -[hidden]right-> OrderItem
-Testimonial -[hidden]up-> Cart
 Inventory -[hidden]down-> User
 Product -[hidden]right-> Order
-Cart -[hidden]down-> Testimonial
 Inventory -[hidden]right--> Order
-User -[hidden]right--> Testimonial
 
 ' Relationships
 User ||--o{ Cart : "has many"
 User ||--o{ Order : "has many"
-User ||--o{ Testimonial : "has many"
+
 
 Product ||--o{ Cart : "has many"
 Product }o--|| Inventory : "belongs to"
@@ -202,13 +185,12 @@ Product ||--o{ OrderItem : "has many"
 Inventory ||--o{ Product : "has many"
 
 Order ||--o{ OrderItem : "has many"
-Order ||--o{ Testimonial : "has many"
+
 
 OrderItem }o--|| Order : "belongs to"
 OrderItem }o--|| Product : "belongs to"
 
-Testimonial }o--|| User : "belongs to"
-Testimonial }o--|| Order : "belongs to"
+
 
 Cart }o--|| User : "belongs to"
 Cart }o--|| Product : "belongs to"

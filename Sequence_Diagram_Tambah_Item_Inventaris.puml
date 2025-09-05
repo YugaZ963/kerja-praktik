@@ -1,0 +1,39 @@
+@startuml
+!theme plain
+title Sequence Diagram - Tambah Item Inventaris (REQ-APITS-F-03C)
+
+actor Admin
+participant "Form Tambah\nInventaris" as Form
+participant "Validation\nSystem" as Validation
+participant "Database" as DB
+participant "Notification\nSystem" as Notif
+
+Admin -> Form: Akses halaman tambah inventaris
+activate Form
+Form --> Admin: Tampilkan form kosong
+
+Admin -> Form: Isi data inventaris\n(nama, kategori, stok, harga)
+Form -> Validation: Validasi input data
+activate Validation
+
+alt Data Valid
+    Validation --> Form: Data tervalidasi
+    deactivate Validation
+    Form -> DB: Simpan data inventaris baru
+    activate DB
+    DB --> Form: Konfirmasi data tersimpan
+    deactivate DB
+    Form -> Notif: Trigger notifikasi sukses
+    activate Notif
+    Notif --> Admin: Tampilkan pesan berhasil
+    deactivate Notif
+    Form --> Admin: Redirect ke halaman inventaris
+else Data Tidak Valid
+    Validation --> Form: Return error messages
+    deactivate Validation
+    Form --> Admin: Tampilkan pesan error\ndan form dengan data sebelumnya
+end
+
+deactivate Form
+
+@enduml

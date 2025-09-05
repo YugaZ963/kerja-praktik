@@ -19,7 +19,7 @@
 
         <!-- About Content -->
         <div class="row g-4 mb-5">
-            <div class="col-lg-8">
+            <div class="col-12">
                 <div class="mb-5">
                     <h2 class="h3 mb-4 text-primary fw-bold">Tentang {{ $titleShop }}</h2>
                     <div class="content-text">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 mb-4">
+                <div class="card shadow-sm border-0 mb-2">
                     <div class="card-header bg-gradient-primary text-white py-3">
                         <h5 class="mb-0 fw-bold"><i class="bi bi-star-fill me-2"></i>Mengapa memilih kami?</h5>
                     </div>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 mb-4">
+                <div class="card shadow-sm border-0 mb-2">
                     <div class="card-header bg-gradient-primary text-white py-3">
                         <h5 class="mb-0 fw-bold"><i class="bi bi-building me-2"></i>Profil Perusahaan</h5>
                     </div>
@@ -117,100 +117,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-gradient-primary text-white py-3">
-                        <h5 class="mb-0 fw-bold"><i class="bi bi-chat-quote-fill me-2"></i>Testimoni Pelanggan</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        @if($testimonials->count() > 0)
-                            @foreach($testimonials as $testimonial)
-                            <div class="testimonial-item mb-4 {{ !$loop->last ? 'border-bottom pb-4' : '' }}">
-                                <div class="testimonial-content p-3 bg-light rounded">
-                                    <i class="bi bi-quote text-primary fs-4 mb-2 d-block"></i>
-                                    <p class="mb-2 fst-italic lh-base">{{ $testimonial->testimonial_text }}</p>
-                                    <div class="testimonial-author text-end">
-                                        <small class="text-primary fw-bold">{{ $testimonial->customer_name }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        @else
-                            <!-- Default testimonials when no database testimonials exist -->
-                            <div class="testimonial-item mb-4 border-bottom pb-4">
-                                <div class="testimonial-content p-3 bg-light rounded">
-                                    <i class="bi bi-quote text-primary fs-4 mb-2 d-block"></i>
-                                    <p class="mb-2 fst-italic lh-base">Kualitas seragam sangat baik dan layanan pelanggan sangat memuaskan. Sudah bekerja sama selama 5 tahun.</p>
-                                    <div class="testimonial-author text-end">
-                                        <small class="text-primary fw-bold">Kepala Sekolah SMK Negeri 1 Jakarta</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="testimonial-item mb-4 border-bottom pb-4">
-                                <div class="testimonial-content p-3 bg-light rounded">
-                                    <i class="bi bi-quote text-primary fs-4 mb-2 d-block"></i>
-                                    <p class="mb-2 fst-italic lh-base">Desain seragam sangat modis dan sesuai dengan kebutuhan sekolah kami.</p>
-                                    <div class="testimonial-author text-end">
-                                        <small class="text-primary fw-bold">Wakil Kepala Sekolah SMA Katolik St. Yoseph</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="testimonial-item mb-4">
-                                <div class="testimonial-content p-3 bg-light rounded">
-                                    <i class="bi bi-quote text-primary fs-4 mb-2 d-block"></i>
-                                    <p class="mb-2 fst-italic lh-base">Pelayanan sangat profesional dan hasil jahitan rapi. Siswa-siswi merasa nyaman menggunakan seragam dari RAVAZKA.</p>
-                                    <div class="testimonial-author text-end">
-                                        <small class="text-primary fw-bold">Koordinator Kesiswaan SMP Negeri 5 Bandung</small>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                        
-                        @if($testimonials->count() > 0)
-                        <div class="text-center mt-4 p-2 bg-primary bg-opacity-10 rounded">
-                            <small class="text-primary fw-semibold">
-                                <i class="bi bi-info-circle-fill me-1"></i>
-                                Menampilkan {{ $testimonials->count() }} testimoni terbaru dari pelanggan kami
-                            </small>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-gradient-primary text-white py-3">
-                        <h5 class="mb-0 fw-bold"><i class="bi bi-envelope-heart-fill me-2"></i>Hubungi Kami</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form>
-                            <div class="mb-4">
-                                <label for="name" class="form-label fw-semibold text-dark">
-                                    <i class="bi bi-person-fill text-primary me-1"></i>Nama
-                                </label>
-                                <input type="text" class="form-control form-control-lg border-2" id="name" placeholder="Masukkan nama lengkap" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="email" class="form-label fw-semibold text-dark">
-                                    <i class="bi bi-envelope-fill text-primary me-1"></i>Email
-                                </label>
-                                <input type="email" class="form-control form-control-lg border-2" id="email" placeholder="contoh@email.com" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="message" class="form-label fw-semibold text-dark">
-                                    <i class="bi bi-chat-text-fill text-primary me-1"></i>Pesan
-                                </label>
-                                <textarea class="form-control border-2" id="message" rows="4" placeholder="Tulis pesan Anda di sini..." required></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
-                                    <i class="bi bi-send-fill me-2"></i>Kirim Pesan
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -259,17 +165,7 @@
             transform: translateX(5px);
         }
         
-        .testimonial-content {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-        
-        .testimonial-item:hover .testimonial-content {
-            border-left-color: #007bff;
-            box-shadow: 0 5px 15px rgba(0,123,255,0.1);
-            transform: translateY(-2px);
-        }
-        
+
         .form-control:focus {
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);

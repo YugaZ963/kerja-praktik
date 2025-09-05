@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <title>Laporan Penjualan - {{ $startDate->format('d M Y') }} s/d {{ $endDate->format('d M Y') }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Penjualan RAVAZKA</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
             font-size: 12px;
             line-height: 1.4;
+            color: #333;
             margin: 0;
             padding: 20px;
         }
@@ -15,59 +17,68 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #007bff;
             padding-bottom: 20px;
         }
         
         .header h1 {
+            color: #007bff;
             margin: 0;
             font-size: 24px;
-            color: #333;
         }
         
-        .header p {
-            margin: 5px 0;
+        .header h2 {
             color: #666;
+            margin: 5px 0;
+            font-size: 16px;
+            font-weight: normal;
         }
         
-        .summary-section {
+        .period {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .summary {
+            display: table;
+            width: 100%;
             margin-bottom: 30px;
         }
         
-        .summary-cards {
-            display: table;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        
-        .summary-card {
+        .summary-item {
             display: table-cell;
-            width: 25%;
+            width: 50%;
             padding: 15px;
-            border: 1px solid #ddd;
             text-align: center;
-            vertical-align: top;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
         }
         
-        .summary-card h3 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            color: #333;
-        }
-        
-        .summary-card p {
+        .summary-item h3 {
             margin: 0;
+            color: #007bff;
+            font-size: 18px;
+        }
+        
+        .summary-item p {
+            margin: 5px 0 0 0;
             color: #666;
             font-size: 11px;
         }
         
-        .section-title {
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h3 {
+            color: #007bff;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 16px;
-            font-weight: bold;
-            margin: 30px 0 15px 0;
-            color: #333;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
         }
         
         table {
@@ -77,19 +88,15 @@
         }
         
         th, td {
-            border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            border-bottom: 1px solid #dee2e6;
         }
         
         th {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
             font-weight: bold;
-            font-size: 11px;
-        }
-        
-        td {
-            font-size: 10px;
+            color: #495057;
         }
         
         .text-right {
@@ -100,221 +107,132 @@
             text-align: center;
         }
         
-        .currency {
+        .text-success {
+            color: #28a745;
             font-weight: bold;
-            color: #0d6efd;
         }
         
-        .rank {
-            background-color: #fcdf10;
-            color: #c9b012;
+        .badge {
+            background-color: #007bff;
+            color: white;
             padding: 2px 6px;
             border-radius: 3px;
-            font-weight: bold;
+            font-size: 10px;
         }
         
         .footer {
             margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
             text-align: center;
-            color: #666;
             font-size: 10px;
-        }
-        
-        .page-break {
-            page-break-before: always;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
         }
         
         .no-data {
             text-align: center;
-            color: #999;
+            color: #666;
             font-style: italic;
             padding: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
-        <h1>LAPORAN PENJUALAN</h1>
-        <p><strong>Periode:</strong> {{ $startDate->format('d F Y') }} - {{ $endDate->format('d F Y') }}</p>
-        <p><strong>Tanggal Cetak:</strong> {{ now()->format('d F Y H:i:s') }}</p>
-        <p><strong>Total Hari:</strong> {{ $startDate->diffInDays($endDate) + 1 }} hari</p>
+        <h1>RAVAZKA</h1>
+        <h2>Laporan Penjualan</h2>
     </div>
-
-    <!-- Summary Section -->
-    <div class="summary-section">
-        <div class="section-title">RINGKASAN PENJUALAN</div>
-        
-        <div class="summary-cards">
-            <div class="summary-card">
-                <h3 class="currency">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
-                <p>Total Revenue</p>
-            </div>
-            <div class="summary-card">
-                <h3>{{ number_format($totalOrders) }}</h3>
-                <p>Total Pesanan Selesai</p>
-            </div>
-            <div class="summary-card">
-                <h3 class="currency">Rp {{ number_format($averageOrderValue, 0, ',', '.') }}</h3>
-                <p>Rata-rata per Pesanan</p>
-            </div>
-            <div class="summary-card">
-                <h3>{{ $topProducts->sum('total_quantity') }}</h3>
-                <p>Total Unit Terjual</p>
-            </div>
+    
+    <div class="period">
+        <strong>Periode Laporan:</strong> {{ date('d/m/Y', strtotime($startDate)) }} - {{ date('d/m/Y', strtotime($endDate)) }}
+    </div>
+    
+    <div class="summary">
+        <div class="summary-item">
+            <h3>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+            <p>Total Revenue</p>
         </div>
-        
-        @if($revenueGrowth != 0)
-        <p style="text-align: center; margin-top: 10px;">
-            <strong>Pertumbuhan Revenue:</strong> 
-            <span style="color: {{ $revenueGrowth > 0 ? '#0d6efd' : '#cb2368' }};">
-                {{ $revenueGrowth > 0 ? '+' : '' }}{{ round($revenueGrowth, 1) }}%
-            </span>
-            dari bulan sebelumnya
-        </p>
+        <div class="summary-item">
+            <h3>{{ number_format($totalOrders) }}</h3>
+            <p>Total Pesanan</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h3>Produk Terlaris</h3>
+        @if($topProducts->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th class="text-center">Qty Terjual</th>
+                        <th class="text-right">Total Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($topProducts as $index => $product)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $product->name }}</td>
+                            <td>{{ $product->category }}</td>
+                            <td class="text-center">{{ $product->total_sold }}</td>
+                            <td class="text-right text-success">
+                                Rp {{ number_format($product->total_revenue, 0, ',', '.') }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">
+                Tidak ada data produk terlaris dalam periode ini
+            </div>
         @endif
     </div>
-
-    <!-- Top Products Section -->
-    <div class="section-title">PRODUK TERLARIS</div>
-    @if($topProducts->count() > 0)
-    <table>
-        <thead>
-            <tr>
-                <th width="8%">Rank</th>
-                <th width="40%">Nama Produk</th>
-                <th width="20%">Kategori</th>
-                <th width="12%">Unit Terjual</th>
-                <th width="20%">Total Revenue</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($topProducts as $index => $item)
-            <tr>
-                <td class="text-center">
-                    <span class="rank">#{{ $index + 1 }}</span>
-                </td>
-                <td>{{ $item->product->name ?? 'Produk Dihapus' }}</td>
-                <td>{{ $item->product->category ?? '-' }}</td>
-                <td class="text-center">{{ number_format($item->total_quantity) }}</td>
-                <td class="text-right currency">Rp {{ number_format($item->total_revenue, 0, ',', '.') }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-    @else
-    <div class="no-data">Tidak ada data produk dalam periode ini</div>
-    @endif
-
-    <!-- Category Sales Section -->
-    <div class="section-title">PENJUALAN PER KATEGORI</div>
-    @if($categorySales->count() > 0)
-    <table>
-        <thead>
-            <tr>
-                <th width="30%">Kategori</th>
-                <th width="20%">Unit Terjual</th>
-                <th width="30%">Total Revenue</th>
-                <th width="20%">Persentase</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($categorySales as $category)
-            @php
-                $percentage = $totalRevenue > 0 ? ($category->total_revenue / $totalRevenue) * 100 : 0;
-            @endphp
-            <tr>
-                <td>{{ $category->category }}</td>
-                <td class="text-center">{{ number_format($category->total_quantity) }}</td>
-                <td class="text-right currency">Rp {{ number_format($category->total_revenue, 0, ',', '.') }}</td>
-                <td class="text-center">{{ round($percentage, 1) }}%</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-    @else
-    <div class="no-data">Tidak ada data kategori dalam periode ini</div>
-    @endif
-
-    <!-- Daily Sales Section -->
-    @if($dailySales->count() > 0)
-    <div class="page-break">
-        <div class="section-title">TREN PENJUALAN HARIAN</div>
-        <table>
-            <thead>
-                <tr>
-                    <th width="20%">Tanggal</th>
-                    <th width="15%">Hari</th>
-                    <th width="20%">Jumlah Pesanan</th>
-                    <th width="25%">Revenue Harian</th>
-                    <th width="20%">Rata-rata per Order</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($dailySales as $daily)
-                @php
-                    $date = \Carbon\Carbon::parse($daily->date);
-                    $avgPerOrder = $daily->orders_count > 0 ? $daily->daily_revenue / $daily->orders_count : 0;
-                @endphp
-                <tr>
-                    <td>{{ $date->format('d M Y') }}</td>
-                    <td>{{ $date->format('l') }}</td>
-                    <td class="text-center">{{ $daily->orders_count }}</td>
-                    <td class="text-right currency">Rp {{ number_format($daily->daily_revenue, 0, ',', '.') }}</td>
-                    <td class="text-right currency">Rp {{ number_format($avgPerOrder, 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
-
-    <!-- Recent Completed Orders -->
-    @if($completedOrders->count() > 0)
-    <div class="page-break">
-        <div class="section-title">PESANAN SELESAI TERBARU (10 Terakhir)</div>
-        <table>
-            <thead>
-                <tr>
-                    <th width="15%">No. Pesanan</th>
-                    <th width="25%">Customer</th>
-                    <th width="15%">Tanggal Selesai</th>
-                    <th width="10%">Items</th>
-                    <th width="20%">Total Amount</th>
-                    <th width="15%">Metode Bayar</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($completedOrders->take(10) as $order)
-                <tr>
-                    <td>{{ $order->order_number }}</td>
-                    <td>
-                        <strong>{{ $order->customer_name }}</strong><br>
-                        <small>{{ $order->customer_phone }}</small>
-                    </td>
-                    <td>{{ $order->completed_at->format('d M Y H:i') }}</td>
-                    <td class="text-center">{{ $order->items->count() }}</td>
-                    <td class="text-right currency">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                    <td class="text-center">{{ ucfirst($order->payment_method ?? '-') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        
-        @if($completedOrders->count() > 10)
-        <p style="text-align: center; margin-top: 10px; font-style: italic; color: #666;">
-            * Menampilkan 10 dari {{ $completedOrders->count() }} total pesanan selesai dalam periode ini
-        </p>
+    
+    <div class="section">
+        <h3>Penjualan per Kategori</h3>
+        @if($salesByCategory->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kategori</th>
+                        <th class="text-center">Qty Terjual</th>
+                        <th class="text-right">Total Revenue</th>
+                        <th class="text-center">Persentase</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $totalCategoryRevenue = $salesByCategory->sum('total_revenue'); @endphp
+                    @foreach($salesByCategory as $index => $category)
+                        @php $percentage = $totalCategoryRevenue > 0 ? ($category->total_revenue / $totalCategoryRevenue) * 100 : 0; @endphp
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $category->category }}</td>
+                            <td class="text-center">{{ $category->total_sold }}</td>
+                            <td class="text-right text-success">
+                                Rp {{ number_format($category->total_revenue, 0, ',', '.') }}
+                            </td>
+                            <td class="text-center">{{ number_format($percentage, 1) }}%</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">
+                Tidak ada data penjualan per kategori dalam periode ini
+            </div>
         @endif
     </div>
-    @endif
-
-    <!-- Footer -->
+    
     <div class="footer">
-        <p>Laporan ini dibuat secara otomatis oleh sistem pada {{ now()->format('d F Y \p\u\k\u\l H:i:s') }}</p>
-        <p>© {{ date('Y') }} - Sistem Manajemen Penjualan</p>
+        <p>
+            <strong>RAVAZKA - Seragam Sekolah Berkualitas</strong><br>
+            Laporan ini dibuat secara otomatis pada {{ $generatedAt }}
+        </p>
     </div>
 </body>
 </html>

@@ -32,7 +32,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                <a class="navbar-brand d-flex align-items-center" href="@auth{{ Auth::user()->isAdmin() ? route('dashboard') : url('/') }}@else{{ url('/') }}@endauth">
                     <img src="{{ asset('images/ravazka.jpg') }}" alt="Logo" height="20" class="me-2">
                     {{-- {{ config('app.name', 'Laravel') }} --}}
                 </a>
@@ -94,15 +94,6 @@
                                     
                                     <!-- Navigation Menu -->
                                     @if (Auth::user()->isAdmin())
-                                        <a class="dropdown-item" href="{{ route('dashboard') }}">
-                                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                                        </a>
-                                        <a class="dropdown-item" href="{{ route('inventory.index') }}">
-                                            <i class="bi bi-box-seam me-2"></i>Inventaris
-                                        </a>
-                                        <a class="dropdown-item" href="{{ route('admin.orders.index') }}">
-                                            <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
-                                        </a>
                                         <hr class="dropdown-divider">
                                     @else
                                         <a class="dropdown-item" href="/orders">

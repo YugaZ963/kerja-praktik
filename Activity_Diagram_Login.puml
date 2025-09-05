@@ -1,0 +1,31 @@
+@startuml Activity_Diagram_Login
+!theme plain
+title Activity Diagram - Login
+
+|Admin/Customer|
+start
+:Buka halaman login;
+:Masukkan Email dan Password;
+:Tekan tombol Login;
+
+|Sistem|
+:Tampilkan form login;
+:Baca input kredensial;
+:Validasi kredensial terhadap database;
+
+if (Kredensial valid?) then (Ya)
+  :Buat sesi dan berikan token akses;
+  :Arahkan ke halaman utama sesuai role;
+  
+  |Admin/Customer|
+  :Berhasil masuk ke aplikasi;
+  stop
+else (Tidak)
+  :Tampilkan pesan error;
+  
+  |Admin/Customer|
+  :Kembali ke form login;
+  stop
+endif
+
+@enduml

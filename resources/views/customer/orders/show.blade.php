@@ -275,7 +275,7 @@
                                         <i class="fas fa-envelope me-2"></i>
                                         <div>
                                             <div class="info-label">Email</div>
-                                            <div class="info-value">{{ $order->customer_email }}</div>
+                                            <div class="info-value">{{ $order->customer_email ?? '-' }}</div>
                                         </div>
                                     </div>
                                     <div class="info-row">
@@ -352,13 +352,7 @@
                                         </button>
                                     @endif
 
-                                    @if (in_array($order->status, ['shipped', 'delivered']))
-                                        <a href="{{ route('customer.orders.track') }}?order_number={{ $order->order_number }}"
-                                            class="btn btn-info w-100 mb-3">
-                                            <i class="fas fa-map-marker-alt me-2"></i>
-                                            Lacak Pesanan
-                                        </a>
-                                    @endif
+
 
                                     @if ($order->status === 'delivered')
                                         <button type="button" class="btn btn-warning w-100 mb-3" data-bs-toggle="modal"
@@ -385,75 +379,7 @@
                             </div>
                         </div>
 
-                        <!-- Testimonial Form for Completed Orders -->
-                        @if ($order->status === 'completed')
-                            @php
-                                $existingTestimonial = \App\Models\Testimonial::where('order_id', $order->id)->first();
-                            @endphp
 
-                            <div class="card mt-4">
-                                <div class="card-header">
-                                    <h5 class="card-title">
-                                        <i class="fas fa-star me-2"></i>
-                                        @if ($existingTestimonial)
-                                            Testimoni Anda
-                                        @else
-                                            Berikan Testimoni
-                                        @endif
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    @if ($existingTestimonial)
-                                        <!-- Display existing testimonial -->
-                                        <div class="testimonial-display">
-                                            <div class="alert alert-success">
-                                                <i class="fas fa-check-circle me-2"></i>
-                                                Terima kasih telah memberikan testimoni!
-                                            </div>
-                                            <div class="testimonial-content">
-                                                <p class="testimonial-text">{{ $existingTestimonial->testimonial_text }}
-                                                </p>
-                                                <div class="testimonial-meta">
-                                                    <small class="text-muted">
-                                                        Dikirim pada
-                                                        {{ $existingTestimonial->created_at->format('d M Y, H:i') }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <!-- Testimonial form -->
-                                        <form action="{{ route('customer.testimonials.store') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="order_id" value="{{ $order->id }}">
-
-                                            <div class="mb-3">
-                                                <label for="customer_name" class="form-label">
-                                                    <i class="fas fa-user me-2"></i>
-                                                    Nama
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_name"
-                                                    name="customer_name" value="{{ auth()->user()->name }}" required>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="testimonial_text" class="form-label">
-                                                    <i class="fas fa-comment me-2"></i>
-                                                    Testimoni
-                                                </label>
-                                                <textarea class="form-control" id="testimonial_text" name="testimonial_text" rows="4"
-                                                    placeholder="Bagikan pengalaman Anda dengan produk dan layanan kami..."></textarea>
-                                            </div>
-
-                                            <button type="submit" class="btn btn-success w-100">
-                                                <i class="fas fa-paper-plane me-2"></i>
-                                                Kirim Testimoni
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -963,30 +889,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* Testimonial Styling */
-        .testimonial-display {
-            background: var(--light-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .testimonial-content {
-            margin-top: 1rem;
-        }
-
-        .testimonial-text {
-            font-style: italic;
-            color: var(--text-dark);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .testimonial-meta {
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.75rem;
-        }
-
 
 
         /* Modal Styling */

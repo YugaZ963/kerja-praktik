@@ -185,6 +185,7 @@ class CartController extends Controller
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => Auth::check() ? Auth::id() : null,
                 'customer_name' => $validated['name'],
+                'customer_email' => Auth::check() ? Auth::user()->email : null,
                 'customer_phone' => $validated['phone'],
                 'customer_address' => $validated['address'],
                 'notes' => $validated['notes'] ?? null,

@@ -1,0 +1,62 @@
+@startuml Sequence_Diagram_Registrasi_Akun
+!theme plain
+title Sequence Diagram - Registrasi Akun (REQ-APITS-F-06)
+
+actor "Customer" as Customer
+participant "Registration Page" as UI
+participant "Auth System" as Auth
+participant "Validation System" as Validator
+participant "Cart System" as Cart
+database "Database" as DB
+
+Customer -> UI: buka halaman registrasi
+activate UI
+UI -> Customer: tampilkan form registrasi
+deactivate UI
+
+Customer -> UI: isi form (nama, email, password)
+activate UI
+UI -> Validator: validateRealTime()
+activate Validator
+Validator -> DB: checkEmailUnique()
+activate DB
+DB --> Validator: email status
+deactivate DB
+Validator -> UI: validasi hasil
+UI -> Customer: feedback validasi
+deactivate Validator
+deactivate UI
+
+Customer -> UI: konfirmasi password
+activate UI
+UI -> Validator: validatePasswordMatch()
+activate Validator
+Validator -> UI: konfirmasi cocok
+UI -> Customer: password valid
+deactivate Validator
+deactivate UI
+
+Customer -> UI: klik tombol "Daftar"
+activate UI
+UI -> Auth: registerUser()
+activate Auth
+Auth -> DB: createUser(role: "user")
+activate DB
+DB --> Auth: user created
+deactivate DB
+
+Auth -> Auth: autoLogin()
+Auth -> Cart: mergeGuestCart()
+activate Cart
+Cart -> DB: updateCartOwner()
+activate DB
+DB --> Cart: cart merged
+deactivate DB
+deactivate Cart
+
+Auth -> UI: registrasi berhasil
+UI -> Customer: redirect ke beranda + pesan sukses
+deactivate Auth
+deactivate UI
+
+@enduml

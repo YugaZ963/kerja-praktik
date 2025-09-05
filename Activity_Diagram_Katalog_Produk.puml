@@ -1,0 +1,51 @@
+@startuml Activity_Diagram_Katalog_Produk
+!theme plain
+title Activity Diagram - Katalog Produk (REQ-APITS-F-07)
+
+|#LightBlue|Customer|
+|#LightGreen|Sistem|
+|Customer|
+start
+:Buka halaman utama dan
+klik "Lihat Koleksi" atau menu "Produk";
+
+|Sistem|
+:Tampilkan halaman katalog dengan
+kategori populer dan grid layout;
+
+|Customer|
+:Gunakan filter kategori atau
+search bar untuk mencari produk;
+
+|Sistem|
+:Sediakan fitur pencarian dan filter,
+tampilkan hasil sesuai kriteria;
+
+|Customer|
+:Lihat daftar produk dan
+urutkan berdasarkan harga/nama;
+
+|Sistem|
+:Tampilkan informasi produk lengkap
+dengan pagination;
+
+|Customer|
+:Klik "Lihat Detail" pada
+produk yang diminati;
+
+|Sistem|
+if (Produk ditemukan?) then (ya)
+  :Tampilkan halaman detail
+  produk dengan informasi lengkap;
+else (tidak)
+  :Tampilkan pesan
+  "Produk Tidak Ditemukan";
+endif
+
+|Customer|
+:Berhasil melihat katalog
+dan dapat memilih produk;
+
+stop
+
+@enduml

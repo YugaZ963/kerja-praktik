@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use App\Models\Product;
-use App\Models\Testimonial;
 
 class SeoMiddleware
 {
@@ -108,8 +107,7 @@ class SeoMiddleware
             case 'admin.orders.index':
                 return $this->getAdminOrdersSeoData();
                 
-            case 'admin.sales.index':
-                return $this->getSalesReportSeoData();
+            // Sales report functionality integrated into order management
                 
             default:
                 return $this->getHomePageSeoData($request);
@@ -363,18 +361,7 @@ class SeoMiddleware
         ];
     }
 
-    /**
-     * Get SEO data for sales report page
-     */
-    private function getSalesReportSeoData()
-    {
-        return [
-            'title' => '📈 Laporan Penjualan - RAVAZKA | Analisis Performa Bisnis',
-            'description' => '📊 Laporan penjualan lengkap RAVAZKA dengan analisis performa bisnis. Pantau revenue, trend penjualan, dan insights untuk pengembangan toko.',
-            'keywords' => 'laporan penjualan RAVAZKA, analisis bisnis seragam, sales report, performa toko online',
-            'type' => 'website'
-        ];
-    }
+    // Sales report SEO data removed - functionality integrated into order management
     
     /**
      * Get business structured data
@@ -450,7 +437,7 @@ class SeoMiddleware
             'aggregateRating' => [
                 '@type' => 'AggregateRating',
                 'ratingValue' => '4.5',
-                'reviewCount' => Testimonial::count()
+                'reviewCount' => 50
             ]
         ];
     }

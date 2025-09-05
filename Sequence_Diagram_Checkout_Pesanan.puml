@@ -1,0 +1,82 @@
+@startuml Sequence_Diagram_Checkout_Pesanan
+!theme plain
+title Sequence Diagram - Checkout Pesanan (REQ-APITS-F-09)
+
+actor "Customer" as Customer
+participant "Cart Page" as Cart
+participant "Checkout Page" as Checkout
+participant "Order System" as Order
+participant "Stock Validator" as Validator
+participant "WhatsApp System" as WhatsApp
+database "Database" as DB
+
+Customer -> Cart: klik "Checkout"
+activate Cart
+Cart -> Checkout: redirectToCheckout()
+activate Checkout
+Checkout -> Order: loadCartSummary()
+activate Order
+Order -> DB: getCartItems(userId)
+activate DB
+DB --> Order: item keranjang
+deactivate DB
+Order -> Checkout: ringkasan pesanan + total
+Checkout -> Customer: tampilkan form checkout + ringkasan
+deactivate Order
+deactivate Cart
+deactivate Checkout
+
+Customer -> Checkout: isi data pelanggan (nama, WhatsApp, alamat)
+activate Checkout
+Checkout -> Customer: validasi input real-time
+deactivate Checkout
+
+Customer -> Checkout: pilih metode pembayaran (BRI/DANA)
+activate Checkout
+Checkout -> Customer: tampilkan preview pesanan
+deactivate Checkout
+
+Customer -> Checkout: tambah catatan (opsional)
+activate Checkout
+Checkout -> Customer: catatan tersimpan
+deactivate Checkout
+
+Customer -> Checkout: klik "Kirim Pesanan via WhatsApp"
+activate Checkout
+Checkout -> Order: validateAndCreateOrder()
+activate Order
+Order -> Validator: validateStock(cartItems)
+activate Validator
+Validator -> DB: checkProductStock()
+activate DB
+DB --> Validator: stok tersedia
+deactivate DB
+Validator -> Order: validasi berhasil
+deactivate Validator
+
+Order -> DB: createOrder(status: "pending")
+activate DB
+DB --> Order: order created
+deactivate DB
+
+Order -> DB: createOrderItems()
+activate DB
+DB --> Order: order items created
+deactivate DB
+
+Order -> DB: clearCart(userId)
+activate DB
+DB --> Order: keranjang dikosongkan
+deactivate DB
+
+Order -> WhatsApp: generateWhatsAppMessage(orderData)
+activate WhatsApp
+WhatsApp -> Order: pesan WhatsApp siap
+deactivate WhatsApp
+
+Order -> Checkout: order berhasil dibuat
+Checkout -> Customer: redirect ke WhatsApp dengan pesan pesanan
+deactivate Order
+deactivate Checkout
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml Activity_Diagram_Logout
+!theme plain
+title Activity Diagram - Logout
+
+|Admin/Customer|
+start
+:Klik tombol atau menu Logout;
+
+|Sistem|
+:Tampilkan opsi logout di interface;
+:Proses permintaan logout;
+
+if (Konfirmasi diperlukan?) then (Ya)
+  |Admin/Customer|
+  if (Konfirmasi logout?) then (Ya)
+    |Sistem|
+    :Hapus sesi pengguna dan token akses;
+    :Arahkan ke halaman login atau halaman publik;
+    
+    |Admin/Customer|
+    :Berhasil keluar dari aplikasi;
+    stop
+  else (Tidak/Batal)
+    |Sistem|
+    :Tetap di halaman saat ini;
+    
+    |Admin/Customer|
+    :Tetap berada di dalam aplikasi;
+    stop
+  endif
+else (Tidak)
+  :Hapus sesi pengguna dan token akses;
+  :Arahkan ke halaman login atau halaman publik;
+  
+  |Admin/Customer|
+  :Berhasil keluar dari aplikasi;
+  stop
+endif
+
+@enduml

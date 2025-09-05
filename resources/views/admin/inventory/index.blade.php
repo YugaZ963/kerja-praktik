@@ -1,20 +1,32 @@
 {{-- resources/views/inventory/index.blade.php --}}
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Manajemen Inventaris')
 
 @section('content')
-    <div class="container mt-4">
-        <x-navbar />
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">
+                        <i class="fas fa-boxes text-primary me-3"></i>Manajemen Inventaris
+                    </h2>
+                    <p class="text-muted mb-0">Kelola inventaris seragam sekolah dengan mudah dan efisien</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <span class="badge bg-primary px-3 py-2">
+                        <i class="fas fa-user-shield me-1"></i>
+                        Administrator
+                    </span>
+                </div>
+            </div>
 
-        <div class="bg-light p-5 rounded mb-4 text-center">
-            <h1 class="display-5 fw-bold text-primary">Manajemen Inventaris</h1>
-            <p class="lead">Kelola inventaris seragam sekolah dengan mudah dan efisien</p>
-            <div class="alert alert-info mt-3 mb-0">
+            <div class="alert alert-info border-0 shadow-sm mb-4">
                 <i class="bi bi-info-circle me-2"></i>
                 <strong>Info:</strong> Stok inventaris dikelola otomatis melalui data produk. Tambah/kurangi stok dengan mengelola produk di setiap ukuran.
             </div>
-        </div>
 
         {{-- Alert Messages --}}
         @if (session('success'))
@@ -43,15 +55,12 @@
 
 
 
-        {{-- Action Buttons --}}
-        <div class="row mb-4">
-            <div class="col-md-12 d-flex justify-content-between flex-wrap gap-2">
-                <div>
-                    <a href="{{ route('inventory.create') }}" class="btn btn-success me-2">
+            {{-- Action Buttons --}}
+            <div class="row mb-4">
+                <div class="col-md-12 d-flex justify-content-between flex-wrap gap-2">
+                    <div>
+                        <a href="{{ route('inventory.create') }}" class="btn btn-success me-2">
                         <i class="bi bi-box"></i> Tambah Item Inventaris
-                    </a>
-                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary me-2">
-                        <i class="bi bi-plus-circle"></i> Tambah Produk
                     </a>
 
                 </div>
@@ -148,9 +157,6 @@
                         <h5 class="mb-0">Daftar Inventaris</h5>
                     </div>
                     <div class="col-auto d-flex gap-2">
-                        <button type="button" class="btn btn-outline-info" onclick="toggleSizeBreakdown()">
-                            <i class="bi bi-rulers"></i> <span id="toggleText">Tampilkan Detail Ukuran</span>
-                        </button>
                         <form method="GET" action="{{ route('inventory.index') }}" class="input-group input-group-sm"
                             style="width:260px;">
                             <input type="text" name="search" class="form-control" placeholder="Cari inventaris..."
@@ -170,7 +176,7 @@
             @endif
         </div>
     </div>
-
+</div>
 
 @endsection
 

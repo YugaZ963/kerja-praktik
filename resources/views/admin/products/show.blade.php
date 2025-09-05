@@ -16,7 +16,7 @@
                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-warning me-2">
                         <i class="bi bi-pencil-square"></i> Edit Produk
                     </a>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left"></i> Kembali ke Daftar
                     </a>
                 </div>

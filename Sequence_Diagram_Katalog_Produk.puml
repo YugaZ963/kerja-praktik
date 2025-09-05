@@ -1,0 +1,85 @@
+@startuml Sequence_Diagram_Katalog_Produk
+!theme plain
+title Sequence Diagram - Katalog Produk (REQ-APITS-F-07)
+
+actor "Customer" as Customer
+participant "Home Page" as Home
+participant "Product Catalog" as Catalog
+participant "Search System" as Search
+participant "Filter System" as Filter
+participant "Product Detail" as Detail
+database "Database" as DB
+
+Customer -> Home: buka halaman utama
+activate Home
+Home -> DB: getPopularCategories()
+activate DB
+DB --> Home: kategori populer
+deactivate DB
+Home -> Customer: tampilkan kategori (SD, SMP, SMA, Pramuka)
+deactivate Home
+
+Customer -> Home: klik "Lihat Koleksi" / menu "Produk"
+activate Home
+Home -> Catalog: loadProductCatalog()
+activate Catalog
+Catalog -> DB: getAllProducts()
+activate DB
+DB --> Catalog: daftar produk
+deactivate DB
+Catalog -> Customer: tampilkan grid layout produk
+deactivate Home
+deactivate Catalog
+
+alt filter kategori
+    Customer -> Catalog: pilih filter kategori
+    activate Catalog
+    Catalog -> Filter: filterByCategory()
+    activate Filter
+    Filter -> DB: getProductsByCategory()
+    activate DB
+    DB --> Filter: produk terfilter
+    deactivate DB
+    Filter -> Catalog: hasil filter
+    Catalog -> Customer: tampilkan produk sesuai kategori
+    deactivate Filter
+    deactivate Catalog
+end
+
+alt pencarian produk
+    Customer -> Catalog: gunakan search bar
+    activate Catalog
+    Catalog -> Search: searchProducts(keyword)
+    activate Search
+    Search -> DB: findProductsByKeyword()
+    activate DB
+    DB --> Search: hasil pencarian
+    deactivate DB
+    Search -> Catalog: produk ditemukan
+    Catalog -> Customer: tampilkan hasil pencarian
+    deactivate Search
+    deactivate Catalog
+end
+
+Customer -> Catalog: urutkan berdasarkan harga/nama
+activate Catalog
+Catalog -> DB: sortProducts(criteria)
+activate DB
+DB --> Catalog: produk terurut
+deactivate DB
+Catalog -> Customer: tampilkan produk terurut
+deactivate Catalog
+
+Customer -> Catalog: klik "Lihat Detail" produk
+activate Catalog
+Catalog -> Detail: loadProductDetail(productId)
+activate Detail
+Detail -> DB: getProductById()
+activate DB
+DB --> Detail: detail produk lengkap
+deactivate DB
+Detail -> Customer: tampilkan halaman detail produk
+deactivate Detail
+deactivate Catalog
+
+@enduml

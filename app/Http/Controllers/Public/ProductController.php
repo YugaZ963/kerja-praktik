@@ -50,4 +50,27 @@ class ProductController extends Controller
             'products' => $products
         ]);
     }
+
+    /**
+     * Show product details
+     */
+    public function show($slug)
+    {
+        $product = Product::where('slug', $slug)->with('inventory')->firstOrFail();
+        
+        // Get related products from same category
+        $relatedProducts = Product::where('category', $product->category)
+            ->where('id', '!=', $product->id)
+            ->limit(4)
+            ->get();
+
+        return view('public.product-detail', [
+            'titleShop' => '🔍 ' . $product->name . ' - Detail Produk RAVAZKA | ' . $product->category,
+            'title' => '🔍 ' . $product->name . ' - Detail Produk RAVAZKA | ' . $product->category,
+            'metaDescription' => '📋 Detail lengkap ' . $product->name . ' dari RAVAZKA. Lihat spesifikasi, harga, stok, dan ukuran yang tersedia. Kualitas terjamin dengan harga terjangkau.',
+            'metaKeywords' => $product->name . ', detail produk seragam, ' . $product->category . ', RAVAZKA, beli seragam online',
+            'product' => $product,
+            'relatedProducts' => $relatedProducts
+        ]);
+    }
 }

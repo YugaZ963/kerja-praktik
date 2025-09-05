@@ -1,0 +1,51 @@
+@startuml Activity_Diagram_Laporan_Inventaris
+!theme plain
+title Activity Diagram - Laporan Inventaris (REQ-APITS-F-05)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Login ke sistem;
+:Akses menu Laporan Inventaris;
+
+|Sistem|
+:Tampilkan halaman dengan
+4 kartu ringkasan;
+
+:Tampilkan grafik bar chart
+stok per kategori;
+
+:Tampilkan line chart
+tren perubahan stok harian;
+
+:Tampilkan tabel item low stock
+dengan alert;
+
+:Tampilkan tabel item
+dengan penjualan tertinggi;
+
+|Admin|
+:Analisis grafik stok
+per kategori dan tren;
+
+:Lihat tabel item low stock
+dan item terpopuler;
+
+:Gunakan filter kategori
+dan export Excel;
+
+|Sistem|
+:Filter data berdasarkan
+kategori yang dipilih;
+
+:Generate file Excel
+laporan inventaris;
+
+|Admin|
+:Laporan berhasil dianalisis
+dan dapat diekspor Excel;
+
+stop
+
+@enduml

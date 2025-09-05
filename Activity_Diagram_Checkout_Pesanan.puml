@@ -1,0 +1,46 @@
+@startuml Activity_Diagram_Checkout_Pesanan
+!theme plain
+title Activity Diagram - Checkout Pesanan (REQ-APITS-F-09)
+
+|#LightBlue|Customer|
+|#LightGreen|Sistem|
+|Customer|
+start
+:Akses halaman checkout
+dari keranjang;
+
+|Sistem|
+:Tampilkan halaman checkout dengan
+form data pelanggan dan ringkasan pesanan;
+
+|Customer|
+:Isi data pelanggan (nama, WhatsApp, alamat)
+dan pilih metode pembayaran (BRI/DANA);
+
+|Sistem|
+:Validasi input data pelanggan
+dan metode pembayaran;
+
+|Customer|
+:Tambahkan catatan tambahan (opsional)
+dan tekan "Kirim Pesanan via WhatsApp";
+
+|Sistem|
+:Buat order baru dengan status pending,
+buat order items, validasi stok, kosongkan keranjang;
+
+|Customer|
+:Tunggu redirect ke WhatsApp
+untuk konfirmasi pesanan;
+
+|Sistem|
+:Generate pesan WhatsApp dengan detail
+pesanan lengkap dan redirect ke WhatsApp;
+
+|Customer|
+:Berhasil buat pesanan dan
+diarahkan ke WhatsApp untuk konfirmasi;
+
+stop
+
+@enduml

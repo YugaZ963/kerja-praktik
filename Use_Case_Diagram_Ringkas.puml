@@ -1,0 +1,70 @@
+@startuml Use_Case_Diagram_Ringkas
+!theme plain
+title Use Case - Aplikasi Penjualan Dan Inventaris Toko Seragam Sekolah
+
+left to right direction
+
+' Actors
+actor "Customer" as Customer
+actor "Admin" as Admin
+
+' System Boundary
+rectangle "Sistem Aplikasi Penjualan Dan Inventaris Toko Seragam Sekolah" {
+  
+  ' Use Case Utama
+  usecase "Katalog Produk" as UC1
+  usecase "Registrasi" as UC2
+  usecase "Checkout\nPesanan" as UC3
+  usecase "Keranjang\nBelanja" as UC4
+  usecase "Login" as UC5
+  usecase "Logout" as UC6
+  usecase "Laporan\nPenjualan" as UC7
+  usecase "Manajemen\nInventaris" as UC8
+  usecase "Manajemen\nPesanan" as UC9
+  
+  ' Sub Use Case - Manajemen Inventaris
+  usecase "Lihat Data\nInventaris" as UC8A
+  usecase "Tambah Item\nInventaris" as UC8C
+  usecase "Edit Item\nInventaris" as UC8D
+  usecase "Hapus Item\nInventaris" as UC8E
+  
+  ' Sub Use Case - Manajemen Pesanan
+  usecase "Lihat Daftar\nPesanan" as UC9A
+  usecase "Update Status\nPesanan" as UC9B
+}
+
+' Association relationships (Customer use cases)
+Customer -- UC1
+Customer -- UC2
+Customer -- UC3
+Customer -- UC4
+Customer -- UC5
+Customer -- UC6
+
+' Association relationships (Admin use cases)
+Admin -- UC5
+Admin -- UC6
+Admin -- UC7
+Admin -- UC8
+Admin -- UC9
+
+' Include relationships - Use Case Utama
+UC3 .> UC5 : <<include>>
+UC4 .> UC5 : <<include>>
+UC7 .> UC5 : <<include>>
+UC8 .> UC5 : <<include>>
+UC9 .> UC5 : <<include>>
+UC3 .> UC4 : <<include>>
+
+' Include relationships - Sub Use Cases
+' Manajemen Inventaris includes
+UC8 .> UC8A : <<include>>
+UC8 .> UC8C : <<include>>
+UC8 .> UC8D : <<include>>
+UC8 .> UC8E : <<include>>
+
+' Manajemen Pesanan includes
+UC9 .> UC9A : <<include>>
+UC9 .> UC9B : <<include>>
+
+@enduml

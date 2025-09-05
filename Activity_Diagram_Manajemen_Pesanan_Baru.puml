@@ -1,0 +1,26 @@
+@startuml
+title Activity Diagram - Manajemen Pesanan (REQ-APITS-F-04)
+
+start
+:Admin login ke sistem;
+:Admin akses halaman Manajemen Pesanan;
+:Sistem tampilkan halaman dengan daftar pesanan dan counter status;
+
+switch (Admin pilih operasi?)
+case (Pencarian)
+  :Admin mencari pesanan berdasarkan nomor/nama/telepon;
+  :Sistem memproses pencarian dan menampilkan hasil yang sesuai;
+case (Filter)
+  :Admin memfilter pesanan berdasarkan status tertentu;
+  :Sistem memfilter dan menampilkan pesanan sesuai status yang dipilih;
+case (Update Status)
+  :Admin mengupdate status pesanan dan menambahkan catatan;
+  :Sistem menyimpan perubahan, mengirim notifikasi ke pelanggan, dan mencatat riwayat dengan timestamp;
+endswitch
+
+:Sistem tampilkan hasil operasi dengan feedback sukses;
+:Pesanan pelanggan berhasil dikelola dan status pesanan terupdate sesuai alur bisnis;
+
+stop
+
+@enduml

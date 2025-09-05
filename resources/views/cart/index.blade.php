@@ -44,7 +44,7 @@
                         </div>
                         <div class="card-body p-0">
                             @foreach($cartItems as $item)
-                                <div class="border-bottom p-3">
+                                <div class="border-bottom p-3" data-item-id="{{ $item->id }}">
                                     <div class="cart-item-row">
                                         <div class="cart-item-image">
                                             <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
@@ -54,7 +54,7 @@
                                             <h6 class="mb-1">{{ $item->product->name }}</h6>
                                             <small class="text-muted">{{ $item->product->category }} - {{ $item->product->size }}</small>
                                             <div class="mt-1">
-                                                <span class="text-primary fw-bold">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                                <span class="text-primary fw-bold item-price" data-price="{{ $item->price }}">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="cart-item-quantity">
@@ -64,15 +64,14 @@
                                                 <div class="quantity-controls">
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="decreaseQuantity({{ $item->id }})">-</button>
                                                     <input type="number" name="quantity" id="quantity-{{ $item->id }}" value="{{ $item->quantity }}" 
-                                                           min="1" max="{{ $item->product->stock }}" class="form-control form-control-sm">
+                                                           min="1" max="{{ $item->product->stock }}" class="form-control form-control-sm" onchange="autoUpdateQuantity({{ $item->id }})">
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity({{ $item->id }}, {{ $item->product->stock }})">+</button>
-                                                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
                                                 </div>
                                             </form>
                                             <small class="text-muted d-block text-center">Stok: {{ $item->product->stock }}</small>
                                         </div>
                                         <div class="cart-item-total">
-                                            <div class="fw-bold mb-2">Rp {{ number_format($item->total, 0, ',', '.') }}</div>
+                                            <div class="fw-bold mb-2 item-total">Rp {{ number_format($item->total, 0, ',', '.') }}</div>
                                             <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -107,8 +106,8 @@
                         </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Subtotal ({{ $itemCount }} item)</span>
-                                <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                <span>Subtotal (<span id="cart-item-count">{{ $itemCount }}</span> item)</span>
+                                <span id="cart-subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Ongkos Kirim</span>
@@ -117,7 +116,7 @@
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <strong>Total</strong>
-                                <strong class="text-primary">Rp {{ number_format($total, 0, ',', '.') }}</strong>
+                                <strong class="text-primary" id="cart-total">Rp {{ number_format($total, 0, ',', '.') }}</strong>
                             </div>
                             <a href="{{ route('cart.checkout') }}" class="btn btn-primary w-100">
                                 <i class="bi bi-credit-card"></i> Checkout
@@ -169,8 +168,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             margin-bottom: 0.5rem;
+            flex-wrap: wrap;
         }
         
         .quantity-controls .btn {
@@ -180,11 +180,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 0.375rem;
+            font-weight: 500;
         }
         
         .quantity-controls input {
             width: 60px;
             text-align: center;
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+            height: 32px;
+        }
+        
+
+        
+        .quantity-controls .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        
+        .quantity-controls .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
         }
         
         /* Mobile Styles (< 768px) */
@@ -240,14 +258,22 @@
             .quantity-controls {
                 justify-content: center;
                 margin-bottom: 0.75rem;
+                gap: 0.25rem;
             }
             
-            .quantity-controls .btn-primary {
-                margin-left: 0.5rem;
-                padding: 0.25rem 0.75rem;
-                height: auto;
-                width: auto;
+            .quantity-controls .btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.875rem;
             }
+            
+            .quantity-controls input {
+                width: 50px;
+                height: 30px;
+                font-size: 0.875rem;
+            }
+            
+
             
             .cart-item-total {
                 border-top: 1px solid #dee2e6;
@@ -314,7 +340,20 @@
             
             .quantity-controls {
                 justify-content: flex-start;
+                gap: 0.25rem;
             }
+            
+            .quantity-controls .btn {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .quantity-controls input {
+                width: 55px;
+                height: 32px;
+            }
+            
+
         }
         
         /* Desktop Styles (≥ 992px) */
@@ -348,7 +387,20 @@
             
             .quantity-controls {
                 justify-content: flex-start;
+                gap: 0.25rem;
             }
+            
+            .quantity-controls .btn {
+                width: 34px;
+                height: 34px;
+            }
+            
+            .quantity-controls input {
+                width: 60px;
+                height: 34px;
+            }
+            
+
         }
         
         /* Additional improvements */
@@ -379,6 +431,7 @@
             const currentValue = parseInt(input.value);
             if (currentValue < maxStock) {
                 input.value = currentValue + 1;
+                autoUpdateQuantity(itemId);
             }
         }
 
@@ -387,7 +440,96 @@
             const currentValue = parseInt(input.value);
             if (currentValue > 1) {
                 input.value = currentValue - 1;
+                autoUpdateQuantity(itemId);
             }
         }
+
+        function updateItemTotal(itemId) {
+            const quantityInput = document.getElementById('quantity-' + itemId);
+            const quantity = parseInt(quantityInput.value);
+            const priceElement = document.querySelector(`[data-item-id="${itemId}"] .item-price`);
+            const totalElement = document.querySelector(`[data-item-id="${itemId}"] .item-total`);
+            
+            if (priceElement && totalElement) {
+                const price = parseInt(priceElement.getAttribute('data-price'));
+                const total = price * quantity;
+                totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+            }
+        }
+
+        function autoUpdateQuantity(itemId) {
+            const quantityInput = document.getElementById('quantity-' + itemId);
+            const quantity = parseInt(quantityInput.value);
+            
+            // Update quantity via AJAX
+            fetch(`/cart/update/${itemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateItemTotal(itemId);
+                    updateCartSummary();
+                } else {
+                    alert('Gagal mengupdate kuantitas');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mengupdate kuantitas');
+            });
+        }
+
+        function updateCartSummary() {
+            let totalItems = 0;
+            let totalAmount = 0;
+            
+            // Hitung total dari semua item
+            document.querySelectorAll('[data-item-id]').forEach(function(item) {
+                const itemId = item.getAttribute('data-item-id');
+                const quantityInput = document.getElementById('quantity-' + itemId);
+                const priceElement = item.querySelector('.item-price');
+                
+                if (quantityInput && priceElement) {
+                    const quantity = parseInt(quantityInput.value);
+                    const price = parseInt(priceElement.getAttribute('data-price'));
+                    totalItems += quantity;
+                    totalAmount += (price * quantity);
+                }
+            });
+            
+            // Update tampilan ringkasan
+            const subtotalElement = document.getElementById('cart-subtotal');
+            const itemCountElement = document.getElementById('cart-item-count');
+            const totalElement = document.getElementById('cart-total');
+            
+            if (subtotalElement) {
+                subtotalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalAmount);
+            }
+            if (itemCountElement) {
+                itemCountElement.textContent = totalItems;
+            }
+            if (totalElement) {
+                totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalAmount);
+            }
+        }
+
+        // Event listener untuk input quantity manual
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[name="quantity"]').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    const itemId = this.id.replace('quantity-', '');
+                    updateItemTotal(itemId);
+                    updateCartSummary();
+                });
+            });
+        });
     </script>
 @endsection

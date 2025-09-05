@@ -254,45 +254,6 @@
                                     <i class="fas fa-eye me-2"></i>
                                     Detail Pesanan
                                 </a>
-                                
-                                @if(in_array($order->status, ['pending', 'payment_pending']))
-                                <button type="button" class="btn-action btn-warning" 
-                                        data-bs-toggle="modal" data-bs-target="#paymentModal{{ $order->id }}">
-                                    <i class="fas fa-upload me-2"></i>
-                                    @if($order->status === 'pending')
-                                        Upload Bukti Bayar
-                                    @else
-                                        Upload Ulang Bukti Bayar
-                                    @endif
-                                </button>
-                                @endif
-                                
-                                @if($order->status === 'shipped')
-                                <a href="{{ route('customer.orders.track') }}?order_number={{ $order->order_number }}" 
-                                   class="btn-action btn-info">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    Lacak Pesanan
-                                </a>
-                                @elseif($order->status === 'delivered')
-                                <button type="button" class="btn-action btn-warning" 
-                                        data-bs-toggle="modal" data-bs-target="#deliveredModal{{ $order->id }}">
-                                    <i class="fas fa-camera me-2"></i>
-                                    Upload Foto Barang Sampai
-                                </button>
-                                <form action="{{ route('customer.orders.mark-completed', $order) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-action btn-success" 
-                                        onclick="return confirm('Apakah Anda yakin ingin menandai pesanan ini sebagai selesai? Tindakan ini tidak dapat dibatalkan.')">
-                                        <i class="fas fa-check-circle me-2"></i>
-                                        Tandai Selesai
-                                    </button>
-                                </form>
-                                <a href="{{ route('customer.orders.track') }}?order_number={{ $order->order_number }}" 
-                                   class="btn-action btn-info">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    Lacak Pesanan
-                                </a>
-                                @endif
                             </div>
                         </div>
                     </div>

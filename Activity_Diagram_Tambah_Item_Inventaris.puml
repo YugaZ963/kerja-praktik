@@ -1,0 +1,55 @@
+@startuml Activity_Diagram_Tambah_Item_Inventaris
+!theme plain
+title Activity Diagram - Tambah Item Inventaris (REQ-APITS-F-03C)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman inventaris
+dari dashboard;
+
+|Sistem|
+:Tampilkan halaman inventaris
+dengan tombol "Tambah Item";
+
+|Admin|
+:Klik tombol "Tambah Item"
+untuk membuka form;
+
+|Sistem|
+:Tampilkan form input lengkap
+dengan field yang diperlukan;
+
+|Admin|
+:Isi form dengan data item
+(nama, kategori, kode, stok, dll);
+
+|Sistem|
+:Validasi input real-time
+dan tampilkan pesan error jika ada;
+
+|Admin|
+if (Data valid?) then (Ya)
+  :Submit form dengan
+  menekan tombol "Simpan";
+  |Sistem|
+  :Validasi final data dan
+  simpan ke database;
+  :Tampilkan pesan sukses
+  dan redirect ke halaman inventaris;
+else (Tidak)
+  :Perbaiki data yang
+  tidak valid;
+  |Sistem|
+  :Tampilkan pesan error
+  spesifik untuk setiap field;
+endif
+
+|Admin|
+:Item inventaris baru
+berhasil ditambahkan;
+
+stop
+
+@enduml

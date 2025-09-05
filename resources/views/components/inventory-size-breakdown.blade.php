@@ -54,22 +54,7 @@
                                 <small class="text-muted">unit</small>
                             </div>
                             <div class="btn-group w-100" role="group">
-                                <div class="dropdown">
-                                    <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Kelola">
-                                        <i class="bi bi-gear"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('admin.products.manage.quantity', ['inventory' => $item->id ?? $item['id'], 'size' => $breakdown['size']]) }}">
-                                            <i class="bi bi-plus-minus me-2 text-success"></i>Kelola Qty
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="{{ route('admin.products.manage.edit', ['inventory' => $item->id ?? $item['id'], 'size' => $breakdown['size']]) }}">
-                                            <i class="bi bi-pencil me-2 text-warning"></i>Edit
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmDeleteProducts({{ $item->id ?? $item['id'] }}, '{{ $breakdown['size'] }}')">                                            <i class="bi bi-trash me-2"></i>Hapus
-                                        </a></li>
-                                    </ul>
-                                </div>
+
                                 <a href="{{ route('customer.products') }}?inventory={{ $item->id ?? $item['id'] }}&size={{ $breakdown['size'] }}" 
                                    class="btn btn-outline-secondary btn-sm"
                                    title="Lihat di Katalog"
@@ -103,33 +88,3 @@
         Tidak ada detail produk per ukuran untuk item ini.
     </div>
 @endif
-
-
-<script>
-function confirmDeleteProducts(inventoryId, size) {
-    if (confirm(`Apakah Anda yakin ingin menghapus SEMUA produk dengan ukuran ${size}? Tindakan ini tidak dapat dibatalkan!`)) {
-        // Buat form untuk mengirim request DELETE
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/admin/products/manage/delete/${inventoryId}/${size}`;
-        
-        // Tambahkan CSRF token
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-        
-        // Tambahkan method DELETE
-        const methodField = document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'DELETE';
-        form.appendChild(methodField);
-        
-        // Submit form
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>

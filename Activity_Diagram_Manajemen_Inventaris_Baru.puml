@@ -1,0 +1,59 @@
+@startuml Activity_Diagram_Manajemen_Inventaris
+!theme plain
+title Activity Diagram - Manajemen Inventaris (REQ-APITS-F-03)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman inventaris
+dari dashboard;
+
+|Sistem|
+:Tampilkan halaman inventaris dengan
+tabel data dan fitur pencarian/filter;
+
+|Admin|
+:Lakukan pencarian dengan
+kata kunci tertentu;
+
+|Sistem|
+:Proses pencarian dengan query LIKE
+pada nama, kategori, dan kode inventaris;
+
+|Admin|
+:Filter data berdasarkan
+kategori atau status stok;
+
+|Sistem|
+:Terapkan filter dan tampilkan
+data sesuai kriteria;
+
+|Admin|
+if (Operasi yang dipilih?) then (Tambah)
+  :Tambah item baru dengan
+  mengisi form lengkap;
+  |Sistem|
+  :Validasi input form dan simpan
+  data baru dengan feedback sukses;
+elseif (Edit) then
+  :Edit item existing dengan
+  mengubah data;
+  |Sistem|
+  :Perbarui data dengan validasi
+  unique code dan konfirmasi;
+else (Hapus)
+  :Hapus item inventaris
+  yang tidak diperlukan;
+  |Sistem|
+  :Hapus item dan cascade delete
+  produk terkait dengan konfirmasi;
+endif
+
+|Admin|
+:Data inventaris berhasil dikelola
+dengan feedback yang sesuai;
+
+stop
+
+@enduml

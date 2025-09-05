@@ -1,0 +1,92 @@
+@startuml Sequence_Diagram_Laporan_Inventaris
+!theme plain
+title Sequence Diagram - Laporan Inventaris (REQ-APITS-F-05)
+
+actor "Admin" as Admin
+participant "Dashboard" as UI
+participant "Inventory System" as System
+participant "Filter System" as Filter
+participant "Export System" as Export
+database "Database" as DB
+
+Admin -> UI: klik menu "Laporan Inventaris"
+activate UI
+UI -> System: loadInventoryReport()
+activate System
+
+System -> DB: getInventoryData()
+activate DB
+DB --> System: data inventaris
+deactivate DB
+
+System -> UI: tampilkan dashboard laporan
+UI -> Admin: halaman laporan dengan 4 kartu ringkasan
+deactivate UI
+
+Admin -> UI: analisis grafik stok per kategori
+activate UI
+UI -> System: getStockChartData()
+activate System
+System -> DB: getStockByCategory(), getTrendData()
+activate DB
+DB --> System: data grafik
+deactivate DB
+System -> UI: bar chart stok & line chart tren
+UI -> Admin: tampilkan grafik visualisasi
+deactivate System
+deactivate UI
+
+Admin -> UI: lihat tabel item low stock
+activate UI
+UI -> System: getLowStockItems(), getPopularItems()
+activate System
+System -> DB: getItemsBelowMinimum(), getTopSellingItems()
+activate DB
+DB --> System: data tabel
+deactivate DB
+System -> UI: tabel low stock & item terpopuler
+UI -> Admin: tampilkan tabel dengan alert
+deactivate System
+deactivate UI
+
+alt filter kategori
+    Admin -> UI: klik "Filter Kategori"
+    activate UI
+    UI -> Filter: showCategoryFilter()
+    activate Filter
+    Filter -> Admin: dropdown filter kategori
+    Admin -> Filter: pilih kategori
+    Filter -> System: filterByCategory(categoryId)
+    activate System
+    System -> DB: getInventoryData(category)
+    activate DB
+    DB --> System: data terfilter
+    deactivate DB
+    System -> UI: update dashboard
+    UI -> Admin: tampilkan data terfilter
+    deactivate System
+    deactivate Filter
+    deactivate UI
+end
+
+alt export Excel
+    Admin -> UI: klik "Export Excel"
+    activate UI
+    UI -> Export: generateExcel()
+    activate Export
+    Export -> System: getInventoryReportData()
+    activate System
+    System -> DB: getAllInventoryData()
+    activate DB
+    DB --> System: complete data
+    deactivate DB
+    System --> Export: report data
+    deactivate System
+    Export -> Export: createExcelFile()
+    Export -> UI: file Excel siap
+    UI -> Admin: download link Excel
+    deactivate Export
+    deactivate UI
+end
+
+@enduml

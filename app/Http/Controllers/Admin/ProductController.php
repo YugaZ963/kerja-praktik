@@ -11,102 +11,7 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of products
-     */
-    public function index(Request $request)
-    {
-        $query = Product::with('inventory');
-        
-        // Filter pencarian
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('size', 'like', "%{$search}%");
-            });
-        }
-        
-        // Filter berdasarkan kategori
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
-        
-        // Filter berdasarkan ukuran
-        if ($request->filled('size')) {
-            $query->where('size', $request->size);
-        }
-        
-        // Filter berdasarkan inventaris
-        if ($request->filled('inventory_id')) {
-            $query->where('inventory_id', $request->inventory_id);
-        }
-        
-        // Filter berdasarkan status stok
-        if ($request->filled('stock_status')) {
-            switch ($request->stock_status) {
-                case 'low':
-                    $query->where('stock', '<=', 10)->where('stock', '>', 0);
-                    break;
-                case 'out':
-                    $query->where('stock', 0);
-                    break;
-                case 'available':
-                    $query->where('stock', '>', 10);
-                    break;
-            }
-        }
-        
-        // Sorting
-        switch ($request->sort) {
-            case 'name-asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name-desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'price-asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price-desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'stock-asc':
-                $query->orderBy('stock', 'asc');
-                break;
-            case 'stock-desc':
-                $query->orderBy('stock', 'desc');
-                break;
-            case 'size-asc':
-                $query->orderBy('size', 'asc');
-                break;
-            case 'size-desc':
-                $query->orderBy('size', 'desc');
-                break;
-            default:
-                $query->latest();
-        }
-        
-        $products = $query->paginate(15)->withQueryString();
-        $inventories = Inventory::all();
-        
-        // Get unique categories and sizes for filters
-        $categories = Product::select('category')->distinct()->pluck('category');
-        $sizes = Product::select('size')->distinct()->pluck('size');
-        
-        return view('admin.products.index', [
-            'titleShop' => '📊 Manajemen Produk Seragam - Admin RAVAZKA | Kelola Inventaris',
-            'title' => '📊 Manajemen Produk Seragam - Admin RAVAZKA | Kelola Inventaris',
-            'metaDescription' => '🔧 Panel admin untuk mengelola produk seragam sekolah RAVAZKA. Kelola stok, harga, kategori, dan inventaris dengan mudah. Dashboard lengkap untuk administrator.',
-            'metaKeywords' => 'admin produk RAVAZKA, kelola seragam, manajemen inventaris, dashboard admin, stok produk',
-            'products' => $products,
-            'inventories' => $inventories,
-            'categories' => $categories,
-            'sizes' => $sizes
-        ]);
-    }
+
     
     /**
      * Show the form for creating a new product
@@ -197,48 +102,57 @@ class ProductController extends Controller
             ]);
         }
         
-        return redirect()->route('admin.products.index')
+        return redirect()->route('inventory.index')
             ->with('success', "Produk '{$product->name}' ukuran {$product->size} berhasil ditambahkan.");
     }
     
     /**
-     * Get available sizes from daftar-harga.txt
+     * Get available sizes from daftar-harga.txt and combine with actual sizes in database
      */
     private function getAvailableSizesFromPriceList()
     {
         $filePath = base_path('daftar-harga.txt');
         $sizes = [];
         
-        if (!file_exists($filePath)) {
-            // Fallback ke ukuran default jika file tidak ada
-            return ['S', 'M', 'L', 'XL', 'XXL'];
-        }
-        
-        $content = file_get_contents($filePath);
-        $lines = explode("\n", $content);
-        
-        foreach ($lines as $line) {
-            $line = trim($line);
-            // Skip baris kosong, header, dan baris yang tidak mengandung ukuran
-            if (empty($line) || strpos($line, 'NO') === 0 || strpos($line, 'HARGA') !== false) {
-                continue;
-            }
+        // Ambil ukuran dari file daftar-harga.txt
+        if (file_exists($filePath)) {
+            $content = file_get_contents($filePath);
+            $lines = explode("\n", $content);
             
-            // Cek apakah baris mengandung ukuran (angka atau huruf ukuran)
-            if (preg_match('/^(\d+|[A-Z]+\d*|L\d+|SML)\s+\d+/', $line)) {
-                $parts = preg_split('/\s+/', $line);
-                if (count($parts) >= 2) {
-                    $size = $parts[0];
-                    // Tambahkan ukuran ke array jika belum ada
-                    if (!in_array($size, $sizes)) {
-                        $sizes[] = $size;
+            foreach ($lines as $line) {
+                $line = trim($line);
+                // Skip baris kosong, header, dan baris yang tidak mengandung ukuran
+                if (empty($line) || strpos($line, 'NO') === 0 || strpos($line, 'HARGA') !== false) {
+                    continue;
+                }
+                
+                // Cek apakah baris mengandung ukuran (angka atau huruf ukuran)
+                if (preg_match('/^(\d+|[A-Z]+\d*|L\d+|SML)\s+\d+/', $line)) {
+                    $parts = preg_split('/\s+/', $line);
+                    if (count($parts) >= 2) {
+                        $size = $parts[0];
+                        // Tambahkan ukuran ke array jika belum ada
+                        if (!in_array($size, $sizes)) {
+                            $sizes[] = $size;
+                        }
                     }
                 }
             }
         }
         
+        // Ambil ukuran yang benar-benar ada di database
+        $actualSizes = \App\Models\Product::distinct()->pluck('size')->toArray();
+        
+        // Gabungkan ukuran dari file dengan ukuran aktual di database
+        $allSizes = array_unique(array_merge($sizes, $actualSizes));
+        
+        // Filter ukuran kosong atau null
+        $allSizes = array_filter($allSizes, function($size) {
+            return !empty($size) && $size !== null;
+        });
+        
         // Urutkan ukuran: angka dulu, lalu huruf
-        usort($sizes, function($a, $b) {
+        usort($allSizes, function($a, $b) {
             // Jika keduanya angka
             if (is_numeric($a) && is_numeric($b)) {
                 return (int)$a - (int)$b;
@@ -251,7 +165,12 @@ class ProductController extends Controller
             return is_numeric($a) ? -1 : 1;
         });
         
-        return $sizes;
+        // Fallback ke ukuran default jika tidak ada ukuran yang ditemukan
+        if (empty($allSizes)) {
+            return ['S', 'M', 'L', 'XL', 'XXL'];
+        }
+        
+        return array_values($allSizes);
     }
     
     /**
@@ -351,7 +270,7 @@ class ProductController extends Controller
             ]);
         }
         
-        return redirect()->route('admin.products.index')
+        return redirect()->route('inventory.index')
             ->with('success', "Produk '{$product->name}' ukuran {$product->size} berhasil diperbarui.");
     }
     
@@ -375,7 +294,7 @@ class ProductController extends Controller
             ]);
         }
         
-        return redirect()->route('admin.products.index')
+        return redirect()->route('inventory.index')
             ->with('success', "Produk '{$productName}' ukuran {$productSize} berhasil dihapus.");
     }
     
@@ -404,7 +323,7 @@ class ProductController extends Controller
             }
         }
         
-        return redirect()->route('admin.products.index')
+        return redirect()->route('inventory.index')
             ->with('success', "{$deletedCount} produk berhasil dihapus.");
     }
     
@@ -432,123 +351,7 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    /**
-     * Tampilkan form untuk mengelola quantity produk berdasarkan inventory dan size
-     */
-    public function manageQuantity($inventoryId, $size)
-    {
-        $inventory = Inventory::findOrFail($inventoryId);
-        $products = Product::where('inventory_id', $inventoryId)
-            ->where('size', $size)
-            ->get();
 
-        if ($products->isEmpty()) {
-            return redirect()->back()->with('error', 'Tidak ada produk dengan ukuran tersebut.');
-        }
-
-        return view('admin.products.manage-quantity', [
-            'titleShop' => 'RAVAZKA - Kelola Quantity Produk',
-            'inventory' => $inventory,
-            'products' => $products,
-            'size' => $size
-        ]);
-    }
-
-    /**
-     * Update quantity produk
-     */
-    public function updateQuantity(Request $request, $inventoryId, $size)
-    {
-        $request->validate([
-            'quantities' => 'required|array',
-            'quantities.*' => 'required|integer|min:0'
-        ]);
-
-        foreach ($request->quantities as $productId => $quantity) {
-            $product = Product::where('id', $productId)
-                ->where('inventory_id', $inventoryId)
-                ->where('size', $size)
-                ->first();
-
-            if ($product) {
-                $product->update(['stock' => $quantity]);
-            }
-        }
-
-        return redirect()->route('inventory.index')
-            ->with('success', 'Quantity produk berhasil diperbarui.');
-    }
-
-    /**
-     * Tampilkan form untuk mengedit informasi produk berdasarkan inventory dan size
-     */
-    public function manageEdit($inventoryId, $size)
-    {
-        $inventory = Inventory::findOrFail($inventoryId);
-        $products = Product::where('inventory_id', $inventoryId)
-            ->where('size', $size)
-            ->get();
-
-        if ($products->isEmpty()) {
-            return redirect()->back()->with('error', 'Tidak ada produk dengan ukuran tersebut.');
-        }
-
-        return view('admin.products.manage-edit', [
-            'titleShop' => 'RAVAZKA - Edit Info Produk',
-            'inventory' => $inventory,
-            'products' => $products,
-            'size' => $size
-        ]);
-    }
-
-    /**
-     * Update informasi produk
-     */
-    public function updateProductInfo(Request $request, $inventoryId, $size)
-    {
-        $request->validate([
-            'product_updates' => 'required|array',
-            'product_updates.*.name' => 'required|string|max:255',
-            'product_updates.*.price' => 'required|numeric|min:0',
-            'product_updates.*.description' => 'nullable|string'
-        ]);
-
-        foreach ($request->product_updates as $productId => $updates) {
-            $product = Product::where('id', $productId)
-                ->where('inventory_id', $inventoryId)
-                ->where('size', $size)
-                ->first();
-
-            if ($product) {
-                $product->update([
-                    'name' => $updates['name'],
-                    'price' => $updates['price'],
-                    'description' => $updates['description'] ?? $product->description
-                ]);
-            }
-        }
-
-        return redirect()->route('inventory.index')
-            ->with('success', 'Informasi produk berhasil diperbarui.');
-    }
-
-    /**
-     * Hapus semua produk berdasarkan inventory dan size
-     */
-    public function deleteBySize($inventoryId, $size)
-    {
-        $deletedCount = Product::where('inventory_id', $inventoryId)
-            ->where('size', $size)
-            ->delete();
-
-        if ($deletedCount > 0) {
-            return redirect()->route('inventory.index')
-                ->with('success', "Berhasil menghapus {$deletedCount} produk dengan ukuran {$size}.");
-        } else {
-            return redirect()->route('inventory.index')
-                ->with('error', 'Tidak ada produk yang dihapus.');
-        }
-    }
 
     /**
      * Adjust stock for individual product

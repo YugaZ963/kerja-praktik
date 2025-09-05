@@ -5,8 +5,10 @@ use App\Models\Inventory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\SalesReportController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -15,11 +17,7 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Admin Registration Routes (protected by admin middleware)
-Route::middleware('admin')->group(function () {
-    Route::get('/admin/register', [AuthController::class, 'showAdminRegisterForm'])->name('admin.register');
-    Route::post('/admin/register', [AuthController::class, 'registerAdmin']);
-});
+// Admin Registration Routes removed - not needed in simplified version
 
 // Dashboard Route (hanya untuk admin)
 Route::get('/dashboard', function () {
@@ -32,33 +30,37 @@ Route::get('/dashboard', function () {
 
 
 
-Route::get('/', [\App\Http\Controllers\Public\WelcomeController::class, 'index']);
+// Route beranda - admin diarahkan ke dashboard, customer ke welcome page
+Route::get('/', function () {
+    if (Auth::check() && Auth::user()->isAdmin()) {
+        return redirect()->route('dashboard');
+    }
+    return app(\App\Http\Controllers\Public\WelcomeController::class)->index();
+});
 
-Route::get('/about', [\App\Http\Controllers\Public\AboutController::class, 'index'])->name('about.index');
-Route::get('/contact', [\App\Http\Controllers\Public\ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact/send', [\App\Http\Controllers\Public\ContactController::class, 'send'])->name('contact.send');
-Route::get('/products', [\App\Http\Controllers\Customer\ProductController::class, 'index'])->name('customer.products');
+// Public pages (admin diblokir dari halaman customer)
+Route::middleware('block.admin.customer')->group(function () {
+    Route::get('/about', [\App\Http\Controllers\Public\AboutController::class, 'index'])->name('about.index');
+    Route::get('/contact', [\App\Http\Controllers\Public\ContactController::class, 'index'])->name('contact.index');
+    Route::post('/contact/send', [\App\Http\Controllers\Public\ContactController::class, 'send'])->name('contact.send');
+    Route::get('/products', [\App\Http\Controllers\Customer\ProductController::class, 'index'])->name('customer.products');
+});
 
-// 1. Detail produk
+// Detail produk (admin diblokir)
 Route::get('/products/{slug}', function ($slug) {
     $product = Product::where('slug', $slug)->firstOrFail();
     return view('public.product', ['titleShop' => 'RAVAZKA', 'product' => $product]);
-})->name('customer.product.detail');
+})->middleware('block.admin.customer')->name('customer.product.detail');
 
-// Customer Order Routes
-Route::prefix('orders')->name('customer.orders.')->middleware('auth')->group(function () {
+// Customer Order Routes (admin diblokir)
+Route::prefix('orders')->name('customer.orders.')->middleware(['auth', 'block.admin.customer'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('index');
-    Route::get('/track', [\App\Http\Controllers\Customer\OrderController::class, 'track'])->name('track');
     Route::get('/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('show');
     Route::post('/{order}/upload-payment', [\App\Http\Controllers\Customer\OrderController::class, 'uploadPaymentProof'])->name('upload-payment');
     Route::post('/{order}/upload-delivery', [\App\Http\Controllers\Customer\OrderController::class, 'uploadDeliveryProof'])->name('upload-delivery');
     Route::post('/{order}/mark-completed', [\App\Http\Controllers\Customer\OrderController::class, 'markAsCompleted'])->name('mark-completed');
 });
 
-// Customer Testimonial Routes
-Route::prefix('testimonials')->name('customer.testimonials.')->middleware('auth')->group(function () {
-    Route::post('/store', [\App\Http\Controllers\Customer\TestimonialController::class, 'store'])->name('store');
-});
 
 // Rute untuk manajemen inventaris (hanya admin)
 Route::prefix('inventory')->middleware('admin')->group(function () {
@@ -314,17 +316,11 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
     })->name('inventory.detail');
 });
 
-// Routes untuk tampilan terpadu produk dan inventaris
-Route::prefix('admin/unified')->middleware('admin')->name('admin.unified.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Admin\UnifiedController::class, 'index'])->name('index');
-    Route::get('/export', [\App\Http\Controllers\Admin\UnifiedController::class, 'export'])->name('export');
-    Route::get('/report', [\App\Http\Controllers\Admin\UnifiedController::class, 'report'])->name('report');
-    Route::get('/{inventory}/products', [\App\Http\Controllers\Admin\UnifiedController::class, 'getProducts'])->name('products');
-});
+// Unified routes removed - functionality integrated into product management
 
 // Routes untuk manajemen produk admin
 Route::prefix('admin/products')->middleware('admin')->name('admin.products.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('index');
+
     Route::get('/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('create');
     Route::post('/', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('store');
     Route::get('/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'show'])->name('show');
@@ -335,21 +331,14 @@ Route::prefix('admin/products')->middleware('admin')->name('admin.products.')->g
     Route::post('/{product}/adjust-stock', [\App\Http\Controllers\Admin\ProductController::class, 'adjustStock'])->name('adjust-stock');
     Route::get('/inventory/{inventory}/products', [\App\Http\Controllers\Admin\ProductController::class, 'getByInventory'])->name('by-inventory');
     
-    // Routes untuk manajemen produk dari inventaris
-    Route::prefix('manage')->name('manage.')->group(function () {
-        Route::get('/quantity/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'manageQuantity'])->name('quantity');
-        Route::post('/quantity/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'updateQuantity'])->name('quantity.update');
-        Route::get('/edit/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'manageEdit'])->name('edit');
-        Route::post('/edit/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'updateProductInfo'])->name('edit.update');
-        Route::delete('/delete/{inventory}/{size}', [\App\Http\Controllers\Admin\ProductController::class, 'deleteBySize'])->name('delete');
-    });
+
 });
 
 // Route untuk bulk delete produk dan inventaris
 
 
-// Routes untuk fitur keranjang belanja (memerlukan login)
-Route::prefix('cart')->middleware('require.login')->group(function () {
+// Routes untuk fitur keranjang belanja (memerlukan login, admin diblokir)
+Route::prefix('cart')->middleware(['require.login', 'block.admin.customer'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Customer\CartController::class, 'index'])->name('cart.index');
     Route::post('/add/{product}', [\App\Http\Controllers\Customer\CartController::class, 'add'])->name('cart.add');
     Route::put('/update/{cart}', [\App\Http\Controllers\Customer\CartController::class, 'update'])->name('cart.update');
@@ -359,8 +348,10 @@ Route::prefix('cart')->middleware('require.login')->group(function () {
     Route::post('/process-order', [\App\Http\Controllers\Customer\CartController::class, 'processOrder'])->name('cart.process-order');
 });
 
-// Route untuk cart count (tidak perlu login untuk menampilkan jumlah)
-Route::get('/cart/count', [\App\Http\Controllers\Customer\CartController::class, 'getCartCount'])->name('cart.count');
+// Route untuk cart count (tidak perlu login untuk menampilkan jumlah, admin diblokir)
+Route::get('/cart/count', [\App\Http\Controllers\Customer\CartController::class, 'getCartCount'])
+    ->middleware('block.admin.customer')
+    ->name('cart.count');
 
 // Routes untuk manajemen pesanan admin
 Route::prefix('admin/orders')->middleware('admin')->group(function () {
@@ -372,11 +363,11 @@ Route::prefix('admin/orders')->middleware('admin')->group(function () {
     Route::delete('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
 });
 
-// Sales Report Routes
-Route::prefix('admin/sales')->name('admin.sales.')->middleware(['auth'])->group(function () {
+// Routes untuk laporan penjualan admin
+Route::prefix('admin/sales')->middleware('admin')->name('admin.sales.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\SalesReportController::class, 'index'])->name('index');
-    Route::get('/export-pdf', [\App\Http\Controllers\Admin\SalesReportController::class, 'exportPdf'])->name('export-pdf');
     Route::get('/data', [\App\Http\Controllers\Admin\SalesReportController::class, 'getData'])->name('data');
+    Route::get('/export-pdf', [\App\Http\Controllers\Admin\SalesReportController::class, 'exportPdf'])->name('export-pdf');
 });
 
 // SEO Routes

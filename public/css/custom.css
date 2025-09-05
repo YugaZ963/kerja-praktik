@@ -481,6 +481,18 @@
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
 }
 
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
 /* Responsive adjustments for size breakdown */
 @media (max-width: 576px) {
     .size-item {

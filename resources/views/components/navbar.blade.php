@@ -8,77 +8,61 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+            @if(!Auth::check() || !Auth::user()->isAdmin())
+            <!-- Menu navigasi untuk customer dan guest -->
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">Beranda</a>
+                    <a class="nav-link" href="/">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('product') ? 'active' : '' }}" href="/products">Produk</a>
+                    <a class="nav-link" href="/products">Produk</a>
                 </li>
                 @auth
-                    @if(Auth::user()->isAdmin())
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }}"
-                                href="/inventory">Inventaris</a>
-                        </li>
-
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('orders*') ? 'active' : '' }}" href="/orders">
-                                <i class="bi bi-bag-check me-1"></i>Pesanan
-                            </a>
-                        </li>
+                    @if(!Auth::user()->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link" href="/orders">Pesanan Saya</a>
+                    </li>
                     @endif
                 @endauth
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('about') ? 'active' : '' }}" href="/about">Tentang Kami</a>
+                    <a class="nav-link" href="/about">Tentang Kami</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('contact') ? 'active' : '' }}" href="/contact">Kontak</a>
+                    <a class="nav-link" href="/contact">Kontak</a>
                 </li>
             </ul>
-
-            <div class="d-flex align-items-center">
-                <!-- Pencarian -->
-                <div class="dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="searchDropdown">
+            
+            <!-- Search Bar untuk customer -->
+            <div class="d-flex me-2">
+                <form class="d-flex" method="GET" action="/products">
+                    <input class="form-control me-1" type="search" name="search" placeholder="Cari..." 
+                           value="{{ request('search') }}" style="width: 120px;">
+                    <button class="btn btn-outline-primary btn-sm" type="submit">
                         <i class="bi bi-search"></i>
-                    </a>
-                    <div class="dropdown-menu p-2" style="min-width: 300px;">
-                        <form action="{{ route('customer.products') }}" method="GET" id="searchForm">
-                            <div class="input-group">
-                                <input class="form-control" type="text" name="search" id="searchInput" 
-                                       placeholder="Cari produk..." value="{{ request('search') }}">
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                        <div class="mt-2">
-                            <small class="text-muted">Tekan Enter atau klik tombol untuk mencari</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Keranjang -->
-                @auth
-                    <a href="{{ route('cart.index') }}" class="nav-link position-relative me-3">
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Cart untuk customer yang login -->
+            @auth
+                @if(!Auth::user()->isAdmin())
+                <div class="me-2">
+                    <a href="/cart" class="btn btn-outline-success btn-sm position-relative">
                         <i class="bi bi-cart3"></i>
-                        <span id="cart-count"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
+                            {{ Auth::user()->carts ? Auth::user()->carts->sum('quantity') : 0 }}
+                        </span>
                     </a>
-                @else
-                    <a href="{{ route('login') }}" class="nav-link position-relative me-3" 
-                       title="Silakan login untuk mengakses keranjang" data-bs-toggle="tooltip">
-                        <i class="bi bi-cart3 text-muted"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">0</span>
-                    </a>
-                @endauth
+                </div>
+                @endif
+            @endauth
+            
+            <div class="d-flex align-items-center ms-auto">
 
                 <!-- Login/Register atau User Menu -->
                 @guest
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('login') }}" class="nav-link me-2">Masuk</a>
+                        <a href="{{ route('login') }}" class="nav-link me-1">Masuk</a>
                         <a href="{{ route('register') }}" class="btn btn-sm btn-outline-primary">Daftar</a>
                     </div>
                 @else
@@ -86,7 +70,7 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle me-1"></i>
-                            {{ Auth::user()->name }}
+                            <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">
                             <!-- Profile Information -->
@@ -113,25 +97,10 @@
                             
                             <!-- Navigation Menu -->
                             @if (Auth::user()->isAdmin())
-                                <li><a class="dropdown-item" href="{{ route('dashboard') }}">
-                                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                                    </a></li>
-                                <li><a class="dropdown-item" href="{{ route('inventory.index') }}">
-                                        <i class="bi bi-box-seam me-2"></i>Inventaris
-                                    </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">
-                                        <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
-                                    </a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
                             @else
-                                <li><a class="dropdown-item" href="/orders">
-                                        <i class="bi bi-bag-check me-2"></i>Pesanan Saya
-                                    </a></li>
-                                <li><a class="dropdown-item" href="{{ route('customer.orders.track') }}">
-                                        <i class="bi bi-search me-2"></i>Lacak Pesanan
-                                    </a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -147,53 +116,25 @@
                         </ul>
                     </div>
                 @endguest
+            @endif
             </div>
         </div>
     </div>
 </nav>
 
 <script>
+// Search functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    const searchForm = document.querySelector('form[action="/products"]');
+    const searchInput = document.querySelector('input[name="search"]');
     
-    const searchInput = document.getElementById('searchInput');
-    const searchForm = document.getElementById('searchForm');
-    const searchDropdown = document.getElementById('searchDropdown');
-    
-    // Focus pada input ketika dropdown dibuka
-    searchDropdown.addEventListener('click', function() {
-        setTimeout(() => {
-            searchInput.focus();
-        }, 100);
-    });
-    
-    // Submit form ketika Enter ditekan
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            searchForm.submit();
-        }
-    });
-    
-    // Prevent dropdown close ketika klik di dalam search form saja
-    const searchDropdownMenu = document.querySelector('#searchDropdown + .dropdown-menu');
-    if (searchDropdownMenu) {
-        searchDropdownMenu.addEventListener('click', function(e) {
-            e.stopPropagation();
+    if (searchForm && searchInput) {
+        searchForm.addEventListener('submit', function(e) {
+            if (searchInput.value.trim() === '') {
+                e.preventDefault();
+                window.location.href = '/products';
+            }
         });
     }
-    
-    // Quick search - redirect langsung jika input kosong
-    searchForm.addEventListener('submit', function(e) {
-        const searchValue = searchInput.value.trim();
-        if (searchValue === '') {
-            e.preventDefault();
-            window.location.href = '{{ route("customer.products") }}';
-        }
-    });
 });
 </script>

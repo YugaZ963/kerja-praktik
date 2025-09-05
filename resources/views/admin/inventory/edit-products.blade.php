@@ -79,7 +79,7 @@
                                     <div class="col-md-3">
                                         <label for="stock_{{ $product->id }}" class="form-label">Stok</label>
                                         <input type="number" class="form-control" id="stock_{{ $product->id }}" name="stock" 
-                                               value="{{ old('stock', $product->stock) }}" required min="0">
+                                               value="{{ old('stock', $product->stock) }}" readonly min="0">
                                     </div>
                                     
                                     <div class="col-md-6">

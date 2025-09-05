@@ -1,0 +1,41 @@
+@startuml Activity_Diagram_Registrasi_Akun
+!theme plain
+title Activity Diagram - Registrasi Akun (REQ-APITS-F-06)
+
+|#LightBlue|Customer|
+|#LightGreen|Sistem|
+|Customer|
+start
+:Buka halaman registrasi;
+:Isi form nama, email, password;
+
+|Sistem|
+:Tampilkan form registrasi
+dengan role "User" default;
+
+|Customer|
+:Konfirmasi password dan
+verifikasi data;
+
+|Sistem|
+:Validasi data real-time
+(email unik, password min 6 karakter);
+
+|Customer|
+:Tekan tombol "Daftar";
+
+|Sistem|
+:Buat akun baru dengan role "user",
+auto-login, gabungkan cart session;
+
+|Customer|
+:Berhasil masuk ke aplikasi
+dengan akses fitur user;
+
+|Sistem|
+:Redirect ke beranda dengan
+pesan sukses dan navbar user;
+
+stop
+
+@enduml

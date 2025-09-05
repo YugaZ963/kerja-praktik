@@ -279,89 +279,11 @@
                                                     <i class="fas fa-eye"></i>
                                                     <span>Detail</span>
                                                 </a>
-                                                @if($order->status !== 'completed' && $order->status !== 'cancelled')
-                                                <button type="button" class="btn-action btn-edit" 
-                                                        data-bs-toggle="modal" data-bs-target="#statusModal{{ $order->id }}" 
-                                                        title="Update Status">
-                                                    <i class="fas fa-edit"></i>
-                                                    <span>Edit</span>
-                                                </button>
-                                                @endif
-                                                <button type="button" class="btn-action btn-delete" 
-                                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ $order->id }}" 
-                                                        title="Hapus Pesanan">
-                                                    <i class="fas fa-trash"></i>
-                                                    <span>Hapus</span>
-                                                </button>
                                             </div>
                                         </td>
                                     </tr>
 
-                                <!-- Status Update Modal -->
-                                @if($order->status !== 'completed' && $order->status !== 'cancelled')
-                                <div class="modal fade" id="statusModal{{ $order->id }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form method="POST" action="{{ route('admin.orders.update-status', $order) }}">
-                                                @csrf
-                                                @method('PATCH')
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Update Status Pesanan</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Status Baru</label>
-                                                        <select name="status" class="form-select" required>
-                                                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                            <option value="payment_pending" {{ $order->status == 'payment_pending' ? 'selected' : '' }}>Menunggu Verifikasi Pembayaran</option>
-                                                            <option value="payment_verified" {{ $order->status == 'payment_verified' ? 'selected' : '' }}>Pembayaran Terverifikasi</option>
-                                                            <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Sedang Diproses</option>
-                                                            <option value="packaged" {{ $order->status == 'packaged' ? 'selected' : '' }}>Dikemas</option>
-                                                            <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Dikirim</option>
-                                                            <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Terkirim</option>
-                                                            <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Selesai</option>
-                                                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Catatan Admin</label>
-                                                        <textarea name="admin_notes" class="form-control" rows="3" placeholder="Catatan tambahan...">{{ $order->admin_notes }}</textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-primary">Update Status</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
 
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal{{ $order->id }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form method="POST" action="{{ route('admin.orders.destroy', $order) }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Hapus Pesanan</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Apakah Anda yakin ingin menghapus pesanan <strong>{{ $order->order_number }}</strong>?</p>
-                                                    <p class="text-danger"><small>Tindakan ini tidak dapat dibatalkan!</small></p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-danger">Hapus</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                                 @empty
                                 <tr>
                                     <td colspan="7">

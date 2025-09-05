@@ -63,13 +63,7 @@
                                 <i class="bi bi-facebook"></i>
                             </a>
                             <a href="#" class="text-reset fs-3">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                            <a href="#" class="text-reset fs-3">
                                 <i class="bi bi-instagram"></i>
-                            </a>
-                            <a href="#" class="text-reset fs-3">
-                                <i class="bi bi-youtube"></i>
                             </a>
                         </div>
                     </div>
@@ -121,35 +115,9 @@
         </div>
 
         <!-- Map Section -->
-        <div class="row mb-5">
+        <div class="row mb-2">
             <div class="col-12">
-                <h3 class="mb-4">Lokasi Kami</h3>
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>Temukan Toko Kami</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div id="map" style="height: 450px; width: 100%;"></div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h6 class="mb-2"><i
-                                        class="bi bi-building me-2"></i>{{ $mapsData['storeLocation']['name'] }}</h6>
-                                <p class="mb-1"><i
-                                        class="bi bi-geo-alt me-2"></i>{{ $mapsData['storeLocation']['address'] }}</p>
-                                <p class="mb-0"><i
-                                        class="bi bi-telephone me-2"></i>{{ $mapsData['storeLocation']['phone'] }}</p>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <a href="{{ $mapsData['simpleDirectionsUrl'] }}" target="_blank"
-                                    class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-box-arrow-up-right me-1"></i>Buka di Google Maps
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>

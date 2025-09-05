@@ -19,14 +19,6 @@
                     <td>{{ $item['code'] }}</td>
                     <td>
                         {{ $item['name'] }}
-                        <br>
-                        <button class="btn btn-sm btn-outline-secondary size-breakdown-toggle" 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#sizeBreakdown{{ $item['id'] }}" 
-                                aria-expanded="false" 
-                                style="display: inline-block;">
-                            <i class="bi bi-rulers"></i> Detail Ukuran
-                        </button>
                     </td>
                     <td>{{ $item['category'] }}</td>
                     <td>
@@ -48,9 +40,6 @@
                                     <a href="/inventory/{{ $item['code'] }}" class="btn btn-info btn-sm" title="Lihat Detail">
                                         <i class="bi bi-eye me-1"></i>Detail
                                     </a>
-                                    <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary btn-sm" title="Edit">
-                                        <i class="bi bi-pencil me-1"></i>Edit
-                                    </a>
 
                                 </div>
                             </div>
@@ -61,20 +50,9 @@
                                     <a href="/inventory/{{ $item['code'] }}" class="btn btn-info" title="Lihat Detail">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('inventory.edit', $item['id']) }}" class="btn btn-primary" title="Edit Inventaris">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
 
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                <!-- Size Breakdown Row -->
-                <tr class="collapse size-breakdown-row" id="sizeBreakdown{{ $item['id'] }}">
-                    <td colspan="7" class="p-0">
-                        <div class="p-3 bg-light">
-                            <x-inventory-size-breakdown :item="$item" />
                         </div>
                     </td>
                 </tr>
@@ -94,26 +72,6 @@
 </div>
 
 <script>
-function toggleSizeBreakdown() {
-    const toggleButtons = document.querySelectorAll('.size-breakdown-toggle');
-    const toggleText = document.getElementById('toggleText');
-    const isVisible = toggleButtons[0].style.display !== 'none';
-    
-    toggleButtons.forEach(button => {
-        button.style.display = isVisible ? 'none' : 'inline-block';
-    });
-    
-    if (isVisible) {
-        // Sembunyikan semua breakdown yang terbuka
-        document.querySelectorAll('.size-breakdown-row.show').forEach(row => {
-            row.classList.remove('show');
-        });
-        toggleText.textContent = 'Tampilkan Detail Ukuran';
-    } else {
-        toggleText.textContent = 'Sembunyikan Detail Ukuran';
-    }
-}
-
 // Fungsi untuk menambah stok
 function addProduct(inventoryId, size) {
     console.log('addProduct called with:', inventoryId, size);
@@ -163,7 +121,7 @@ function editProducts(inventoryId, size) {
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Stok</label>
-                                        <input type="number" class="form-control" name="stock" value="${product.stock}" required>
+                                        <input type="number" class="form-control" name="stock" value="${product.stock}" readonly>
                                     </div>
                                     <div class="col-md-6 mb-3 d-flex align-items-end">
                                         <button type="button" class="btn btn-primary me-2" onclick="updateProduct(${product.id})">

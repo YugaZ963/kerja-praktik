@@ -16,7 +16,7 @@
                     <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-outline-info me-2">
                         <i class="bi bi-eye"></i> Lihat Detail
                     </a>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left"></i> Kembali ke Daftar
                     </a>
                 </div>
@@ -239,7 +239,7 @@
 
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-2">
+                                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary me-2">
                                         <i class="bi bi-arrow-left"></i> Batal
                                     </a>
                                     <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-outline-info">

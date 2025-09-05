@@ -1,0 +1,46 @@
+@startuml Activity_Diagram_Laporan_Penjualan
+!theme plain
+title Activity Diagram - Laporan Penjualan (REQ-APITS-F-05)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Login ke sistem;
+:Akses menu Laporan Penjualan;
+
+|Sistem|
+:Tampilkan halaman dengan
+4 kartu ringkasan;
+
+|Admin|
+:Analisis grafik tren
+dan kategori;
+
+|Sistem|
+:Tampilkan grafik tren harian
+dan pie chart kategori;
+
+|Admin|
+:Lihat tabel produk terlaris
+dan pesanan terbaru;
+
+|Sistem|
+:Tampilkan tabel produk terlaris
+dan pesanan selesai terbaru;
+
+|Admin|
+:Gunakan filter tanggal
+dan export PDF;
+
+|Sistem|
+:Filter data berdasarkan tanggal
+dan generate PDF laporan;
+
+|Admin|
+:Laporan berhasil dianalisis
+dan dapat diekspor PDF;
+
+stop
+
+@enduml

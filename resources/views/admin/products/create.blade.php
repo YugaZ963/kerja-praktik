@@ -12,7 +12,7 @@
                     <h1 class="h3 fw-bold text-primary mb-1">Tambah Produk Baru</h1>
                     <p class="text-muted mb-0">Tambahkan produk seragam sekolah dengan ukuran dan harga spesifik</p>
                 </div>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Kembali ke Daftar Produk
                 </a>
             </div>
@@ -52,7 +52,7 @@
                         <a href="{{ route('admin.products.create') }}" class="btn btn-primary me-2">
                             <i class="bi bi-arrow-left me-1"></i> Pilih Ulang
                         </a>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary">
                             <i class="bi bi-list me-1"></i> Lihat Semua Produk
                         </a>
                     </div>
@@ -227,7 +227,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                                <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Batal
                                 </a>
                                 <button type="submit" class="btn btn-primary">

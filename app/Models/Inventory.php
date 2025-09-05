@@ -130,4 +130,10 @@ class Inventory extends Model
     {
         return $this->getAvailableSizesCount();
     }
+
+    // Accessor untuk mendapatkan ukuran yang tersedia
+    public function getAvailableSizesAttribute()
+    {
+        return $this->products()->distinct('size')->pluck('size')->filter()->values()->toArray();
+    }
 }

@@ -1,0 +1,83 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="inventaris" name="Manajemen-Inventaris">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ===== SWIMLANES ===== -->
+        <mxCell id="admin" value="Admin" style="swimlane;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="400" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="system" value="Sistem" style="swimlane;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="0" width="400" height="400" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== START ===== -->
+        <mxCell id="start" value="" style="ellipse;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="185" y="10" width="30" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== ADMIN 6 ACTIVITIES ===== -->
+        <mxCell id="A1" value="Akses halaman inventaris" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="60" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="A2" value="Cari kata kunci" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="110" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="A3" value="Filter kategori / stok" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="160" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="A4" value="Tambah item baru" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="210" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="A5" value="Edit item existing" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="260" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="A6" value="Hapus item" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="admin">
+          <mxGeometry x="50" y="310" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== SISTEM 6 ACTIVITIES ===== -->
+        <mxCell id="S1" value="Tampilkan halaman &amp; fitur" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="60" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="S2" value="Proses LIKE search" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="110" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="S3" value="Terapkan filter &amp; sort" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="160" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="S4" value="Validasi &amp; simpan data" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="210" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="S5" value="Validasi &amp; update data" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="260" width="300" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="S6" value="Konfirmasi &amp; hapus item" style="rounded=1;whiteSpace=wrap;" vertex="1" parent="system">
+          <mxGeometry x="50" y="310" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== END ===== -->
+        <mxCell id="end" value="" style="ellipse;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="585" y="350" width="30" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== CONTROL FLOWS ===== -->
+        <mxCell id="f0" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="start" target="A1"/>
+        <mxCell id="f1" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A1" target="S1"/>
+        <mxCell id="f2" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S1" target="A2"/>
+        <mxCell id="f3" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A2" target="S2"/>
+        <mxCell id="f4" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S2" target="A3"/>
+        <mxCell id="f5" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A3" target="S3"/>
+        <mxCell id="f6" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S3" target="A4"/>
+        <mxCell id="f7" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A4" target="S4"/>
+        <mxCell id="f8" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S4" target="A5"/>
+        <mxCell id="f9" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A5" target="S5"/>
+        <mxCell id="f10" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S5" target="A6"/>
+        <mxCell id="f11" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="A6" target="S6"/>
+        <mxCell id="f12" style="edgeStyle=orthogonalEdgeStyle" edge="1" parent="1" source="S6" target="end"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

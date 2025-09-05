@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'require.login' => \App\Http\Middleware\RequireLoginMiddleware::class,
             'seo' => \App\Http\Middleware\SeoMiddleware::class,
+            'block.admin.customer' => \App\Http\Middleware\BlockAdminFromCustomerFeatures::class,
         ]);
         
         // Apply SEO middleware globally to web routes

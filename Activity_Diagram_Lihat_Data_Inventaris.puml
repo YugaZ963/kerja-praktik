@@ -1,0 +1,39 @@
+@startuml Activity_Diagram_Lihat_Data_Inventaris
+!theme plain
+title Activity Diagram - Lihat Data Inventaris (REQ-APITS-F-03A)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman inventaris
+dari dashboard admin;
+
+|Sistem|
+:Tampilkan halaman inventaris dengan
+tabel data dan fitur navigasi;
+
+|Admin|
+if (Operasi yang dipilih?) then (Sorting)
+  :Klik header kolom untuk
+  mengurutkan data;
+  |Sistem|
+  :Urutkan data berdasarkan
+  kolom yang dipilih (ASC/DESC);
+  |Admin|
+  :Data inventaris berhasil ditampilkan
+  dengan urutan yang sesuai;
+else (View Detail)
+  :Lihat detail item inventaris
+  tertentu;
+  |Sistem|
+  :Tampilkan informasi lengkap
+  item inventaris yang dipilih;
+  |Admin|
+  :Detail item inventaris
+  berhasil ditampilkan;
+endif
+
+stop
+
+@enduml

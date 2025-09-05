@@ -1,0 +1,40 @@
+# PEMECAHAN USE CASE MANAJEMEN PESANAN (REQ-APITS-F-04)
+
+Use case "Manajemen Pesanan" yang terlalu besar dapat dipecah menjadi 4 use case yang lebih spesifik:
+
+## 1. Lihat Data Pesanan (REQ-APITS-F-04A)
+- **Tujuan**: Admin dapat melihat dan menavigasi daftar pesanan
+- **Fitur**: Tampilan tabel pesanan, pagination, sorting, counter status
+- **Operasi**: Read (View) dengan navigasi dan statistik
+- **Deskripsi**: Admin mengakses halaman manajemen pesanan untuk melihat daftar semua pesanan dengan informasi dasar seperti nomor pesanan, nama pelanggan, status, dan tanggal.
+
+## 2. Cari dan Filter Pesanan (REQ-APITS-F-04B)
+- **Tujuan**: Admin dapat mencari dan memfilter data pesanan
+- **Fitur**: Pencarian berdasarkan nomor/nama/telepon, filter status pesanan
+- **Operasi**: Search dan Filter dengan query LIKE dan WHERE
+- **Deskripsi**: Admin dapat mencari pesanan spesifik menggunakan kata kunci atau memfilter pesanan berdasarkan status tertentu (pending, diproses, selesai, dibatalkan).
+
+## 3. Update Status Pesanan (REQ-APITS-F-04C)
+- **Tujuan**: Admin dapat mengubah status pesanan dan menambah catatan
+- **Fitur**: Form update status, input catatan, notifikasi otomatis
+- **Operasi**: Update dengan validasi dan notifikasi
+- **Deskripsi**: Admin mengupdate status pesanan dari satu tahap ke tahap berikutnya, menambahkan catatan jika diperlukan, sistem otomatis mengirim notifikasi ke pelanggan.
+
+## 4. Riwayat dan Detail Pesanan (REQ-APITS-F-04D)
+- **Tujuan**: Admin dapat melihat detail lengkap dan riwayat perubahan pesanan
+- **Fitur**: Detail pesanan, riwayat status, timeline perubahan
+- **Operasi**: Read detail dengan tracking history
+- **Deskripsi**: Admin dapat melihat informasi lengkap pesanan termasuk item yang dipesan, alamat pengiriman, riwayat perubahan status dengan timestamp, dan catatan-catatan sebelumnya.
+
+## KEUNTUNGAN PEMECAHAN:
+
+1. **Modularitas**: Setiap use case memiliki tanggung jawab yang jelas dan spesifik
+2. **Pengembangan**: Tim dapat mengembangkan fitur secara paralel dan independen
+3. **Testing**: Pengujian menjadi lebih fokus dan mudah dilakukan per fitur
+4. **Maintenance**: Pemeliharaan dan debugging lebih mudah karena scope yang terbatas
+5. **User Experience**: Interface dapat dioptimalkan untuk setiap fungsi spesifik
+
+## CATATAN:
+- Pemecahan ini menghasilkan 4 use case yang masih dalam jumlah wajar
+- Setiap use case tetap saling terkait dalam konteks manajemen pesanan
+- Implementasi dapat dilakukan secara bertahap sesuai prioritas bisnis

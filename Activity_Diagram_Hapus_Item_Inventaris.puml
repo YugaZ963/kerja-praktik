@@ -1,0 +1,49 @@
+@startuml Activity_Diagram_Hapus_Item_Inventaris
+!theme plain
+title Activity Diagram - Hapus Item Inventaris (REQ-APITS-F-03E)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman inventaris
+dan pilih item untuk dihapus;
+
+|Sistem|
+:Tampilkan daftar inventaris
+dengan tombol "Hapus" per item;
+
+|Admin|
+:Klik tombol "Hapus"
+pada item yang dipilih;
+
+|Sistem|
+:Tampilkan dialog konfirmasi
+penghapusan dengan peringatan;
+
+|Admin|
+if (Konfirmasi penghapusan?) then (Ya)
+  :Konfirmasi penghapusan
+  dengan klik "Ya, Hapus";
+  |Sistem|
+  :Cek produk terkait dan
+  lakukan cascade delete;
+  :Hapus item inventaris dan
+  produk terkait dari database;
+  :Tampilkan pesan sukses
+  dan refresh halaman inventaris;
+else (Tidak)
+  :Batalkan penghapusan
+  dengan klik "Batal";
+  |Sistem|
+  :Tutup dialog konfirmasi
+  dan kembali ke halaman inventaris;
+endif
+
+|Admin|
+:Item inventaris dan produk terkait
+berhasil dihapus atau dibatalkan;
+
+stop
+
+@enduml

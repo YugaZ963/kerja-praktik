@@ -1,0 +1,55 @@
+PEMECAHAN USE CASE MANAJEMEN INVENTARIS
+========================================
+
+Use Case Utama: Manajemen Inventaris (REQ-APITS-F-03)
+Status: Dipecah menjadi 5 sub-use case yang lebih spesifik
+
+========================================
+
+### 1. Lihat Data Inventaris (REQ-APITS-F-03A)
+- Tujuan: Admin dapat melihat dan menavigasi data inventaris
+- Fitur: Tampilan tabel, pagination, sorting data
+- Operasi: Read (View) dengan navigasi
+- Deskripsi: Admin dapat melihat daftar inventaris dalam bentuk tabel dengan fitur navigasi halaman dan pengurutan data
+
+### 2. Cari dan Filter Inventaris (REQ-APITS-F-03B)
+- Tujuan: Admin dapat mencari dan memfilter data inventaris
+- Fitur: Pencarian kata kunci, filter kategori/status stok/harga
+- Operasi: Search dan Filter dengan query LIKE
+- Deskripsi: Admin dapat mencari inventaris berdasarkan kata kunci dan memfilter berdasarkan kategori, status stok, atau rentang harga
+
+### 3. Tambah Item Inventaris (REQ-APITS-F-03C)
+- Tujuan: Admin dapat menambah item inventaris baru
+- Fitur: Form input lengkap, validasi data, simpan ke database
+- Operasi: Create dengan validasi
+- Deskripsi: Admin dapat menambahkan item inventaris baru dengan mengisi form lengkap yang mencakup validasi data sebelum disimpan
+
+### 4. Edit Item Inventaris (REQ-APITS-F-03D)
+- Tujuan: Admin dapat mengubah data item inventaris existing
+- Fitur: Form edit, validasi unique code, update database
+- Operasi: Update dengan validasi
+- Deskripsi: Admin dapat mengedit data item inventaris yang sudah ada dengan validasi kode unik dan pembaruan database
+
+### 5. Hapus Item Inventaris (REQ-APITS-F-03E)
+- Tujuan: Admin dapat menghapus item inventaris
+- Fitur: Konfirmasi penghapusan, cascade delete produk terkait
+- Operasi: Delete dengan konfirmasi
+- Deskripsi: Admin dapat menghapus item inventaris dengan konfirmasi dan penghapusan otomatis produk terkait
+
+========================================
+
+KEUNTUNGAN PEMECAHAN:
+- Setiap use case memiliki fokus yang jelas dan spesifik
+- Lebih mudah untuk testing dan development
+- Memisahkan concern antara operasi CRUD dan operasi pencarian
+- Tetap mencakup semua fitur dari use case asli tanpa redundansi
+- Memudahkan dalam pembuatan activity diagram dan sequence diagram
+- Mempermudah estimasi waktu development untuk setiap fitur
+
+========================================
+
+Catatan:
+- Semua sub-use case ini tetap terkait dengan aktor Admin
+- Kondisi awal tetap sama: Admin telah login dan memiliki akses ke sistem inventaris
+- Setiap use case dapat dikembangkan secara independen
+- Dapat diprioritaskan berdasarkan kebutuhan bisnis

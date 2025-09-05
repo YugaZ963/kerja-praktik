@@ -1,0 +1,46 @@
+@startuml Activity_Diagram_Keranjang_Belanja
+!theme plain
+title Activity Diagram - Keranjang Belanja (REQ-APITS-F-08)
+
+|#LightBlue|Customer|
+|#LightGreen|Sistem|
+|Customer|
+start
+:Tambahkan produk ke keranjang
+dengan pilih ukuran dan quantity;
+
+|Sistem|
+:Tampilkan form "Tambah ke Keranjang"
+dan validasi stok produk;
+
+|Customer|
+:Akses halaman keranjang
+untuk lihat daftar produk;
+
+|Sistem|
+:Tampilkan halaman keranjang dengan
+daftar produk lengkap dan kontrol quantity;
+
+|Customer|
+:Ubah quantity produk atau
+hapus produk dari keranjang;
+
+|Sistem|
+:Validasi stok maksimum, hitung subtotal
+per item dan total keseluruhan;
+
+|Customer|
+:Lanjutkan ke checkout atau
+kosongkan seluruh keranjang;
+
+|Sistem|
+:Dukung persistent cart untuk user login
+dan session cart untuk guest;
+
+|Customer|
+:Berhasil kelola keranjang
+dan dapat lanjut checkout;
+
+stop
+
+@enduml

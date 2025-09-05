@@ -130,45 +130,7 @@ class AuthController extends Controller
         return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name . '!');
     }
 
-    /**
-     * Show admin register form
-     */
-    public function showAdminRegisterForm()
-    {
-        return view('auth.admin-register', [
-            'titleShop' => '👨‍💼 Registrasi Admin - RAVAZKA | Daftar Administrator Baru',
-            'title' => '👨‍💼 Registrasi Admin - RAVAZKA | Daftar Administrator Baru',
-            'metaDescription' => '🔧 Form registrasi khusus administrator RAVAZKA. Buat akun admin baru untuk mengelola sistem, inventaris, dan pesanan seragam sekolah.',
-            'metaKeywords' => 'registrasi admin RAVAZKA, daftar administrator, akun admin baru, manajemen sistem'
-        ]);
-    }
-
-    /**
-     * Handle admin register request
-     */
-    public function registerAdmin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'admin', // Registrasi khusus admin
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Admin baru berhasil didaftarkan: ' . $user->name . '!');
-    }
+    // Admin registration methods removed - not needed in simplified version
 
     /**
      * Handle logout request

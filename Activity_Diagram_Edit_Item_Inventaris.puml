@@ -1,0 +1,55 @@
+@startuml Activity_Diagram_Edit_Item_Inventaris
+!theme plain
+title Activity Diagram - Edit Item Inventaris (REQ-APITS-F-03D)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman inventaris
+dan pilih item untuk diedit;
+
+|Sistem|
+:Tampilkan daftar inventaris
+dengan tombol "Edit" per item;
+
+|Admin|
+:Klik tombol "Edit"
+pada item yang dipilih;
+
+|Sistem|
+:Tampilkan form edit dengan
+data existing item terisi;
+
+|Admin|
+:Ubah data item yang diperlukan
+(nama, kategori, kode, stok, dll);
+
+|Sistem|
+:Validasi input real-time dan
+validasi unique code;
+
+|Admin|
+if (Data valid?) then (Ya)
+  :Submit form dengan
+  menekan tombol "Update";
+  |Sistem|
+  :Validasi final dan update
+  data ke database;
+  :Tampilkan pesan sukses
+  dan redirect ke halaman inventaris;
+else (Tidak)
+  :Perbaiki data yang
+  tidak valid atau duplikat;
+  |Sistem|
+  :Tampilkan pesan error
+  spesifik (termasuk kode duplikat);
+endif
+
+|Admin|
+:Item inventaris berhasil
+diperbarui dengan data baru;
+
+stop
+
+@enduml

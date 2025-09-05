@@ -67,28 +67,7 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
-    
-    /**
-     * Track order by order number
-     */
-    public function track(Request $request)
-    {
-        $order = null;
-        
-        if ($request->has('order_number')) {
-            $order = Order::where('order_number', $request->order_number)
-                          ->where('user_id', auth()->id())
-                          ->first();
-        }
-        
-        return view('customer.orders.track', [
-            'titleShop' => '🚚 Lacak Pesanan - RAVAZKA | Tracking Order Seragam Sekolah',
-            'title' => '🚚 Lacak Pesanan - RAVAZKA | Tracking Order Seragam Sekolah',
-            'metaDescription' => '📍 Lacak pesanan seragam sekolah Anda di RAVAZKA dengan nomor order. Pantau status pengiriman dan estimasi waktu tiba secara real-time.',
-            'metaKeywords' => 'lacak pesanan RAVAZKA, tracking order seragam, status pengiriman, nomor resi, estimasi tiba',
-            'order' => $order
-        ]);
-    }
+
     
     /**
      * Get status counts for customer orders

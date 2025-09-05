@@ -1,0 +1,92 @@
+@startuml Sequence_Diagram_Laporan_Penjualan
+!theme plain
+title Sequence Diagram - Laporan Penjualan (REQ-APITS-F-05)
+
+actor "Admin" as Admin
+participant "Dashboard" as UI
+participant "Report System" as System
+participant "Filter System" as Filter
+participant "Export System" as Export
+database "Database" as DB
+
+Admin -> UI: klik menu "Laporan Penjualan"
+activate UI
+UI -> System: loadSalesReport()
+activate System
+
+System -> DB: getSalesData()
+activate DB
+DB --> System: data penjualan
+deactivate DB
+
+System -> UI: tampilkan dashboard laporan
+UI -> Admin: halaman laporan dengan 4 kartu ringkasan
+deactivate UI
+
+Admin -> UI: analisis grafik tren dan kategori
+activate UI
+UI -> System: getChartData()
+activate System
+System -> DB: getTrendData(), getCategoryData()
+activate DB
+DB --> System: data grafik
+deactivate DB
+System -> UI: grafik tren harian & pie chart kategori
+UI -> Admin: tampilkan grafik visualisasi
+deactivate System
+deactivate UI
+
+Admin -> UI: lihat tabel produk terlaris
+activate UI
+UI -> System: getTopProducts(), getRecentOrders()
+activate System
+System -> DB: getProductRanking(), getOrderHistory()
+activate DB
+DB --> System: data tabel
+deactivate DB
+System -> UI: tabel produk terlaris & pesanan terbaru
+UI -> Admin: tampilkan tabel data
+deactivate System
+deactivate UI
+
+alt filter tanggal
+    Admin -> UI: klik "Filter Tanggal"
+    activate UI
+    UI -> Filter: showDateFilter()
+    activate Filter
+    Filter -> Admin: modal filter tanggal
+    Admin -> Filter: pilih rentang tanggal
+    Filter -> System: filterByDate(startDate, endDate)
+    activate System
+    System -> DB: getSalesData(dateRange)
+    activate DB
+    DB --> System: data terfilter
+    deactivate DB
+    System -> UI: update dashboard
+    UI -> Admin: tampilkan data terfilter
+    deactivate System
+    deactivate Filter
+    deactivate UI
+end
+
+alt export PDF
+    Admin -> UI: klik "Export PDF"
+    activate UI
+    UI -> Export: generatePDF()
+    activate Export
+    Export -> System: getReportData()
+    activate System
+    System -> DB: getAllReportData()
+    activate DB
+    DB --> System: complete data
+    deactivate DB
+    System --> Export: report data
+    deactivate System
+    Export -> Export: createPDFFile()
+    Export -> UI: file PDF siap
+    UI -> Admin: download link PDF
+    deactivate Export
+    deactivate UI
+end
+
+@enduml

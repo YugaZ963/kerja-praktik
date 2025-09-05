@@ -1,0 +1,39 @@
+@startuml Activity_Diagram_Lihat_Data_Pesanan
+!theme plain
+title Activity Diagram - Lihat Data Pesanan (REQ-APITS-F-04A)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman manajemen pesanan
+dari dashboard admin;
+
+|Sistem|
+:Tampilkan halaman pesanan dengan
+tabel data dan counter status;
+
+|Admin|
+if (Operasi yang dipilih?) then (Sorting)
+  :Klik header kolom untuk
+  mengurutkan data pesanan;
+  |Sistem|
+  :Urutkan data berdasarkan
+  kolom yang dipilih (ASC/DESC);
+  |Admin|
+  :Data pesanan berhasil ditampilkan
+  dengan urutan yang sesuai;
+else (View Detail)
+  :Klik nomor pesanan untuk
+  melihat detail lengkap;
+  |Sistem|
+  :Tampilkan informasi lengkap
+  pesanan yang dipilih;
+  |Admin|
+  :Detail pesanan berhasil
+  ditampilkan dengan lengkap;
+endif
+
+stop
+
+@enduml

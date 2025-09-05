@@ -1,0 +1,46 @@
+@startuml Activity_Diagram_Update_Status_Pesanan
+!theme plain
+title Activity Diagram - Update Status Pesanan (REQ-APITS-F-04C)
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+|Admin|
+start
+:Akses halaman detail pesanan
+yang akan diupdate statusnya;
+
+|Sistem|
+:Tampilkan detail pesanan dengan
+form update status dan catatan;
+
+|Admin|
+:Pilih status baru dari dropdown
+dan tambahkan catatan (opsional);
+
+|Sistem|
+:Validasi status transition
+dan format input catatan;
+
+|Admin|
+if (Data valid?) then (Ya)
+  :Submit form update
+  dengan menekan tombol "Update";
+  |Sistem|
+  :Update status pesanan
+  ke database dengan timestamp;
+  :Kirim notifikasi otomatis
+  ke pelanggan via email/WhatsApp;
+  |Admin|
+  :Status pesanan berhasil diupdate
+  dengan notifikasi terkirim;
+else (Tidak)
+  :Perbaiki input status
+  atau catatan yang tidak valid;
+  |Sistem|
+  :Tampilkan pesan error
+  dan form tetap terbuka;
+endif
+
+stop
+
+@enduml

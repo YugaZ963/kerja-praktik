@@ -1,114 +1,74 @@
 @startuml Activity_Diagram_Manajemen_Inventaris
 !theme plain
-title Activity Diagram - Manajemen Inventaris
-
-|#LightBlue|Admin|
-|#LightGreen|Sistem|
-
-start
+title Activity Diagram - Manajemen Inventaris (REQ-APITS-F-03)
 
 |Admin|
-:Mengakses Halaman Inventaris
-dari Dashboard;
+start
+:Login ke sistem;
+:Akses halaman inventaris
+dari dashboard;
 
 |Sistem|
-:Menampilkan Halaman Inventaris
-dengan Tabel Data;
-:Menyediakan Pagination
-untuk Navigasi Data;
+:Tampilkan halaman inventaris
+dengan tabel data dan fitur
+pencarian/filter;
 
 |Admin|
-if (Melakukan Pencarian?) then (Ya)
-  :Memasukkan Kata Kunci
-Pencarian;
+:Pilih operasi:
+- Pencarian
+- Filter data
+- Tambah item
+- Edit item
+- Hapus item;
+
+switch (Operasi yang dipilih?)
+case (Pencarian)
+  :Input kata kunci
+pencarian tertentu;
   |Sistem|
-  :Memproses Pencarian dengan
-Query LIKE pada Nama, Kategori,
-Deskripsi, dan Kode;
-else (Tidak)
-endif
+  :Proses pencarian dengan
+  query LIKE pada nama,
+  kategori, dan kode inventaris;
+  :Tampilkan hasil pencarian;
+case (Filter)
+  |Admin|
+  :Filter data berdasarkan
+  kategori atau status stok;
+  |Sistem|
+  :Terapkan filter dan
+  tampilkan data sesuai
+  kriteria yang dipilih;
+case (Tambah Item)
+  |Admin|
+  :Tambah item baru dengan
+  mengisi form lengkap;
+  |Sistem|
+  :Validasi input form dan
+  simpan data baru ke database
+  dengan feedback sukses;
+case (Edit Item)
+  |Admin|
+  :Edit item existing
+  dengan mengubah data;
+  |Sistem|
+  :Perbarui data dengan
+  validasi unique code dan
+  berikan konfirmasi perubahan;
+case (Hapus Item)
+  |Admin|
+  :Hapus item inventaris
+  yang tidak diperlukan;
+  |Sistem|
+  :Hapus item dan cascade
+  delete produk terkait
+  dengan konfirmasi penghapusan;
+endswitch
 
 |Admin|
-if (Melakukan Filter?) then (Ya)
-  :Memilih Filter Kategori,
-Status Stok, atau Rentang Harga;
-  |Sistem|
-  :Menerapkan Filter Kategori,
-Status Stok (Rendah/Habis/Siap/Kritis),
-dan Rentang Harga;
-else (Tidak)
-endif
-
-|Admin|
-if (Melakukan Sorting?) then (Ya)
-  :Memilih Urutan Data
-(Nama, Stok, Harga);
-  |Sistem|
-  :Mengurutkan Data Sesuai Pilihan
-(Ascending/Descending);
-else (Tidak)
-endif
-
-|Admin|
-if (Tambah Item Baru?) then (Ya)
-  :Mengisi Form Item Baru
-(Kode, Nama, Kategori, Stok,
-Harga Beli/Jual, Supplier);
-  |Sistem|
-  :Memvalidasi Input Form;
-  if (Data Valid?) then (Ya)
-    :Menyimpan Data Baru
-ke Database;
-    :Memberikan Feedback
-Sukses;
-  else (Tidak)
-    :Memberikan Feedback
-Error Validasi;
-  endif
-else (Tidak)
-endif
-
-|Admin|
-if (Edit Item Existing?) then (Ya)
-  :Mengubah Data Item
-Existing;
-  |Sistem|
-  :Memperbarui Data dengan
-Validasi Unique Code;
-  if (Data Valid?) then (Ya)
-    :Menyimpan Perubahan
-ke Database;
-    :Memberikan Feedback
-Sukses;
-  else (Tidak)
-    :Memberikan Feedback
-Error Validasi;
-  endif
-else (Tidak)
-endif
-
-|Admin|
-if (Hapus Item?) then (Ya)
-  :Memilih Item untuk
-Dihapus;
-  |Sistem|
-  :Menghapus Item dan
-Cascade Delete Produk Terkait;
-  :Memberikan Feedback
-Sukses Penghapusan;
-else (Tidak)
-endif
-
-|Admin|
-if (Lihat Detail Item?) then (Ya)
-  :Memilih Item untuk
-Melihat Detail;
-  |Sistem|
-  :Menampilkan Detail Lengkap Item
-dengan Breakdown Ukuran
-dan Riwayat Stok;
-else (Tidak)
-endif
+:Data inventaris berhasil
+dikelola sesuai operasi
+yang dipilih dengan
+feedback yang sesuai;
 
 stop
 
