@@ -5,20 +5,26 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
+/**
+ * Class BreadcrumbHelper
+ *
+ * A helper class for generating breadcrumbs.
+ */
 class BreadcrumbHelper
 {
     /**
-     * Generate breadcrumbs for current route
+     * Generate breadcrumbs for the current route.
+     *
+     * @return array
      */
-    public static function generate()
+    public static function generate(): array
     {
         $routeName = Route::currentRouteName();
         $routeParameters = Route::current()->parameters();
         $breadcrumbs = [];
         
-        // Always start with home
         $breadcrumbs[] = [
-            'title' => 'Beranda',
+            'title' => 'Home',
             'url' => url('/'),
             'active' => false
         ];
@@ -26,7 +32,7 @@ class BreadcrumbHelper
         switch ($routeName) {
             case 'customer.products':
                 $breadcrumbs[] = [
-                    'title' => 'Produk',
+                    'title' => 'Products',
                     'url' => route('customer.products'),
                     'active' => true
                 ];
@@ -34,7 +40,7 @@ class BreadcrumbHelper
                 
             case 'customer.product.detail':
                 $breadcrumbs[] = [
-                    'title' => 'Produk',
+                    'title' => 'Products',
                     'url' => route('customer.products'),
                     'active' => false
                 ];
@@ -53,7 +59,7 @@ class BreadcrumbHelper
                 
             case 'contact.index':
                 $breadcrumbs[] = [
-                    'title' => 'Kontak',
+                    'title' => 'Contact',
                     'url' => route('contact.index'),
                     'active' => true
                 ];
@@ -61,7 +67,7 @@ class BreadcrumbHelper
                 
             case 'customer.orders.index':
                 $breadcrumbs[] = [
-                    'title' => 'Pesanan Saya',
+                    'title' => 'My Orders',
                     'url' => route('customer.orders.index'),
                     'active' => true
                 ];
@@ -69,14 +75,14 @@ class BreadcrumbHelper
                 
             case 'customer.orders.show':
                 $breadcrumbs[] = [
-                    'title' => 'Pesanan Saya',
+                    'title' => 'My Orders',
                     'url' => route('customer.orders.index'),
                     'active' => false
                 ];
                 
                 if (isset($routeParameters['orderNumber'])) {
                     $breadcrumbs[] = [
-                        'title' => 'Detail Pesanan #' . $routeParameters['orderNumber'],
+                        'title' => 'Order Details #' . $routeParameters['orderNumber'],
                         'url' => route('customer.orders.show', $routeParameters['orderNumber']),
                         'active' => true
                     ];
@@ -84,7 +90,6 @@ class BreadcrumbHelper
                 break;
                 
             default:
-                // For other routes, try to generate breadcrumbs from URL segments
                 $segments = request()->segments();
                 $url = url('/');
                 
@@ -105,9 +110,12 @@ class BreadcrumbHelper
     }
     
     /**
-     * Generate structured data for breadcrumbs
+     * Generate structured data for breadcrumbs.
+     *
+     * @param array|null $breadcrumbs
+     * @return array
      */
-    public static function getStructuredData($breadcrumbs = null)
+    public static function getStructuredData(?array $breadcrumbs = null): array
     {
         if (!$breadcrumbs) {
             $breadcrumbs = self::generate();
@@ -132,9 +140,13 @@ class BreadcrumbHelper
     }
     
     /**
-     * Render breadcrumbs HTML
+     * Render the breadcrumbs HTML.
+     *
+     * @param array|null $breadcrumbs
+     * @param bool $showStructuredData
+     * @return string
      */
-    public static function render($breadcrumbs = null, $showStructuredData = true)
+    public static function render(?array $breadcrumbs = null, bool $showStructuredData = true): string
     {
         if (!$breadcrumbs) {
             $breadcrumbs = self::generate();

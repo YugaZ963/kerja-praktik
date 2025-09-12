@@ -4,9 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Product
+ *
+ * Represents a product in the application.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property float $price
+ * @property float|null $weight
+ * @property string|null $description
+ * @property int $stock
+ * @property string|null $size
+ * @property string|null $category
+ * @property int|null $inventory_id
+ * @property string|null $image
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Inventory|null $inventory
+ */
 class Product extends Model
 {
-    // Mass assignment protection
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name',
         'slug',
@@ -20,15 +44,21 @@ class Product extends Model
         'image'
     ];
 
-    // Relasi dengan inventory
+    /**
+     * Get the inventory that the product belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function inventory()
     {
         return $this->belongsTo(Inventory::class);
     }
 
-    // Event listeners sudah dipindahkan ke ProductObserver untuk struktur yang lebih baik
-
-    // Method untuk update stock dan data inventory
+    /**
+     * Update the stock and data of the associated inventory.
+     *
+     * @return void
+     */
     public function updateInventoryStock()
     {
         if ($this->inventory_id) {

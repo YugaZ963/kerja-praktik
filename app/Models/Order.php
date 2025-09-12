@@ -6,8 +6,49 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Order
+ *
+ * Represents a customer order in the application.
+ *
+ * @property int $id
+ * @property string $order_number
+ * @property int|null $user_id
+ * @property string $customer_name
+ * @property string $customer_email
+ * @property string $customer_phone
+ * @property string $customer_address
+ * @property string|null $notes
+ * @property string $payment_method
+ * @property string $shipping_method
+ * @property float $subtotal
+ * @property float $shipping_cost
+ * @property float $total_amount
+ * @property string $status
+ * @property string|null $payment_proof
+ * @property \Illuminate\Support\Carbon|null $payment_verified_at
+ * @property \Illuminate\Support\Carbon|null $shipped_at
+ * @property \Illuminate\Support\Carbon|null $delivered_at
+ * @property string|null $delivery_proof
+ * @property string|null $admin_notes
+ * @property string|null $tracking_number
+ * @property bool $stock_reduced
+ * @property \Illuminate\Support\Carbon|null $stock_reduced_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\OrderItem[] $items
+ * @property-read string $status_label
+ * @property-read string $payment_method_label
+ * @property-read string $shipping_method_label
+ */
 class Order extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'order_number',
         'user_id',
@@ -33,6 +74,11 @@ class Order extends Model
         'stock_reduced_at'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'payment_verified_at' => 'datetime',
         'shipped_at' => 'datetime',
@@ -55,6 +101,11 @@ class Order extends Model
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
 
+    /**
+     * Get the labels for the order statuses.
+     *
+     * @return array<string, string>
+     */
     public static function getStatusLabels()
     {
         return [
@@ -70,48 +121,91 @@ class Order extends Model
         ];
     }
 
+    /**
+     * Get the status label attribute.
+     *
+     * @return string
+     */
     public function getStatusLabelAttribute()
     {
         return self::getStatusLabels()[$this->status] ?? $this->status;
     }
 
+    /**
+     * Get the status label.
+     *
+     * @return string
+     */
     public function getStatusLabel()
     {
         return self::getStatusLabels()[$this->status] ?? $this->status;
     }
 
+    /**
+     * Get the payment method label attribute.
+     *
+     * @return string
+     */
     public function getPaymentMethodLabelAttribute()
     {
         return $this->payment_method === 'bri' ? 'Bank BRI' : 'DANA E-Wallet';
     }
 
+    /**
+     * Get the payment method label.
+     *
+     * @return string
+     */
     public function getPaymentMethodLabel()
     {
         return $this->payment_method === 'bri' ? 'Bank BRI' : 'DANA E-Wallet';
     }
 
+    /**
+     * Get the shipping method label attribute.
+     *
+     * @return string
+     */
     public function getShippingMethodLabelAttribute()
     {
         return $this->shipping_method === 'reguler' ? 'Reguler (3-5 hari)' : 'Express (1-2 hari)';
     }
 
+    /**
+     * Get the shipping method label.
+     *
+     * @return string
+     */
     public function getShippingMethodLabel()
     {
         return $this->shipping_method === 'reguler' ? 'Reguler (3-5 hari)' : 'Express (1-2 hari)';
     }
 
-    // Relationships
+    /**
+     * Get the user associated with the order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the items associated with the order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    // Generate order number
+    /**
+     * Generate a unique order number.
+     *
+     * @return string
+     */
     public static function generateOrderNumber()
     {
         $prefix = 'RVZ';
@@ -125,12 +219,24 @@ class Order extends Model
         return $prefix . $date . str_pad($sequence, 3, '0', STR_PAD_LEFT);
     }
 
-    // Scope methods
+    /**
+     * Scope a query to only include orders with a given status.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $status
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeByStatus($query, $status)
     {
         return $query->where('status', $status);
     }
 
+    /**
+     * Scope a query to only include recent orders.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeRecent($query)
     {
         return $query->orderBy('created_at', 'desc');

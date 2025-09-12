@@ -2,10 +2,17 @@
 
 namespace App\Services;
 
+/**
+ * Class GoogleMapsService
+ *
+ * A service class for handling Google Maps related functionality.
+ */
 class GoogleMapsService
 {
     /**
-     * Get Google Maps API key from configuration
+     * Get the Google Maps API key from the configuration.
+     *
+     * @return string
      */
     public static function getApiKey(): string
     {
@@ -13,7 +20,9 @@ class GoogleMapsService
     }
 
     /**
-     * Get store location coordinates from configuration
+     * Get the store location coordinates from the configuration.
+     *
+     * @return array
      */
     public static function getStoreLocation(): array
     {
@@ -21,7 +30,9 @@ class GoogleMapsService
     }
 
     /**
-     * Get map settings from configuration
+     * Get the map settings from the configuration.
+     *
+     * @return array
      */
     public static function getMapSettings(): array
     {
@@ -29,16 +40,19 @@ class GoogleMapsService
     }
 
     /**
-     * Generate Google Maps URL for directions
+     * Generate the Google Maps URL for directions.
+     *
+     * @return string
      */
     public static function getDirectionsUrl(): string
     {
-        // URL Google Maps spesifik untuk Pasar Baru, Bandung
         return "https://www.google.com/maps/place/Pasar+Baru,+Bandung/@-6.9175278,107.6017623,17z";
     }
 
     /**
-     * Generate simple Google Maps URL for coordinates
+     * Generate a simple Google Maps URL for the store's coordinates.
+     *
+     * @return string
      */
     public static function getSimpleDirectionsUrl(): string
     {
@@ -47,7 +61,9 @@ class GoogleMapsService
     }
 
     /**
-     * Generate Google Maps embed URL
+     * Generate the Google Maps embed URL.
+     *
+     * @return string
      */
     public static function getEmbedUrl(): string
     {

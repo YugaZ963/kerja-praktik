@@ -5,14 +5,25 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Class ProductController
+ *
+ * Handles the display of products for customers.
+ */
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the products.
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
     {
         $query = Product::query();
 
-        // Filter pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -23,22 +34,18 @@ class ProductController extends Controller
             });
         }
 
-        // Filter kategori
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        // Filter ukuran
         if ($request->filled('size')) {
             $query->where('size', strtoupper($request->size));
         }
         
-        // Filter berdasarkan inventory
         if ($request->filled('inventory')) {
             $query->where('inventory_id', $request->inventory);
         }
 
-        // Filter harga
         if ($request->filled('price_min')) {
             $query->where('price', '>=', $request->price_min);
         }
@@ -46,7 +53,6 @@ class ProductController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
-        // Filter stok
         if ($request->filled('stock_status')) {
             switch ($request->stock_status) {
                 case 'available':
@@ -61,7 +67,6 @@ class ProductController extends Controller
             }
         }
 
-        // Sorting
         switch ($request->sort) {
             case 'price-asc':
                 $query->orderBy('price', 'asc');
@@ -87,7 +92,6 @@ class ProductController extends Controller
 
         $products = $query->paginate(12);
 
-        // Get categories and sizes for filters
         $categories = Product::distinct()->pluck('category');
         $sizes = Product::distinct()->pluck('size');
 

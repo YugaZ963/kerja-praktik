@@ -8,32 +8,38 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class OrderController
+ *
+ * Handles customer order management.
+ */
 class OrderController extends Controller
 {
     /**
-     * Display customer's orders
+     * Display the customer's order history.
+     *
+     * @param Request $request
+     * @return View
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $user = Auth::user();
         
-        // Get status filter
         $status = $request->get('status', 'all');
         
-        // Build query
         $query = Order::where('user_id', $user->id)
                      ->with(['items.product'])
                      ->orderBy('created_at', 'desc');
         
-        // Apply status filter
         if ($status && $status !== 'all') {
             $query->where('status', $status);
         }
         
         $orders = $query->paginate(10);
         
-        // Get status counts for tabs
         $statusCounts = $this->getStatusCounts($user->id);
         
         return view('customer.orders.index', [
@@ -48,9 +54,12 @@ class OrderController extends Controller
     }
     
     /**
-     * Show specific order details
+     * Display the details of a specific order.
+     *
+     * @param string $orderNumber
+     * @return View
      */
-    public function show($orderNumber)
+    public function show(string $orderNumber): View
     {
         $user = Auth::user();
         
@@ -70,9 +79,12 @@ class OrderController extends Controller
 
     
     /**
-     * Get status counts for customer orders
+     * Get the count of orders for each status for the current customer.
+     *
+     * @param int $userId
+     * @return array
      */
-    private function getStatusCounts($userId)
+    private function getStatusCounts(int $userId): array
     {
         return [
             'all' => Order::where('user_id', $userId)->count(),
@@ -89,13 +101,16 @@ class OrderController extends Controller
     }
     
     /**
-     * Upload payment proof
+     * Upload a payment proof for the specified order.
+     *
+     * @param Request $request
+     * @param Order $order
+     * @return RedirectResponse
      */
-    public function uploadPaymentProof(Request $request, Order $order)
+    public function uploadPaymentProof(Request $request, Order $order): RedirectResponse
     {
         $user = Auth::user();
         
-        // Log the upload attempt
         \Log::info('Payment proof upload attempt', [
             'user_id' => $user->id,
             'order_id' => $order->id,
@@ -103,7 +118,6 @@ class OrderController extends Controller
             'has_file' => $request->hasFile('payment_proof')
         ]);
         
-        // Verify order belongs to customer
         if ($order->user_id !== $user->id) {
             \Log::warning('Unauthorized payment proof upload attempt', [
                 'user_id' => $user->id,
@@ -119,13 +133,11 @@ class OrderController extends Controller
         
         if ($request->hasFile('payment_proof')) {
             try {
-                // Delete old payment proof if exists
                 if ($order->payment_proof) {
                     \Storage::disk('public')->delete($order->payment_proof);
                     \Log::info('Deleted old payment proof', ['old_path' => $order->payment_proof]);
                 }
                 
-                // Store new payment proof
                 $path = $request->file('payment_proof')->store('payment-proofs', 'public');
                 \Log::info('Stored new payment proof', ['new_path' => $path]);
                 
@@ -141,14 +153,14 @@ class OrderController extends Controller
                     'status' => 'payment_pending'
                 ]);
                 
-                return back()->with('success', 'Bukti pembayaran berhasil diunggah. Pesanan Anda akan segera diverifikasi.');
+                return back()->with('success', 'Payment proof uploaded successfully. Your order will be verified soon.');
             } catch (\Exception $e) {
                 \Log::error('Payment proof upload failed', [
                     'order_id' => $order->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                return back()->withErrors(['payment_proof' => 'Gagal mengunggah bukti pembayaran: ' . $e->getMessage()]);
+                return back()->withErrors(['payment_proof' => 'Failed to upload payment proof: ' . $e->getMessage()]);
             }
         }
         
@@ -157,17 +169,20 @@ class OrderController extends Controller
             'request_files' => $request->allFiles()
         ]);
         
-        return back()->withErrors(['payment_proof' => 'Gagal mengunggah bukti pembayaran.']);
+        return back()->withErrors(['payment_proof' => 'Failed to upload payment proof.']);
     }
 
     /**
-     * Upload delivery proof
+     * Upload a delivery proof for the specified order.
+     *
+     * @param Request $request
+     * @param Order $order
+     * @return RedirectResponse
      */
-    public function uploadDeliveryProof(Request $request, Order $order)
+    public function uploadDeliveryProof(Request $request, Order $order): RedirectResponse
     {
         $user = Auth::user();
         
-        // Log the upload attempt
         \Log::info('Delivery proof upload attempt', [
             'user_id' => $user->id,
             'order_id' => $order->id,
@@ -175,7 +190,6 @@ class OrderController extends Controller
             'has_file' => $request->hasFile('delivery_proof')
         ]);
         
-        // Verify order belongs to customer
         if ($order->user_id !== $user->id) {
             \Log::warning('Unauthorized delivery proof upload attempt', [
                 'user_id' => $user->id,
@@ -185,14 +199,13 @@ class OrderController extends Controller
             abort(403, 'Unauthorized access to order');
         }
 
-        // Verify order status is delivered
         if ($order->status !== 'delivered') {
             \Log::warning('Invalid status for delivery proof upload', [
                 'order_id' => $order->id,
                 'current_status' => $order->status,
                 'required_status' => 'delivered'
             ]);
-            return back()->withErrors(['delivery_proof' => 'Upload foto bukti hanya dapat dilakukan untuk pesanan dengan status "Sudah Sampai".']);
+            return back()->withErrors(['delivery_proof' => 'You can only upload a delivery proof for orders with "Delivered" status.']);
         }
         
         $request->validate([
@@ -202,23 +215,20 @@ class OrderController extends Controller
         
         if ($request->hasFile('delivery_proof')) {
             try {
-                // Delete old delivery proof if exists
                 if ($order->delivery_proof) {
                     \Storage::disk('public')->delete($order->delivery_proof);
                     \Log::info('Deleted old delivery proof', ['old_path' => $order->delivery_proof]);
                 }
                 
-                // Store new delivery proof
                 $path = $request->file('delivery_proof')->store('delivery-proofs', 'public');
                 \Log::info('Stored new delivery proof', ['new_path' => $path]);
                 
                 $order->update([
                     'delivery_proof' => $path,
-                    'admin_notes' => $order->admin_notes . "\n\nCustomer upload bukti barang sudah sampai pada " . now()->format('d/m/Y H:i') . 
-                                   ($request->delivery_notes ? "\nCatatan customer: " . $request->delivery_notes : "")
+                    'admin_notes' => $order->admin_notes . "\n\nCustomer uploaded delivery proof on " . now()->format('d/m/Y H:i') .
+                                   ($request->delivery_notes ? "\nCustomer notes: " . $request->delivery_notes : "")
                 ]);
                 
-                // Kurangi stok produk ketika status berubah menjadi delivered (jika belum dikurangi)
         if (!$order->stock_reduced) {
             $this->reduceProductStock($order);
         }
@@ -231,14 +241,14 @@ class OrderController extends Controller
                     'delivered_at' => $order->delivered_at
                 ]);
                 
-                return back()->with('success', 'Foto bukti barang sudah sampai berhasil diunggah.');
+                return back()->with('success', 'Delivery proof uploaded successfully.');
             } catch (\Exception $e) {
                 \Log::error('Delivery proof upload failed', [
                     'order_id' => $order->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                return back()->withErrors(['delivery_proof' => 'Gagal mengunggah foto bukti: ' . $e->getMessage()]);
+                return back()->withErrors(['delivery_proof' => 'Failed to upload delivery proof: ' . $e->getMessage()]);
             }
         }
         
@@ -247,23 +257,24 @@ class OrderController extends Controller
             'request_files' => $request->allFiles()
         ]);
         
-        return back()->withErrors(['delivery_proof' => 'Gagal mengunggah foto bukti.']);
+        return back()->withErrors(['delivery_proof' => 'Failed to upload delivery proof.']);
     }
 
     /**
-     * Kurangi stok produk berdasarkan order items
+     * Reduce product stock based on order items.
+     *
+     * @param Order $order
+     * @return void
      */
-    private function reduceProductStock(Order $order)
+    private function reduceProductStock(Order $order): void
     {
         try {
             foreach ($order->items as $orderItem) {
-                // Cari produk berdasarkan nama dan ukuran
                 $product = Product::where('name', $orderItem->product_name)
                                 ->where('size', $orderItem->product_size)
                                 ->first();
 
                 if ($product) {
-                    // Kurangi stok produk
                     $newStock = max(0, $product->stock - $orderItem->quantity);
                     $product->update(['stock' => $newStock]);
 
@@ -284,7 +295,6 @@ class OrderController extends Controller
                 }
             }
             
-            // Tandai bahwa stok sudah dikurangi
             $order->update([
                 'stock_reduced' => true,
                 'stock_reduced_at' => now()
@@ -299,13 +309,15 @@ class OrderController extends Controller
     }
 
     /**
-     * Mark order as completed by customer
+     * Mark an order as completed by the customer.
+     *
+     * @param Order $order
+     * @return RedirectResponse
      */
-    public function markAsCompleted(Order $order)
+    public function markAsCompleted(Order $order): RedirectResponse
     {
         $user = Auth::user();
         
-        // Log the completion attempt
         \Log::info('Order completion attempt', [
             'user_id' => $user->id,
             'order_id' => $order->id,
@@ -313,7 +325,6 @@ class OrderController extends Controller
             'current_status' => $order->status
         ]);
         
-        // Verify order belongs to customer
         if ($order->user_id !== $user->id) {
             \Log::warning('Unauthorized order completion attempt', [
                 'user_id' => $user->id,
@@ -323,21 +334,20 @@ class OrderController extends Controller
             abort(403, 'Unauthorized access to order');
         }
 
-        // Verify order status is delivered
         if ($order->status !== Order::STATUS_DELIVERED) {
             \Log::warning('Invalid status for order completion', [
                 'order_id' => $order->id,
                 'current_status' => $order->status,
                 'required_status' => Order::STATUS_DELIVERED
             ]);
-            return back()->withErrors(['status' => 'Pesanan hanya dapat diselesaikan jika sudah berstatus "Sudah Sampai".']);
+            return back()->withErrors(['status' => 'An order can only be completed if its status is "Delivered".']);
         }
         
         try {
             $order->update([
                 'status' => Order::STATUS_COMPLETED,
                 'completed_at' => now(),
-                'admin_notes' => $order->admin_notes . "\n\nPesanan ditandai selesai oleh customer pada " . now()->format('d/m/Y H:i')
+                'admin_notes' => $order->admin_notes . "\n\nOrder marked as completed by customer on " . now()->format('d/m/Y H:i')
             ]);
             
             \Log::info('Order marked as completed successfully', [
@@ -346,14 +356,14 @@ class OrderController extends Controller
                 'completed_at' => $order->completed_at
             ]);
             
-            return back()->with('success', 'Pesanan berhasil ditandai sebagai selesai. Terima kasih atas kepercayaan Anda!');
+            return back()->with('success', 'Order marked as completed successfully. Thank you for your trust!');
         } catch (\Exception $e) {
             \Log::error('Failed to mark order as completed', [
                 'order_id' => $order->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return back()->withErrors(['status' => 'Gagal menandai pesanan sebagai selesai: ' . $e->getMessage()]);
+            return back()->withErrors(['status' => 'Failed to mark order as completed: ' . $e->getMessage()]);
         }
     }
 }

@@ -5,10 +5,22 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\GoogleMapsService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class ContactController
+ *
+ * Handles the display of the contact page and sending contact messages.
+ */
 class ContactController extends Controller
 {
-    public function index()
+    /**
+     * Display the contact page.
+     *
+     * @return View
+     */
+    public function index(): View
     {
         $mapsData = [
             'apiKey' => GoogleMapsService::getApiKey(),
@@ -27,9 +39,15 @@ class ContactController extends Controller
             'mapsData' => $mapsData
         ]);
     }
-    public function send(Request $request)
+
+    /**
+     * Send the contact form message to WhatsApp.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function send(Request $request): RedirectResponse
     {
-        // Validasi input
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -37,17 +55,21 @@ class ContactController extends Controller
             'message' => 'required|string'
         ]);
 
-        // Buat pesan WhatsApp
         $message = $this->generateWhatsAppMessage($request->all());
         
-        // Redirect ke WhatsApp
-        $whatsappNumber = '6289677754918'; // Nomor WhatsApp tujuan
+        $whatsappNumber = '6289677754918';
         $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
 
         return redirect()->away($whatsappUrl);
     }
 
-    private function generateWhatsAppMessage($data)
+    /**
+     * Generate a WhatsApp message from the contact form data.
+     *
+     * @param array $data
+     * @return string
+     */
+    private function generateWhatsAppMessage(array $data): string
     {
         $message = "*PESAN KONTAK - RAVAZKA*\n\n";
         $message .= "📧 *Pesan Baru dari Website*\n\n";

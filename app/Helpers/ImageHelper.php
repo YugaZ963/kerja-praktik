@@ -5,12 +5,22 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Class ImageHelper
+ *
+ * A helper class for handling images.
+ */
 class ImageHelper
 {
     /**
-     * Generate optimized image tag with SEO attributes
+     * Generate an optimized image tag with SEO attributes.
+     *
+     * @param string $imagePath
+     * @param string $altText
+     * @param array $options
+     * @return string
      */
-    public static function optimizedImage($imagePath, $altText = '', $options = [])
+    public static function optimizedImage(string $imagePath, string $altText = '', array $options = []): string
     {
         $defaults = [
             'class' => 'img-fluid',
@@ -25,15 +35,12 @@ class ImageHelper
         
         $options = array_merge($defaults, $options);
         
-        // Generate image URL
         $imageUrl = self::getImageUrl($imagePath, $options['fallback']);
         
-        // Generate alt text if not provided
         if (empty($altText)) {
             $altText = self::generateAltText($imagePath);
         }
         
-        // Build image attributes
         $attributes = [
             'src' => $imageUrl,
             'alt' => $altText,
@@ -41,7 +48,6 @@ class ImageHelper
             'loading' => $options['loading']
         ];
         
-        // Add dimensions if provided
         if ($options['width']) {
             $attributes['width'] = $options['width'];
         }
@@ -50,7 +56,6 @@ class ImageHelper
             $attributes['height'] = $options['height'];
         }
         
-        // Add responsive attributes
         if ($options['sizes']) {
             $attributes['sizes'] = $options['sizes'];
         }
@@ -59,7 +64,6 @@ class ImageHelper
             $attributes['srcset'] = $options['srcset'];
         }
         
-        // Add placeholder for lazy loading
         if ($options['placeholder'] && $options['loading'] === 'lazy') {
             $attributes['data-src'] = $imageUrl;
             $attributes['src'] = self::generatePlaceholder($options['width'], $options['height']);
@@ -69,15 +73,18 @@ class ImageHelper
     }
     
     /**
-     * Get image URL with fallback
+     * Get the URL for an image with a fallback.
+     *
+     * @param string $imagePath
+     * @param string $fallback
+     * @return string
      */
-    public static function getImageUrl($imagePath, $fallback = 'images/no-image.jpg')
+    public static function getImageUrl(string $imagePath, string $fallback = 'images/no-image.jpg'): string
     {
         if (empty($imagePath)) {
             return asset($fallback);
         }
         
-        // Check if it's a storage path
         if (Str::startsWith($imagePath, 'storage/') || Str::startsWith($imagePath, 'public/')) {
             $storagePath = Str::startsWith($imagePath, 'storage/') 
                 ? Str::after($imagePath, 'storage/') 
@@ -88,45 +95,48 @@ class ImageHelper
             }
         }
         
-        // Check if it's a public asset
         if (file_exists(public_path($imagePath))) {
             return asset($imagePath);
         }
         
-        // Return fallback
         return asset($fallback);
     }
     
     /**
-     * Generate alt text from image path
+     * Generate alt text from an image path.
+     *
+     * @param string $imagePath
+     * @return string
      */
-    public static function generateAltText($imagePath)
+    public static function generateAltText(string $imagePath): string
     {
         if (empty($imagePath)) {
-            return 'Gambar produk seragam sekolah RAVAZKA';
+            return 'RAVAZKA school uniform product image';
         }
         
         $filename = pathinfo($imagePath, PATHINFO_FILENAME);
         $altText = str_replace(['-', '_'], ' ', $filename);
         $altText = ucwords($altText);
         
-        // Add context for better SEO
-        if (!Str::contains(strtolower($altText), ['seragam', 'baju', 'celana', 'rok'])) {
-            $altText .= ' - Seragam Sekolah RAVAZKA';
+        if (!Str::contains(strtolower($altText), ['uniform', 'shirt', 'pants', 'skirt'])) {
+            $altText .= ' - RAVAZKA School Uniform';
         }
         
         return $altText;
     }
     
     /**
-     * Generate placeholder image for lazy loading
+     * Generate a placeholder image for lazy loading.
+     *
+     * @param int|null $width
+     * @param int|null $height
+     * @return string
      */
-    public static function generatePlaceholder($width = 300, $height = 200)
+    public static function generatePlaceholder(?int $width = 300, ?int $height = 200): string
     {
         $width = $width ?: 300;
         $height = $height ?: 200;
         
-        // Generate a simple SVG placeholder
         $svg = '<svg width="' . $width . '" height="' . $height . '" xmlns="http://www.w3.org/2000/svg">';
         $svg .= '<rect width="100%" height="100%" fill="#f8f9fa"/>';
         $svg .= '<text x="50%" y="50%" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle" dy=".3em">Loading...</text>';
@@ -136,9 +146,12 @@ class ImageHelper
     }
     
     /**
-     * Build image tag from attributes
+     * Build an image tag from an array of attributes.
+     *
+     * @param array $attributes
+     * @return string
      */
-    private static function buildImageTag($attributes)
+    private static function buildImageTag(array $attributes): string
     {
         $html = '<img';
         
@@ -154,14 +167,18 @@ class ImageHelper
     }
     
     /**
-     * Generate product image with SEO optimization
+     * Generate a product image with SEO optimization.
+     *
+     * @param \App\Models\Product $product
+     * @param array $options
+     * @return string
      */
-    public static function productImage($product, $options = [])
+    public static function productImage(\App\Models\Product $product, array $options = []): string
     {
-        $altText = $product->name . ' - Seragam ' . $product->category . ' RAVAZKA';
+        $altText = $product->name . ' - ' . $product->category . ' Uniform RAVAZKA';
         
         if ($product->size) {
-            $altText .= ' Ukuran ' . $product->size;
+            $altText .= ' Size ' . $product->size;
         }
         
         $defaultOptions = [
@@ -177,9 +194,14 @@ class ImageHelper
     }
     
     /**
-     * Generate thumbnail image
+     * Generate a thumbnail image.
+     *
+     * @param string $imagePath
+     * @param string $altText
+     * @param int $size
+     * @return string
      */
-    public static function thumbnail($imagePath, $altText = '', $size = 150)
+    public static function thumbnail(string $imagePath, string $altText = '', int $size = 150): string
     {
         $options = [
             'class' => 'thumbnail img-fluid',
@@ -192,13 +214,18 @@ class ImageHelper
     }
     
     /**
-     * Generate hero image with optimization
+     * Generate a hero image with optimization.
+     *
+     * @param string $imagePath
+     * @param string $altText
+     * @param array $options
+     * @return string
      */
-    public static function heroImage($imagePath, $altText = '', $options = [])
+    public static function heroImage(string $imagePath, string $altText = '', array $options = []): string
     {
         $defaultOptions = [
             'class' => 'hero-image img-fluid w-100',
-            'loading' => 'eager', // Hero images should load immediately
+            'loading' => 'eager',
             'sizes' => '100vw',
             'placeholder' => false
         ];

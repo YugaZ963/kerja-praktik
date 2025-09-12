@@ -8,22 +8,28 @@ use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class ProductController
+ *
+ * Handles product management for the admin panel.
+ */
 class ProductController extends Controller
 {
-
-    
     /**
-     * Show the form for creating a new product
+     * Show the form for creating a new product.
+     *
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         $inventories = Inventory::all();
         
-        // Ambil ukuran dari daftar harga
         $availableSizes = $this->getAvailableSizesFromPriceList();
         
-        // Cek inventory_id dan size dari request untuk validasi duplikasi
         $inventoryId = request('inventory_id');
         $selectedSize = request('size');
         $isDuplicate = false;
@@ -46,7 +52,10 @@ class ProductController extends Controller
     }
     
     /**
-     * Store a newly created product
+     * Store a newly created product in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse|RedirectResponse
      */
     public function store(Request $request)
     {
@@ -63,13 +72,11 @@ class ProductController extends Controller
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         
-        // Handle image upload
         if ($request->hasFile('image_file')) {
             $image = $request->file('image_file');
             $imageName = time() . '_' . $validated['name'] . '_' . $validated['size'] . '.' . $image->getClientOriginalExtension();
             $imageName = Str::slug(pathinfo($imageName, PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
             
-            // Create directory if it doesn't exist
             $uploadPath = public_path('images/products');
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
@@ -79,10 +86,8 @@ class ProductController extends Controller
             $validated['image'] = $imageName;
         }
         
-        // Generate slug
         $validated['slug'] = Str::slug($validated['name'] . '-' . $validated['size']);
         
-        // Ensure slug is unique
         $originalSlug = $validated['slug'];
         $counter = 1;
         while (Product::where('slug', $validated['slug'])->exists()) {
@@ -92,46 +97,42 @@ class ProductController extends Controller
         
         $product = Product::create($validated);
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
-        
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => "Produk '{$product->name}' ukuran {$product->size} berhasil ditambahkan.",
+                'message' => "Product '{$product->name}' size {$product->size} has been added successfully.",
                 'product' => $product
             ]);
         }
         
         return redirect()->route('inventory.index')
-            ->with('success', "Produk '{$product->name}' ukuran {$product->size} berhasil ditambahkan.");
+            ->with('success', "Product '{$product->name}' size {$product->size} has been added successfully.");
     }
     
     /**
-     * Get available sizes from daftar-harga.txt and combine with actual sizes in database
+     * Get available sizes from a price list file and combine them with actual sizes from the database.
+     *
+     * @return array
      */
-    private function getAvailableSizesFromPriceList()
+    private function getAvailableSizesFromPriceList(): array
     {
         $filePath = base_path('daftar-harga.txt');
         $sizes = [];
         
-        // Ambil ukuran dari file daftar-harga.txt
         if (file_exists($filePath)) {
             $content = file_get_contents($filePath);
             $lines = explode("\n", $content);
             
             foreach ($lines as $line) {
                 $line = trim($line);
-                // Skip baris kosong, header, dan baris yang tidak mengandung ukuran
                 if (empty($line) || strpos($line, 'NO') === 0 || strpos($line, 'HARGA') !== false) {
                     continue;
                 }
                 
-                // Cek apakah baris mengandung ukuran (angka atau huruf ukuran)
                 if (preg_match('/^(\d+|[A-Z]+\d*|L\d+|SML)\s+\d+/', $line)) {
                     $parts = preg_split('/\s+/', $line);
                     if (count($parts) >= 2) {
                         $size = $parts[0];
-                        // Tambahkan ukuran ke array jika belum ada
                         if (!in_array($size, $sizes)) {
                             $sizes[] = $size;
                         }
@@ -140,32 +141,24 @@ class ProductController extends Controller
             }
         }
         
-        // Ambil ukuran yang benar-benar ada di database
         $actualSizes = \App\Models\Product::distinct()->pluck('size')->toArray();
         
-        // Gabungkan ukuran dari file dengan ukuran aktual di database
         $allSizes = array_unique(array_merge($sizes, $actualSizes));
         
-        // Filter ukuran kosong atau null
         $allSizes = array_filter($allSizes, function($size) {
             return !empty($size) && $size !== null;
         });
         
-        // Urutkan ukuran: angka dulu, lalu huruf
         usort($allSizes, function($a, $b) {
-            // Jika keduanya angka
             if (is_numeric($a) && is_numeric($b)) {
                 return (int)$a - (int)$b;
             }
-            // Jika keduanya huruf
             if (!is_numeric($a) && !is_numeric($b)) {
                 return strcmp($a, $b);
             }
-            // Angka lebih dulu dari huruf
             return is_numeric($a) ? -1 : 1;
         });
         
-        // Fallback ke ukuran default jika tidak ada ukuran yang ditemukan
         if (empty($allSizes)) {
             return ['S', 'M', 'L', 'XL', 'XXL'];
         }
@@ -174,9 +167,12 @@ class ProductController extends Controller
     }
     
     /**
-     * Display the specified product
+     * Display the specified product.
+     *
+     * @param Product $product
+     * @return View
      */
-    public function show(Product $product)
+    public function show(Product $product): View
     {
         $product->load('inventory');
         
@@ -190,9 +186,12 @@ class ProductController extends Controller
     }
     
     /**
-     * Show the form for editing the specified product
+     * Show the form for editing the specified product.
+     *
+     * @param Product $product
+     * @return View
      */
-    public function edit(Product $product)
+    public function edit(Product $product): View
     {
         $inventories = Inventory::all();
         
@@ -207,7 +206,11 @@ class ProductController extends Controller
     }
     
     /**
-     * Update the specified product
+     * Update the specified product in storage.
+     *
+     * @param Request $request
+     * @param Product $product
+     * @return JsonResponse|RedirectResponse
      */
     public function update(Request $request, Product $product)
     {
@@ -224,9 +227,7 @@ class ProductController extends Controller
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         
-        // Handle image upload
         if ($request->hasFile('image_file')) {
-            // Delete old image if exists
             if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
                 unlink(public_path('images/products/' . $product->image));
             }
@@ -235,7 +236,6 @@ class ProductController extends Controller
             $imageName = time() . '_' . $validated['name'] . '_' . $validated['size'] . '.' . $image->getClientOriginalExtension();
             $imageName = Str::slug(pathinfo($imageName, PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
             
-            // Create directory if it doesn't exist
             $uploadPath = public_path('images/products');
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
@@ -245,11 +245,9 @@ class ProductController extends Controller
             $validated['image'] = $imageName;
         }
         
-        // Update slug if name or size changed
         if ($product->name !== $validated['name'] || $product->size !== $validated['size']) {
             $validated['slug'] = Str::slug($validated['name'] . '-' . $validated['size']);
             
-            // Ensure slug is unique (excluding current product)
             $originalSlug = $validated['slug'];
             $counter = 1;
             while (Product::where('slug', $validated['slug'])->where('id', '!=', $product->id)->exists()) {
@@ -260,22 +258,24 @@ class ProductController extends Controller
         
         $product->update($validated);
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
-        
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => "Produk '{$product->name}' ukuran {$product->size} berhasil diperbarui.",
+                'message' => "Product '{$product->name}' size {$product->size} has been updated successfully.",
                 'product' => $product
             ]);
         }
         
         return redirect()->route('inventory.index')
-            ->with('success', "Produk '{$product->name}' ukuran {$product->size} berhasil diperbarui.");
+            ->with('success', "Product '{$product->name}' size {$product->size} has been updated successfully.");
     }
     
     /**
-     * Remove the specified product
+     * Remove the specified product from storage.
+     *
+     * @param Request $request
+     * @param Product $product
+     * @return JsonResponse|RedirectResponse
      */
     public function destroy(Request $request, Product $product)
     {
@@ -285,37 +285,36 @@ class ProductController extends Controller
         
         $product->delete();
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
-        
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => "Produk '{$productName}' ukuran {$productSize} berhasil dihapus."
+                'message' => "Product '{$productName}' size {$productSize} has been deleted successfully."
             ]);
         }
         
         return redirect()->route('inventory.index')
-            ->with('success', "Produk '{$productName}' ukuran {$productSize} berhasil dihapus.");
+            ->with('success', "Product '{$productName}' size {$productSize} has been deleted successfully.");
     }
     
     /**
-     * Bulk delete products
+     * Remove multiple products from storage in bulk.
+     *
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function bulkDestroy(Request $request)
+    public function bulkDestroy(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'product_ids' => 'required|array',
             'product_ids.*' => 'exists:products,id'
         ]);
         
-        // Ambil inventory_ids yang terkena dampak sebelum delete
         $affectedInventoryIds = Product::whereIn('id', $validated['product_ids'])
             ->pluck('inventory_id')
             ->unique();
         
         $deletedCount = Product::whereIn('id', $validated['product_ids'])->delete();
         
-        // Update stock inventaris yang terkena dampak
         foreach ($affectedInventoryIds as $inventoryId) {
             $inventory = Inventory::find($inventoryId);
             if ($inventory) {
@@ -324,18 +323,16 @@ class ProductController extends Controller
         }
         
         return redirect()->route('inventory.index')
-            ->with('success', "{$deletedCount} produk berhasil dihapus.");
+            ->with('success', "{$deletedCount} products have been deleted successfully.");
     }
     
     /**
-     * Bulk delete products and inventories
+     * Get products by inventory for AJAX requests.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
-
-    
-    /**
-     * Get products by inventory for AJAX
-     */
-    public function getByInventory(Request $request)
+    public function getByInventory(Request $request): JsonResponse
     {
         $inventoryId = $request->get('inventory_id');
         
@@ -354,9 +351,13 @@ class ProductController extends Controller
 
 
     /**
-     * Adjust stock for individual product
+     * Adjust the stock for an individual product.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return RedirectResponse
      */
-    public function adjustStock(Request $request, $id)
+    public function adjustStock(Request $request, int $id): RedirectResponse
     {
         $request->validate([
             'action' => 'required|in:add,reduce',
@@ -370,34 +371,23 @@ class ProductController extends Controller
 
         if ($action === 'add') {
             $product->stock += $quantity;
-            $message = "Berhasil menambah stok produk '{$product->name}' sebanyak {$quantity} unit. Stok sekarang: {$product->stock}";
+            $message = "Successfully added {$quantity} units to '{$product->name}'. Current stock: {$product->stock}";
         } else { // reduce
             if ($quantity > $product->stock) {
                 return redirect()->back()
-                    ->with('error', 'Jumlah yang dikurangi melebihi stok yang tersedia!');
+                    ->with('error', 'The quantity to reduce exceeds the available stock!');
             }
             
             $product->stock -= $quantity;
-            $message = "Berhasil mengurangi stok produk '{$product->name}' sebanyak {$quantity} unit. Stok sekarang: {$product->stock}";
+            $message = "Successfully reduced {$quantity} units from '{$product->name}'. Current stock: {$product->stock}";
         }
 
         $product->save();
 
-        // Update total stock di inventory
         if ($product->inventory) {
             $totalStock = Product::where('inventory_id', $product->inventory_id)->sum('stock');
             $product->inventory->update(['stock' => $totalStock]);
         }
-
-        // Catat riwayat stok (opsional - jika ada model StockHistory)
-        // StockHistory::create([
-        //     'product_id' => $product->id,
-        //     'inventory_id' => $product->inventory_id,
-        //     'type' => $action === 'add' ? 'in' : 'out',
-        //     'quantity' => $quantity,
-        //     'notes' => $action === 'add' ? 'Penambahan stok manual' : 'Pengurangan stok manual',
-        //     'user_id' => auth()->id(),
-        // ]);
 
         return redirect()->back()->with('success', $message);
     }

@@ -5,24 +5,33 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Class ProductController
+ *
+ * Handles the display of products to the public.
+ */
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the products.
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
     {
         $query = Product::query();
 
-        // Filter kategori
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        // Filter ukuran
         if ($request->filled('size')) {
             $query->where('size', strtoupper($request->size));
         }
 
-        // Sorting
         switch ($request->sort) {
             case 'price-asc':
                 $query->orderBy('price', 'asc');
@@ -52,13 +61,15 @@ class ProductController extends Controller
     }
 
     /**
-     * Show product details
+     * Display the specified product.
+     *
+     * @param string $slug
+     * @return View
      */
-    public function show($slug)
+    public function show(string $slug): View
     {
         $product = Product::where('slug', $slug)->with('inventory')->firstOrFail();
         
-        // Get related products from same category
         $relatedProducts = Product::where('category', $product->category)
             ->where('id', '!=', $product->id)
             ->limit(4)

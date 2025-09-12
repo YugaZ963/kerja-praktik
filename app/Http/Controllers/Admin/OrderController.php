@@ -9,10 +9,23 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class OrderController
+ *
+ * Handles order management for the admin panel.
+ */
 class OrderController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the orders.
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
     {
         $status = $request->get('status');
         $search = $request->get('search');
@@ -20,7 +33,6 @@ class OrderController extends Controller
         $query = Order::with(['items', 'user'])->recent();
         
         if ($status && $status !== 'all') {
-            // Filter berdasarkan status yang dipilih
             $query->byStatus($status);
         }
         
@@ -47,7 +59,13 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(Order $order)
+    /**
+     * Display the specified order.
+     *
+     * @param Order $order
+     * @return View
+     */
+    public function show(Order $order): View
     {
         $order->load(['items.product', 'user']);
         return view('admin.orders.show', [
@@ -59,7 +77,14 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Order $order)
+    /**
+     * Update the status of the specified order.
+     *
+     * @param Request $request
+     * @param Order $order
+     * @return RedirectResponse
+     */
+    public function updateStatus(Request $request, Order $order): RedirectResponse
     {
         $request->validate([
             'status' => 'required|in:pending,payment_pending,payment_verified,processing,packaged,shipped,delivered,completed,cancelled',
@@ -70,14 +95,12 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $newStatus = $request->status;
 
-        // Update status, admin notes, dan tracking number
         $order->update([
             'status' => $newStatus,
             'admin_notes' => $request->admin_notes,
             'tracking_number' => $request->tracking_number
         ]);
 
-        // Update timestamp berdasarkan status
         switch ($newStatus) {
             case Order::STATUS_PAYMENT_VERIFIED:
                 $order->update(['payment_verified_at' => now()]);
@@ -90,29 +113,33 @@ class OrderController extends Controller
                 break;
         }
 
-        // Kurangi stok produk ketika pesanan sudah sampai (delivered)
         if ($newStatus === Order::STATUS_DELIVERED && 
             $oldStatus !== Order::STATUS_DELIVERED &&
             !$order->stock_reduced) {
             $this->reduceProductStock($order);
         }
 
-        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Order status updated successfully!');
     }
 
-    public function uploadPaymentProof(Request $request, Order $order)
+    /**
+     * Upload a payment proof for the specified order.
+     *
+     * @param Request $request
+     * @param Order $order
+     * @return RedirectResponse
+     */
+    public function uploadPaymentProof(Request $request, Order $order): RedirectResponse
     {
         $request->validate([
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($request->hasFile('payment_proof')) {
-            // Hapus file lama jika ada
             if ($order->payment_proof) {
                 Storage::disk('public')->delete($order->payment_proof);
             }
 
-            // Upload file baru
             $path = $request->file('payment_proof')->store('payment-proofs', 'public');
             
             $order->update([
@@ -120,25 +147,30 @@ class OrderController extends Controller
                 'status' => Order::STATUS_PAYMENT_PENDING
             ]);
 
-            return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload!');
+            return redirect()->back()->with('success', 'Payment proof uploaded successfully!');
         }
 
-        return redirect()->back()->with('error', 'Gagal mengupload bukti pembayaran!');
+        return redirect()->back()->with('error', 'Failed to upload payment proof!');
     }
 
-    public function uploadDeliveryProof(Request $request, Order $order)
+    /**
+     * Upload a delivery proof for the specified order.
+     *
+     * @param Request $request
+     * @param Order $order
+     * @return RedirectResponse
+     */
+    public function uploadDeliveryProof(Request $request, Order $order): RedirectResponse
     {
         $request->validate([
             'delivery_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($request->hasFile('delivery_proof')) {
-            // Hapus file lama jika ada
             if ($order->delivery_proof) {
                 Storage::disk('public')->delete($order->delivery_proof);
             }
 
-            // Upload file baru
             $path = $request->file('delivery_proof')->store('delivery-proofs', 'public');
             
             $order->update([
@@ -147,15 +179,20 @@ class OrderController extends Controller
                 'delivered_at' => now()
             ]);
 
-            return redirect()->back()->with('success', 'Bukti pengiriman berhasil diupload!');
+            return redirect()->back()->with('success', 'Delivery proof uploaded successfully!');
         }
 
-        return redirect()->back()->with('error', 'Gagal mengupload bukti pengiriman!');
+        return redirect()->back()->with('error', 'Failed to upload delivery proof!');
     }
 
-    public function destroy(Order $order)
+    /**
+     * Remove the specified order from storage.
+     *
+     * @param Order $order
+     * @return RedirectResponse
+     */
+    public function destroy(Order $order): RedirectResponse
     {
-        // Hapus file bukti pembayaran dan pengiriman jika ada
         if ($order->payment_proof) {
             Storage::disk('public')->delete($order->payment_proof);
         }
@@ -165,23 +202,24 @@ class OrderController extends Controller
 
         $order->delete();
 
-        return redirect()->route('admin.orders.index')->with('success', 'Pesanan berhasil dihapus!');
+        return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully!');
     }
 
     /**
-     * Kurangi stok produk berdasarkan order items
+     * Reduce product stock based on order items.
+     *
+     * @param Order $order
+     * @return void
      */
-    private function reduceProductStock(Order $order)
+    private function reduceProductStock(Order $order): void
     {
         try {
             foreach ($order->items as $orderItem) {
-                // Cari produk berdasarkan nama dan ukuran
                 $product = Product::where('name', $orderItem->product_name)
                                 ->where('size', $orderItem->product_size)
                                 ->first();
 
                 if ($product) {
-                    // Kurangi stok produk
                     $newStock = max(0, $product->stock - $orderItem->quantity);
                     $product->update(['stock' => $newStock]);
 
@@ -202,7 +240,6 @@ class OrderController extends Controller
                 }
             }
             
-            // Tandai bahwa stok sudah dikurangi
             $order->update([
                 'stock_reduced' => true,
                 'stock_reduced_at' => now()
@@ -216,7 +253,12 @@ class OrderController extends Controller
         }
     }
 
-    private function getStatusCounts()
+    /**
+     * Get the count of orders for each status.
+     *
+     * @return array
+     */
+    private function getStatusCounts(): array
     {
         return [
             'all' => Order::count(),

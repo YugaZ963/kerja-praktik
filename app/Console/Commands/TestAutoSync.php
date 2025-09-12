@@ -7,6 +7,11 @@ use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class TestAutoSync
+ *
+ * A console command to test the automatic synchronization between products and inventory.
+ */
 class TestAutoSync extends Command
 {
     /**
@@ -21,238 +26,250 @@ class TestAutoSync extends Command
      *
      * @var string
      */
-    protected $description = 'Test sinkronisasi otomatis antara data produk dan inventaris';
+    protected $description = 'Test the automatic synchronization between product and inventory data';
 
     /**
      * Execute the console command.
+     *
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
-        $this->info('🧪 Testing Sinkronisasi Otomatis Produk-Inventaris');
+        $this->info('🧪 Testing Product-Inventory Automatic Synchronization');
         $this->newLine();
 
         if ($this->option('create-test-data')) {
             $this->createTestData();
         }
 
-        // Test 1: Create Product
-        $this->info('📝 Test 1: Membuat Produk Baru');
+        $this->info('📝 Test 1: Creating a New Product');
         $this->testCreateProduct();
         $this->newLine();
 
-        // Test 2: Update Product
-        $this->info('✏️ Test 2: Update Produk');
+        $this->info('✏️ Test 2: Updating a Product');
         $this->testUpdateProduct();
         $this->newLine();
 
-        // Test 3: Delete Product
-        $this->info('🗑️ Test 3: Hapus Produk');
+        $this->info('🗑️ Test 3: Deleting a Product');
         $this->testDeleteProduct();
         $this->newLine();
 
-        // Test 4: Bulk Operations
-        $this->info('📦 Test 4: Operasi Bulk');
+        $this->info('📦 Test 4: Bulk Operations');
         $this->testBulkOperations();
         $this->newLine();
 
-        // Test 5: Inventory Calculations
-        $this->info('🧮 Test 5: Perhitungan Inventaris');
+        $this->info('🧮 Test 5: Inventory Calculations');
         $this->testInventoryCalculations();
         $this->newLine();
 
-        $this->info('✅ Semua test selesai!');
+        $this->info('✅ All tests completed!');
         return 0;
     }
 
-    private function createTestData()
+    /**
+     * Create test data for the synchronization tests.
+     *
+     * @return void
+     */
+    private function createTestData(): void
     {
-        $this->info('🔧 Membuat data test...');
+        $this->info('🔧 Creating test data...');
         
-        // Buat inventory test
         $inventory = Inventory::create([
             'code' => 'TEST-001',
-            'name' => 'Test Seragam',
-            'category' => 'Seragam',
+            'name' => 'Test Uniform',
+            'category' => 'Uniform',
             'stock' => 0,
             'min_stock' => 10,
             'purchase_price' => 50000,
             'selling_price' => 75000,
             'supplier' => 'Test Supplier',
             'last_restock' => now()->toDateString(),
-            'location' => 'Gudang Test',
+            'location' => 'Test Warehouse',
             'sizes_available' => ['S', 'M', 'L', 'XL'],
             'stock_history' => [],
-            'description' => 'Test inventory untuk sinkronisasi'
+            'description' => 'Test inventory for synchronization'
         ]);
         
         $this->line("✓ Test inventory created: {$inventory->name} (ID: {$inventory->id})");
     }
 
-    private function testCreateProduct()
+    /**
+     * Test the creation of a new product and its effect on inventory.
+     *
+     * @return void
+     */
+    private function testCreateProduct(): void
     {
         $inventory = Inventory::where('code', 'TEST-001')->first();
         if (!$inventory) {
-            $this->error('Test inventory tidak ditemukan. Jalankan dengan --create-test-data');
+            $this->error('Test inventory not found. Run with --create-test-data');
             return;
         }
 
         $oldStock = $inventory->stock;
         $oldPrice = $inventory->selling_price;
         
-        // Buat produk baru
         $product = Product::create([
             'inventory_id' => $inventory->id,
-            'name' => 'Test Seragam - M',
+            'name' => 'Test Uniform - M',
             'size' => 'M',
             'price' => 80000,
             'stock' => 25,
-            'category' => 'Seragam',
-            'description' => 'Test produk ukuran M',
-            'slug' => 'test-seragam-m-' . time()
+            'category' => 'Uniform',
+            'description' => 'Test product size M',
+            'slug' => 'test-uniform-m-' . time()
         ]);
         
-        // Refresh inventory
         $inventory->refresh();
         
-        $this->line("✓ Produk dibuat: {$product->name}");
-        $this->line("  Stock inventory: {$oldStock} → {$inventory->stock}");
-        $this->line("  Harga inventory: {$oldPrice} → {$inventory->selling_price}");
+        $this->line("✓ Product created: {$product->name}");
+        $this->line("  Inventory stock: {$oldStock} → {$inventory->stock}");
+        $this->line("  Inventory price: {$oldPrice} → {$inventory->selling_price}");
         
-        // Validasi
         if ($inventory->stock == 25 && $inventory->selling_price == 80000) {
-            $this->info('  ✅ Sinkronisasi berhasil!');
+            $this->info('  ✅ Synchronization successful!');
         } else {
-            $this->error('  ❌ Sinkronisasi gagal!');
+            $this->error('  ❌ Synchronization failed!');
         }
     }
 
-    private function testUpdateProduct()
+    /**
+     * Test the update of a product and its effect on inventory.
+     *
+     * @return void
+     */
+    private function testUpdateProduct(): void
     {
         $inventory = Inventory::where('code', 'TEST-001')->first();
         $product = $inventory->products()->first();
         
         if (!$product) {
-            $this->error('Test produk tidak ditemukan');
+            $this->error('Test product not found');
             return;
         }
 
         $oldStock = $inventory->stock;
         $oldPrice = $inventory->selling_price;
         
-        // Update produk
         $product->update([
             'stock' => 35,
             'price' => 85000
         ]);
         
-        // Refresh inventory
         $inventory->refresh();
         
-        $this->line("✓ Produk diupdate: {$product->name}");
-        $this->line("  Stock inventory: {$oldStock} → {$inventory->stock}");
-        $this->line("  Harga inventory: {$oldPrice} → {$inventory->selling_price}");
+        $this->line("✓ Product updated: {$product->name}");
+        $this->line("  Inventory stock: {$oldStock} → {$inventory->stock}");
+        $this->line("  Inventory price: {$oldPrice} → {$inventory->selling_price}");
         
-        // Validasi
         if ($inventory->stock == 35 && $inventory->selling_price == 85000) {
-            $this->info('  ✅ Sinkronisasi berhasil!');
+            $this->info('  ✅ Synchronization successful!');
         } else {
-            $this->error('  ❌ Sinkronisasi gagal!');
+            $this->error('  ❌ Synchronization failed!');
         }
     }
 
-    private function testDeleteProduct()
+    /**
+     * Test the deletion of a product and its effect on inventory.
+     *
+     * @return void
+     */
+    private function testDeleteProduct(): void
     {
         $inventory = Inventory::where('code', 'TEST-001')->first();
         $product = $inventory->products()->first();
         
         if (!$product) {
-            $this->error('Test produk tidak ditemukan');
+            $this->error('Test product not found');
             return;
         }
 
         $oldStock = $inventory->stock;
         $productName = $product->name;
         
-        // Hapus produk
         $product->delete();
         
-        // Refresh inventory
         $inventory->refresh();
         
-        $this->line("✓ Produk dihapus: {$productName}");
-        $this->line("  Stock inventory: {$oldStock} → {$inventory->stock}");
+        $this->line("✓ Product deleted: {$productName}");
+        $this->line("  Inventory stock: {$oldStock} → {$inventory->stock}");
         
-        // Validasi
         if ($inventory->stock == 0) {
-            $this->info('  ✅ Sinkronisasi berhasil!');
+            $this->info('  ✅ Synchronization successful!');
         } else {
-            $this->error('  ❌ Sinkronisasi gagal!');
+            $this->error('  ❌ Synchronization failed!');
         }
     }
 
-    private function testBulkOperations()
+    /**
+     * Test bulk product operations and their effect on inventory.
+     *
+     * @return void
+     */
+    private function testBulkOperations(): void
     {
         $inventory = Inventory::where('code', 'TEST-001')->first();
         
-        // Buat beberapa produk sekaligus
         $products = [];
         $sizes = ['S', 'M', 'L', 'XL'];
         
         foreach ($sizes as $size) {
             $products[] = Product::create([
                 'inventory_id' => $inventory->id,
-                'name' => "Test Seragam - {$size}",
+                'name' => "Test Uniform - {$size}",
                 'size' => $size,
-                'price' => 75000 + (strlen($size) * 5000), // Harga berbeda per ukuran
+                'price' => 75000 + (strlen($size) * 5000),
                 'stock' => 20,
-                'category' => 'Seragam',
-                'description' => "Test produk ukuran {$size}",
-                'slug' => 'test-seragam-' . strtolower($size) . '-' . time()
+                'category' => 'Uniform',
+                'description' => "Test product size {$size}",
+                'slug' => 'test-uniform-' . strtolower($size) . '-' . time()
             ]);
         }
         
-        // Refresh inventory
         $inventory->refresh();
         
         $totalStock = $inventory->stock;
         $averagePrice = $inventory->selling_price;
         
-        $this->line("✓ " . count($products) . " produk dibuat");
+        $this->line("✓ " . count($products) . " products created");
         $this->line("  Total stock: {$totalStock}");
-        $this->line("  Harga rata-rata: {$averagePrice}");
+        $this->line("  Average price: {$averagePrice}");
         
-        // Validasi
-        if ($totalStock == 80) { // 4 produk x 20 stock
-            $this->info('  ✅ Bulk create berhasil!');
+        if ($totalStock == 80) {
+            $this->info('  ✅ Bulk create successful!');
         } else {
-            $this->error('  ❌ Bulk create gagal!');
+            $this->error('  ❌ Bulk create failed!');
         }
     }
 
-    private function testInventoryCalculations()
+    /**
+     * Test inventory calculations.
+     *
+     * @return void
+     */
+    private function testInventoryCalculations(): void
     {
         $inventory = Inventory::where('code', 'TEST-001')->first();
         
-        $this->line("📊 Status Inventaris: {$inventory->name}");
+        $this->line("📊 Inventory Status: {$inventory->name}");
         $this->line("  Stock: {$inventory->stock}");
         $this->line("  Status: {$inventory->stock_status}");
         $this->line("  Total Value: Rp " . number_format($inventory->total_value, 0, ',', '.'));
-        $this->line("  Jumlah Ukuran: {$inventory->available_sizes_count}");
+        $this->line("  Number of Sizes: {$inventory->available_sizes_count}");
         
-        // Test status stok
-        $expectedStatus = $inventory->stock > $inventory->min_stock ? 'tersedia' : 
-                         ($inventory->stock > 0 ? 'rendah' : 'habis');
+        $expectedStatus = $inventory->stock > $inventory->min_stock ? 'available' :
+                         ($inventory->stock > 0 ? 'low' : 'out_of_stock');
         
         if ($inventory->stock_status == $expectedStatus) {
-            $this->info('  ✅ Status stok benar!');
+            $this->info('  ✅ Stock status correct!');
         } else {
-            $this->error('  ❌ Status stok salah!');
+            $this->error('  ❌ Stock status incorrect!');
         }
         
-        // Cleanup test data
-        $this->info('🧹 Membersihkan data test...');
+        $this->info('🧹 Cleaning up test data...');
         $inventory->products()->delete();
         $inventory->delete();
-        $this->line('✓ Data test dibersihkan');
+        $this->line('✓ Test data cleaned up');
     }
 }

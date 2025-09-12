@@ -6,6 +6,11 @@ use Illuminate\Console\Command;
 use App\Models\Inventory;
 use App\Models\Product;
 
+/**
+ * Class UpdateInventoryStock
+ *
+ * A console command to update inventory stock based on the stock of related products.
+ */
 class UpdateInventoryStock extends Command
 {
     /**
@@ -24,8 +29,10 @@ class UpdateInventoryStock extends Command
 
     /**
      * Execute the console command.
+     *
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Updating inventory stock...');
         
@@ -48,7 +55,6 @@ class UpdateInventoryStock extends Command
             $this->info("All inventory stock is already up to date.");
         }
         
-        // Show summary
         $this->newLine();
         $this->info('Current Inventory Summary:');
         $this->table(

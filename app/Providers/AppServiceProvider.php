@@ -10,14 +10,20 @@ use App\Helpers\ImageHelper;
 use App\Models\Product;
 use App\Observers\ProductObserver;
 
+/**
+ * Class AppServiceProvider
+ *
+ * The main service provider for the application.
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
+     *
+     * @return void
      */
     public function register(): void
     {
-        // Register BreadcrumbHelper
         $this->app->singleton('breadcrumb', function () {
             return new BreadcrumbHelper();
         });
@@ -25,19 +31,18 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
+     * @return void
      */
     public function boot(): void
     {
-        // Register model observers
         Product::observe(ProductObserver::class);
         
-        // Share breadcrumbs with all views
         View::composer('*', function ($view) {
             $breadcrumbs = BreadcrumbHelper::generate();
             $view->with('breadcrumbs', $breadcrumbs);
         });
         
-        // Register custom Blade directives for SEO
         Blade::directive('seoImage', function ($expression) {
             return "<?php echo App\\Helpers\\ImageHelper::optimizedImage($expression); ?>";
         });

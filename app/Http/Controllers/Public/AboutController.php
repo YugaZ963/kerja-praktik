@@ -4,10 +4,21 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Class AboutController
+ *
+ * Handles the display of the about page.
+ */
 class AboutController extends Controller
 {
-    public function index()
+    /**
+     * Display the about page.
+     *
+     * @return View
+     */
+    public function index(): View
     {
         return view('public.about', [
             'titleShop' => '🏢 Tentang Kami - RAVAZKA | Sejarah & Visi Seragam Sekolah Terpercaya',

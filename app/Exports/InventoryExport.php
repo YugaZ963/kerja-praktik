@@ -16,31 +16,51 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Http\Request;
 
+/**
+ * Class InventoryExport
+ *
+ * Handles the export of inventory data to an Excel file.
+ */
 class InventoryExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithTitle, ShouldAutoSize
 {
+    /**
+     * The request instance.
+     *
+     * @var Request|null
+     */
     protected $request;
+
+    /**
+     * The row number.
+     *
+     * @var int
+     */
     protected $rowNumber = 0;
 
+    /**
+     * Create a new export instance.
+     *
+     * @param Request|null $request
+     */
     public function __construct(Request $request = null)
     {
         $this->request = $request;
     }
 
     /**
+     * Get the collection of inventory items to be exported.
+     *
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
         $query = Inventory::query();
         
-        // Apply filters if request is provided
         if ($this->request) {
-            // Filter berdasarkan kategori
             if ($this->request->has('category') && $this->request->category) {
                 $query->where('category', $this->request->category);
             }
             
-            // Filter berdasarkan status stok
             if ($this->request->has('status') && $this->request->status) {
                 if ($this->request->status == 'low') {
                     $query->whereRaw('stock <= min_stock');
@@ -51,7 +71,6 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
                 }
             }
             
-            // Filter berdasarkan periode
             if ($this->request->has('period') && $this->request->period) {
                 switch ($this->request->period) {
                     case 'today':
@@ -70,7 +89,6 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
                 }
             }
 
-            // Filter berdasarkan search
             if ($this->request->has('search') && $this->request->search) {
                 $search = $this->request->search;
                 $query->where(function($q) use ($search) {
@@ -81,7 +99,6 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
                 });
             }
 
-            // Filter berdasarkan ukuran
             if ($this->request->has('size') && $this->request->size) {
                 $size = $this->request->size;
                 $query->where('sizes_available', 'like', "%{$size}%");
@@ -92,32 +109,36 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
     }
 
     /**
+     * Get the headings for the export.
+     *
      * @return array
      */
     public function headings(): array
     {
         return [
             'No',
-            'Kode Item',
-            'Nama Item',
-            'Kategori',
-            'Stok Saat Ini',
-            'Minimum Stok',
-            'Status Stok',
-            'Harga Beli (Rp)',
-            'Harga Jual (Rp)',
+            'Item Code',
+            'Item Name',
+            'Category',
+            'Current Stock',
+            'Minimum Stock',
+            'Stock Status',
+            'Purchase Price (Rp)',
+            'Selling Price (Rp)',
             'Margin (%)',
-            'Nilai Stok Beli (Rp)',
-            'Nilai Stok Jual (Rp)',
-            'Ukuran Tersedia',
+            'Stock Value (Purchase) (Rp)',
+            'Stock Value (Selling) (Rp)',
+            'Available Sizes',
             'Supplier',
-            'Lokasi',
-            'Terakhir Restock',
-            'Deskripsi'
+            'Location',
+            'Last Restock',
+            'Description'
         ];
     }
 
     /**
+     * Map the data for each row.
+     *
      * @param mixed $inventory
      * @return array
      */
@@ -125,7 +146,6 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
     {
         $this->rowNumber++;
         
-        // Decode sizes_available
         $sizes = [];
         if (is_string($inventory->sizes_available)) {
             $sizes = json_decode($inventory->sizes_available, true) ?? [];
@@ -133,21 +153,18 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             $sizes = $inventory->sizes_available;
         }
         
-        // Calculate status
-        $status = 'Siap';
+        $status = 'Ready';
         if ($inventory->stock == 0) {
-            $status = 'Habis';
+            $status = 'Out of Stock';
         } elseif ($inventory->stock <= $inventory->min_stock) {
-            $status = 'Stok Rendah';
+            $status = 'Low Stock';
         }
         
-        // Calculate margin
         $margin = 0;
         if ($inventory->purchase_price > 0) {
             $margin = (($inventory->selling_price - $inventory->purchase_price) / $inventory->purchase_price) * 100;
         }
         
-        // Calculate stock values
         $stockValuePurchase = $inventory->stock * $inventory->purchase_price;
         $stockValueSelling = $inventory->stock * $inventory->selling_price;
         
@@ -173,16 +190,17 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
     }
 
     /**
+     * Apply styles to the worksheet.
+     *
      * @param Worksheet $sheet
      * @return array
      */
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): array
     {
         $lastRow = $sheet->getHighestRow();
         $lastColumn = $sheet->getHighestColumn();
         
         return [
-            // Header row styling
             1 => [
                 'font' => [
                     'bold' => true,
@@ -199,7 +217,6 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
                 ]
             ],
             
-            // All data styling
             "A1:{$lastColumn}{$lastRow}" => [
                 'borders' => [
                     'allBorders' => [
@@ -213,45 +230,48 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
                 ]
             ],
             
-            // Number columns alignment
-            "A2:A{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]], // No
-            "E2:F{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]], // Stock columns
-            "G2:G{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]], // Status
-            "H2:L{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]], // Price columns
+            "A2:A{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
+            "E2:F{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
+            "G2:G{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
+            "H2:L{$lastRow}" => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 
     /**
+     * Get the column widths for the export.
+     *
      * @return array
      */
     public function columnWidths(): array
     {
         return [
-            'A' => 5,   // No
-            'B' => 15,  // Kode
-            'C' => 25,  // Nama
-            'D' => 15,  // Kategori
-            'E' => 12,  // Stok
-            'F' => 12,  // Min Stok
-            'G' => 12,  // Status
-            'H' => 15,  // Harga Beli
-            'I' => 15,  // Harga Jual
-            'J' => 10,  // Margin
-            'K' => 18,  // Nilai Beli
-            'L' => 18,  // Nilai Jual
-            'M' => 20,  // Ukuran
-            'N' => 20,  // Supplier
-            'O' => 15,  // Lokasi
-            'P' => 15,  // Last Restock
-            'Q' => 30,  // Deskripsi
+            'A' => 5,
+            'B' => 15,
+            'C' => 25,
+            'D' => 15,
+            'E' => 12,
+            'F' => 12,
+            'G' => 12,
+            'H' => 15,
+            'I' => 15,
+            'J' => 10,
+            'K' => 18,
+            'L' => 18,
+            'M' => 20,
+            'N' => 20,
+            'O' => 15,
+            'P' => 15,
+            'Q' => 30,
         ];
     }
 
     /**
+     * Get the title of the worksheet.
+     *
      * @return string
      */
     public function title(): string
     {
-        return 'Laporan Inventaris';
+        return 'Inventory Report';
     }
 }

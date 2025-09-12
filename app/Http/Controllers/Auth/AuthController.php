@@ -10,13 +10,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class AuthController
+ *
+ * Handles authentication processes such as login, registration, and logout.
+ */
 class AuthController extends Controller
 {
     /**
-     * Show login form
+     * Display the login form.
+     *
+     * @return View
      */
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
         return view('auth.login', [
             'titleShop' => '🔐 Masuk Akun - RAVAZKA | Login Seragam Sekolah Online',
@@ -27,9 +36,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle login request
+     * Handle a login request to the application.
+     *
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -50,43 +62,39 @@ class AuthController extends Controller
             
             $user = Auth::user();
             
-            // Merge cart session ke user cart setelah login
             $sessionId = Session::getId();
             Cart::mergeSessionToUser($user->id, $sessionId);
             
-            // Ambil intended URL dari session
             $intendedUrl = $request->session()->get('url.intended', '/');
             
-            // Hapus intended URL dari session setelah diambil
             $request->session()->forget('url.intended');
             
-            // Jika user adalah admin
             if ($user->isAdmin()) {
-                // Jika intended URL adalah halaman admin, gunakan itu, jika tidak ke dashboard
                 if (str_contains($intendedUrl, '/dashboard') || str_contains($intendedUrl, '/inventory')) {
-                    return redirect($intendedUrl)->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
+                    return redirect($intendedUrl)->with('success', 'Login successful! Welcome Admin, ' . $user->name . '!');
                 } else {
-                    return redirect('/dashboard')->with('success', 'Login berhasil! Selamat datang Admin, ' . $user->name . '!');
+                    return redirect('/dashboard')->with('success', 'Login successful! Welcome Admin, ' . $user->name . '!');
                 }
             }
             
-            // Jika user biasa, pastikan tidak redirect ke halaman admin
             if (str_contains($intendedUrl, '/dashboard') || str_contains($intendedUrl, '/inventory')) {
                 $intendedUrl = '/';
             }
             
-            return redirect($intendedUrl)->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '!');
+            return redirect($intendedUrl)->with('success', 'Login successful! Welcome, ' . $user->name . '!');
         }
 
         return redirect()->back()
-            ->withErrors(['email' => 'Email atau password salah.'])
+            ->withErrors(['email' => 'Incorrect email or password.'])
             ->withInput();
     }
 
     /**
-     * Show register form
+     * Display the registration form.
+     *
+     * @return View
      */
-    public function showRegisterForm()
+    public function showRegisterForm(): View
     {
         return view('auth.register', [
             'titleShop' => '📝 Daftar Akun Baru - RAVAZKA | Registrasi Seragam Sekolah',
@@ -97,9 +105,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle register request
+     * Handle a registration request for the application.
+     *
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -117,31 +128,30 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Semua registrasi baru otomatis menjadi user/customer
+            'role' => 'user',
         ]);
 
         Auth::login($user);
 
-        // Merge cart session ke user cart setelah register
         $sessionId = Session::getId();
         Cart::mergeSessionToUser($user->id, $sessionId);
 
-        // Semua user baru diarahkan ke halaman utama sebagai customer
-        return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name . '!');
+        return redirect('/')->with('success', 'Registration successful! Welcome, ' . $user->name . '!');
     }
 
-    // Admin registration methods removed - not needed in simplified version
-
     /**
-     * Handle logout request
+     * Log the user out of the application.
+     *
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Logout berhasil!');
+        return redirect('/')->with('success', 'Logout successful!');
     }
 }

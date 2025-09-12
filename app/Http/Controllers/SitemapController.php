@@ -7,12 +7,19 @@ use Illuminate\Http\Response;
 use App\Models\Product;
 use Carbon\Carbon;
 
+/**
+ * Class SitemapController
+ *
+ * Handles the generation of the sitemap and robots.txt file.
+ */
 class SitemapController extends Controller
 {
     /**
-     * Generate XML sitemap
+     * Generate the XML sitemap.
+     *
+     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
         $sitemap = $this->generateSitemap();
         
@@ -22,9 +29,11 @@ class SitemapController extends Controller
     }
     
     /**
-     * Generate sitemap XML content
+     * Generate the sitemap XML content.
+     *
+     * @return string
      */
-    private function generateSitemap()
+    private function generateSitemap(): string
     {
         $baseUrl = config('app.url');
         $now = Carbon::now()->toISOString();
@@ -32,10 +41,8 @@ class SitemapController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         
-        // Homepage
         $xml .= $this->addUrl($baseUrl, $now, 'daily', '1.0');
         
-        // Static pages
         $staticPages = [
             '/products' => ['weekly', '0.9'],
             '/contact' => ['monthly', '0.7'],
@@ -46,7 +53,6 @@ class SitemapController extends Controller
             $xml .= $this->addUrl($baseUrl . $page, $now, $config[0], $config[1]);
         }
         
-        // Product pages
         $products = Product::where('status', 'active')
             ->select('slug', 'updated_at')
             ->get();
@@ -56,7 +62,6 @@ class SitemapController extends Controller
             $xml .= $this->addUrl($baseUrl . '/products/' . $product->slug, $lastmod, 'weekly', '0.8');
         }
         
-        // Product categories
         $categories = Product::select('category')
             ->distinct()
             ->whereNotNull('category')
@@ -72,9 +77,15 @@ class SitemapController extends Controller
     }
     
     /**
-     * Add URL to sitemap
+     * Add a URL to the sitemap XML.
+     *
+     * @param string $url
+     * @param string $lastmod
+     * @param string $changefreq
+     * @param string $priority
+     * @return string
      */
-    private function addUrl($url, $lastmod, $changefreq, $priority)
+    private function addUrl(string $url, string $lastmod, string $changefreq, string $priority): string
     {
         $xml = "  <url>\n";
         $xml .= "    <loc>" . htmlspecialchars($url) . "</loc>\n";
@@ -87,9 +98,11 @@ class SitemapController extends Controller
     }
     
     /**
-     * Generate robots.txt content dynamically
+     * Generate the robots.txt file content.
+     *
+     * @return Response
      */
-    public function robots()
+    public function robots(): Response
     {
         $baseUrl = config('app.url');
         

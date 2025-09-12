@@ -11,10 +11,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
+/**
+ * Class CartController
+ *
+ * Handles shopping cart operations for customers.
+ */
 class CartController extends Controller
 {
-    public function index()
+    /**
+     * Display the customer's shopping cart.
+     *
+     * @return View
+     */
+    public function index(): View
     {
         $userId = Auth::id();
         $sessionId = Session::getId();
@@ -35,43 +48,43 @@ class CartController extends Controller
         ]);
     }
 
-    public function add(Request $request, $productId)
+    /**
+     * Add a product to the shopping cart.
+     *
+     * @param Request $request
+     * @param int $productId
+     * @return RedirectResponse
+     */
+    public function add(Request $request, int $productId): RedirectResponse
     {
         $product = Product::findOrFail($productId);
         $userId = Auth::id();
         $sessionId = Session::getId();
         $quantity = $request->input('quantity', 1);
 
-        // Cek apakah produk sudah ada di keranjang
         $cartQuery = Cart::where('product_id', $productId);
 
         if ($userId) {
-            // Jika user login, cari berdasarkan user_id
             $cartQuery->where('user_id', $userId);
         } else {
-            // Jika guest, cari berdasarkan session_id
             $cartQuery->where('session_id', $sessionId)->whereNull('user_id');
         }
 
         $cartItem = $cartQuery->first();
 
         if ($cartItem) {
-            // Update quantity jika sudah ada
             $newQuantity = $cartItem->quantity + $quantity;
 
-            // Cek stok
             if ($newQuantity > $product->stock) {
-                return redirect()->back()->with('error', 'Stok tidak mencukupi!');
+                return redirect()->back()->with('error', 'Insufficient stock!');
             }
 
             $cartItem->update(['quantity' => $newQuantity]);
         } else {
-            // Cek stok
             if ($quantity > $product->stock) {
-                return redirect()->back()->with('error', 'Stok tidak mencukupi!');
+                return redirect()->back()->with('error', 'Insufficient stock!');
             }
 
-            // Tambah item baru ke keranjang
             Cart::create([
                 'session_id' => $sessionId,
                 'user_id' => $userId,
@@ -81,17 +94,23 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+        return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 
-    public function update(Request $request, $cartId)
+    /**
+     * Update the quantity of a cart item.
+     *
+     * @param Request $request
+     * @param int $cartId
+     * @return RedirectResponse
+     */
+    public function update(Request $request, int $cartId): RedirectResponse
     {
         $cartItem = Cart::findOrFail($cartId);
         $quantity = $request->input('quantity');
 
-        // Cek stok
         if ($quantity > $cartItem->product->stock) {
-            return redirect()->back()->with('error', 'Stok tidak mencukupi!');
+            return redirect()->back()->with('error', 'Insufficient stock!');
         }
 
         if ($quantity <= 0) {
@@ -100,33 +119,47 @@ class CartController extends Controller
             $cartItem->update(['quantity' => $quantity]);
         }
 
-        return redirect()->back()->with('success', 'Keranjang berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Cart updated successfully!');
     }
 
-    public function remove($cartId)
+    /**
+     * Remove an item from the shopping cart.
+     *
+     * @param int $cartId
+     * @return RedirectResponse
+     */
+    public function remove(int $cartId): RedirectResponse
     {
         $cartItem = Cart::findOrFail($cartId);
         $cartItem->delete();
 
-        return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang!');
+        return redirect()->back()->with('success', 'Product removed from cart successfully!');
     }
 
-    public function clear()
+    /**
+     * Clear all items from the shopping cart.
+     *
+     * @return RedirectResponse
+     */
+    public function clear(): RedirectResponse
     {
         $userId = Auth::id();
         $sessionId = Session::getId();
 
         if ($userId) {
-            // Jika user login, hapus berdasarkan user_id
             Cart::where('user_id', $userId)->delete();
         } else {
-            // Jika guest, hapus berdasarkan session_id
             Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
         }
 
-        return redirect()->back()->with('success', 'Keranjang berhasil dikosongkan!');
+        return redirect()->back()->with('success', 'Cart cleared successfully!');
     }
 
+    /**
+     * Display the checkout page.
+     *
+     * @return View|RedirectResponse
+     */
     public function checkout()
     {
         $userId = Auth::id();
@@ -135,7 +168,7 @@ class CartController extends Controller
         $cartItems = Cart::getCartItems($userId, $sessionId);
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
+            return redirect()->route('cart.index')->with('error', 'Cart is empty!');
         }
 
         $total = $cartItems->sum('total');
@@ -150,9 +183,14 @@ class CartController extends Controller
         ]);
     }
 
-    public function processOrder(Request $request)
+    /**
+     * Process the customer's order.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function processOrder(Request $request): RedirectResponse
     {
-        // Validasi input
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -165,22 +203,19 @@ class CartController extends Controller
         $userId = Auth::id();
         $sessionId = Session::getId();
         
-        // Ambil item keranjang
         $cartItems = Cart::getCartItems($userId, $sessionId);
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang kosong! Silakan tambahkan produk terlebih dahulu.');
+            return redirect()->route('cart.index')->with('error', 'Cart is empty! Please add products first.');
         }
 
         try {
             DB::beginTransaction();
 
-            // Hitung total
             $subtotal = $cartItems->sum('total');
-            $shippingCost = 0; // Ongkir gratis untuk semua metode pengiriman
+            $shippingCost = 0;
             $totalAmount = $subtotal;
 
-            // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => Auth::check() ? Auth::id() : null,
@@ -197,11 +232,9 @@ class CartController extends Controller
                 'status' => Order::STATUS_PENDING
             ]);
 
-            // Buat order items dan cek stok
             foreach ($cartItems as $cartItem) {
-                // Cek stok produk
                 if ($cartItem->product->stock < $cartItem->quantity) {
-                    throw new \Exception("Stok produk {$cartItem->product->name} tidak mencukupi. Stok tersedia: {$cartItem->product->stock}");
+                    throw new \Exception("Insufficient stock for product {$cartItem->product->name}. Available stock: {$cartItem->product->stock}");
                 }
 
                 OrderItem::create([
@@ -217,21 +250,17 @@ class CartController extends Controller
 
             DB::commit();
 
-            // Buat pesan WhatsApp dengan nomor order
             $message = $this->generateWhatsAppMessage($cartItems, $validated, $order->order_number);
 
-            // Kosongkan keranjang setelah order berhasil
             if ($userId) {
                 Cart::where('user_id', $userId)->delete();
             } else {
                 Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
             }
 
-            // Redirect ke WhatsApp
             $whatsappNumber = '6289677754918';
             $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
 
-            // Log successful order
             \Log::info('Order created successfully', [
                 'order_number' => $order->order_number,
                 'customer_name' => $validated['name'],
@@ -247,7 +276,6 @@ class CartController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             
-            // Log error
             \Log::error('Order processing failed', [
                 'error' => $e->getMessage(),
                 'customer_name' => $validated['name'] ?? 'Unknown',
@@ -256,12 +284,20 @@ class CartController extends Controller
             ]);
             
             return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi atau hubungi customer service.')
+                ->with('error', 'An error occurred while processing your order. Please try again or contact customer service.')
                 ->withInput();
         }
     }
 
-    private function generateWhatsAppMessage($cartItems, $customerData, $orderNumber = null)
+    /**
+     * Generate a WhatsApp message for the order.
+     *
+     * @param mixed $cartItems
+     * @param array $customerData
+     * @param string|null $orderNumber
+     * @return string
+     */
+    private function generateWhatsAppMessage($cartItems, array $customerData, ?string $orderNumber = null): string
     {
         $message = "*PESANAN BARU - RAVAZKA*\n\n";
 
@@ -282,14 +318,12 @@ class CartController extends Controller
             $message .= "  Subtotal: Rp " . number_format($itemSubtotal, 0, ',', '.') . "\n\n";
         }
 
-        // Total sama dengan subtotal karena ongkir gratis untuk semua metode
         $total = $subtotal;
 
         $message .= "💰 *Ringkasan Biaya:*\n";
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $message .= "Subtotal: Rp " . number_format($subtotal, 0, ',', '.') . "\n";
         
-        // Tampilkan informasi pengiriman tanpa harga
         $shippingLabel = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 'Express (1-2 hari)' : 'Reguler (3-5 hari)';
         $message .= "Pengiriman: {$shippingLabel} - GRATIS\n";
         
@@ -301,7 +335,6 @@ class CartController extends Controller
         $message .= "No. HP: {$customerData['phone']}\n";
         $message .= "Alamat: {$customerData['address']}\n";
         
-        // Tampilkan metode pengiriman
         $shippingMethodLabel = isset($customerData['shipping_method']) && $customerData['shipping_method'] === 'express' ? 'Express (1-2 hari)' : 'Reguler (3-5 hari)';
         $message .= "Metode Pengiriman: {$shippingMethodLabel}\n";
 
@@ -309,7 +342,6 @@ class CartController extends Controller
             $message .= "Catatan: {$customerData['notes']}\n";
         }
 
-        // Informasi pembayaran
         $message .= "\n💳 *Metode Pembayaran:*\n";
         if ($customerData['payment_method'] === 'bri') {
             $message .= "Bank BRI\n";
@@ -332,7 +364,12 @@ class CartController extends Controller
 
 
 
-    public function getCartCount()
+    /**
+     * Get the number of items in the cart.
+     *
+     * @return JsonResponse
+     */
+    public function getCartCount(): JsonResponse
     {
         $userId = Auth::id();
         $sessionId = Session::getId();

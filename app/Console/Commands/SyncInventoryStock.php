@@ -5,6 +5,11 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Inventory;
 
+/**
+ * Class SyncInventoryStock
+ *
+ * A console command to synchronize inventory stock with the total stock of its related products.
+ */
 class SyncInventoryStock extends Command
 {
     /**
@@ -19,19 +24,21 @@ class SyncInventoryStock extends Command
      *
      * @var string
      */
-    protected $description = 'Sinkronkan stok inventory dengan total stok dari products terkait';
+    protected $description = 'Synchronize inventory stock with the total stock from related products';
 
     /**
      * Execute the console command.
+     *
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $dryRun = $this->option('dry-run');
         
-        $this->info('Memulai sinkronisasi stok inventory...');
+        $this->info('Starting inventory stock synchronization...');
         
         if ($dryRun) {
-            $this->warn('Mode DRY RUN - Tidak ada perubahan yang akan disimpan');
+            $this->warn('DRY RUN mode - No changes will be saved');
         }
         
         $inventories = Inventory::with('products')->get();
@@ -44,14 +51,14 @@ class SyncInventoryStock extends Command
             
             if ($currentStock != $actualStock) {
                 $this->line("ID: {$inventory->id} | {$inventory->name}");
-                $this->line("  Stok saat ini: {$currentStock}");
-                $this->line("  Stok aktual: {$actualStock}");
+                $this->line("  Current stock: {$currentStock}");
+                $this->line("  Actual stock: {$actualStock}");
                 
                 if (!$dryRun) {
                     $inventory->update(['stock' => $actualStock]);
-                    $this->info("  ✓ Diperbarui ke {$actualStock}");
+                    $this->info("  ✓ Updated to {$actualStock}");
                 } else {
-                    $this->comment("  → Akan diperbarui ke {$actualStock}");
+                    $this->comment("  → Will be updated to {$actualStock}");
                 }
                 
                 $updated++;
@@ -61,14 +68,14 @@ class SyncInventoryStock extends Command
         }
         
         $this->newLine();
-        $this->info("Sinkronisasi selesai!");
-        $this->line("Total inventory: " . $inventories->count());
-        $this->line("Diperbarui: {$updated}");
-        $this->line("Tidak berubah: {$unchanged}");
+        $this->info("Synchronization complete!");
+        $this->line("Total inventories: " . $inventories->count());
+        $this->line("Updated: {$updated}");
+        $this->line("Unchanged: {$unchanged}");
         
         if ($dryRun && $updated > 0) {
             $this->newLine();
-            $this->comment("Jalankan tanpa --dry-run untuk menyimpan perubahan:");
+            $this->comment("Run without --dry-run to save the changes:");
             $this->comment("php artisan inventory:sync-stock");
         }
         

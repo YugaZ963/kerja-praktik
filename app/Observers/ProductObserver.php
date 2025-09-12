@@ -6,10 +6,18 @@ use App\Models\Product;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class ProductObserver
+ *
+ * Observes the Product model's events.
+ */
 class ProductObserver
 {
     /**
      * Handle the Product "created" event.
+     *
+     * @param  \App\Models\Product  $product
+     * @return void
      */
     public function created(Product $product): void
     {
@@ -19,12 +27,14 @@ class ProductObserver
 
     /**
      * Handle the Product "updated" event.
+     *
+     * @param  \App\Models\Product  $product
+     * @return void
      */
     public function updated(Product $product): void
     {
         $this->syncInventoryData($product);
         
-        // Jika inventory_id berubah, sync inventory lama juga
         if ($product->isDirty('inventory_id')) {
             $oldInventoryId = $product->getOriginal('inventory_id');
             if ($oldInventoryId) {
@@ -41,6 +51,9 @@ class ProductObserver
 
     /**
      * Handle the Product "deleted" event.
+     *
+     * @param  \App\Models\Product  $product
+     * @return void
      */
     public function deleted(Product $product): void
     {
@@ -50,6 +63,9 @@ class ProductObserver
 
     /**
      * Handle the Product "restored" event.
+     *
+     * @param  \App\Models\Product  $product
+     * @return void
      */
     public function restored(Product $product): void
     {
@@ -58,7 +74,10 @@ class ProductObserver
     }
 
     /**
-     * Sync inventory data based on product changes
+     * Sync inventory data based on product changes.
+     *
+     * @param  \App\Models\Product  $product
+     * @return void
      */
     private function syncInventoryData(Product $product): void
     {

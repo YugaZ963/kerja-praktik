@@ -10,23 +10,31 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
+/**
+ * Class SalesReportController
+ *
+ * Handles sales reporting for the admin panel.
+ */
 class SalesReportController extends Controller
 {
     /**
-     * Display sales report dashboard
+     * Display the sales report dashboard.
+     *
+     * @param Request $request
+     * @return View
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        // Default date range (last 30 days)
         $startDate = $request->get('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
         
-        // Convert to Carbon instances for database queries
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
         
-        // Summary statistics
         $totalRevenue = Order::whereBetween('created_at', [$start, $end])
             ->whereIn('status', ['completed', 'delivered'])
             ->sum('total_amount');
@@ -42,7 +50,6 @@ class SalesReportController extends Controller
                   ->whereIn('status', ['completed', 'delivered']);
         })->sum('quantity');
         
-        // Daily sales trend (last 7 days for chart)
         $dailySales = Order::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total_amount) as revenue'),
@@ -54,7 +61,6 @@ class SalesReportController extends Controller
             ->orderBy('date')
             ->get();
             
-        // Top selling products
         $topProducts = OrderItem::select(
                 'products.name',
                 'products.category',
@@ -71,7 +77,6 @@ class SalesReportController extends Controller
             ->limit(10)
             ->get();
             
-        // Sales by category
         $salesByCategory = OrderItem::select(
                 'products.category',
                 DB::raw('SUM(order_items.quantity) as total_sold'),
@@ -86,7 +91,6 @@ class SalesReportController extends Controller
             ->orderBy('total_revenue', 'desc')
             ->get();
             
-        // Recent completed orders
         $recentOrders = Order::with(['user', 'items.product'])
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', ['completed', 'delivered'])
@@ -113,9 +117,12 @@ class SalesReportController extends Controller
     }
     
     /**
-     * Get sales data for AJAX requests
+     * Get sales data for AJAX requests.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function getData(Request $request)
+    public function getData(Request $request): JsonResponse
     {
         $startDate = $request->get('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
@@ -123,7 +130,6 @@ class SalesReportController extends Controller
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
         
-        // Get daily sales for the specified period
         $dailySales = Order::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total_amount) as revenue'),
@@ -145,9 +151,12 @@ class SalesReportController extends Controller
     }
     
     /**
-     * Export sales report to PDF
+     * Export the sales report to a PDF file.
+     *
+     * @param Request $request
+     * @return Response
      */
-    public function exportPdf(Request $request)
+    public function exportPdf(Request $request): Response
     {
         $startDate = $request->get('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
@@ -155,7 +164,6 @@ class SalesReportController extends Controller
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
         
-        // Get all data for PDF
         $totalRevenue = Order::whereBetween('created_at', [$start, $end])
             ->whereIn('status', ['completed', 'delivered'])
             ->sum('total_amount');

@@ -5,10 +5,21 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Class WelcomeController
+ *
+ * Handles the display of the welcome page.
+ */
 class WelcomeController extends Controller
 {
-    public function index()
+    /**
+     * Display the welcome page.
+     *
+     * @return View
+     */
+    public function index(): View
     {
         // Ambil 3 pesanan terbaru dengan status berhasil/selesai saja
         $recentOrders = Order::with(['user', 'items.product'])

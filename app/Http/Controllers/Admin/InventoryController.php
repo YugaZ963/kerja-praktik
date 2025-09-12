@@ -6,14 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
+/**
+ * Class InventoryController
+ *
+ * Handles inventory management for the admin panel.
+ */
 class InventoryController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the inventory items.
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
     {
         $query = Inventory::query();
         
-        // Filter pencarian
+        // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -24,12 +38,12 @@ class InventoryController extends Controller
             });
         }
         
-        // Filter berdasarkan kategori
+        // Category filter
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
         
-        // Filter berdasarkan status stok
+        // Stock status filter
         if ($request->filled('status')) {
             switch ($request->status) {
                 case 'low':
@@ -47,7 +61,7 @@ class InventoryController extends Controller
             }
         }
         
-        // Filter berdasarkan rentang harga
+        // Price range filter
         if ($request->filled('price_min')) {
             $query->where('selling_price', '>=', $request->price_min);
         }
@@ -55,7 +69,7 @@ class InventoryController extends Controller
             $query->where('selling_price', '<=', $request->price_max);
         }
         
-        // Filter berdasarkan tanggal
+        // Date range filter
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -104,11 +118,17 @@ class InventoryController extends Controller
         ]);
     }
     
-    public function report(Request $request)
+    /**
+     * Display the inventory report.
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function report(Request $request): View
     {
         $query = Inventory::query();
         
-        // Filter pencarian untuk laporan
+        // Search filter for report
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -119,17 +139,17 @@ class InventoryController extends Controller
             });
         }
         
-        // Filter berdasarkan kategori
+        // Category filter
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
         
-        // Filter berdasarkan supplier
+        // Supplier filter
         if ($request->filled('supplier')) {
             $query->where('supplier', 'like', "%{$request->supplier}%");
         }
         
-        // Filter berdasarkan status stok
+        // Stock status filter
         if ($request->filled('stock_status')) {
             switch ($request->stock_status) {
                 case 'low':
@@ -183,9 +203,12 @@ class InventoryController extends Controller
     }
     
     /**
-     * Get products by inventory for AJAX requests
+     * Get products by inventory for AJAX requests.
+     *
+     * @param int $inventoryId
+     * @return JsonResponse
      */
-    public function getProducts($inventoryId)
+    public function getProducts(int $inventoryId): JsonResponse
     {
         $inventory = Inventory::findOrFail($inventoryId);
         $products = $inventory->products()->select('id', 'name', 'size', 'price', 'stock')->get();
@@ -202,9 +225,13 @@ class InventoryController extends Controller
     }
     
     /**
-     * Update inventory stock based on product changes
+     * Update inventory stock based on product changes.
+     *
+     * @param Request $request
+     * @param int $inventoryId
+     * @return JsonResponse
      */
-    public function updateStockFromProducts(Request $request, $inventoryId)
+    public function updateStockFromProducts(Request $request, int $inventoryId): JsonResponse
     {
         $inventory = Inventory::findOrFail($inventoryId);
         $totalStock = Product::where('inventory_id', $inventoryId)->sum('stock');
@@ -218,9 +245,12 @@ class InventoryController extends Controller
     }
     
     /**
-     * Mendapatkan ringkasan inventaris beserta rincian produk berdasarkan ukuran
+     * Get an inventory summary with a breakdown of products by size.
+     *
+     * @param int $id
+     * @return JsonResponse
      */
-    public function getSummary($id)
+    public function getSummary(int $id): JsonResponse
     {
         try {
             $inventory = Inventory::findOrFail($id);
@@ -253,15 +283,19 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengambil ringkasan inventaris: ' . $e->getMessage()
+                'message' => 'Failed to get inventory summary: ' . $e->getMessage()
             ], 500);
         }
     }
     
     /**
-     * Menghapus semua produk berdasarkan ukuran dari inventaris tertentu
+     * Delete all products of a specific size from a given inventory.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function deleteProductsBySize(Request $request, $id)
+    public function deleteProductsBySize(Request $request, int $id): JsonResponse
     {
         try {
             $size = $request->query('size');
@@ -269,7 +303,7 @@ class InventoryController extends Controller
             if (!$size) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Parameter ukuran diperlukan'
+                    'message' => 'Size parameter is required'
                 ], 400);
             }
             
@@ -281,35 +315,39 @@ class InventoryController extends Controller
             if ($products->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Tidak ada produk dengan ukuran tersebut'
+                    'message' => 'No products found with that size'
                 ], 404);
             }
             
-            // Hapus semua produk dengan ukuran tertentu
+            // Delete all products with the specified size
             Product::where('inventory_id', $id)
                    ->where('size', $size)
                    ->delete();
             
-            // Update total stok inventaris
+            // Update the total stock of the inventory
             $this->updateStockFromProducts(new Request(), $id);
             
             return response()->json([
                 'success' => true,
-                'message' => 'Semua produk dengan ukuran ' . $size . ' berhasil dihapus',
+                'message' => 'All products with size ' . $size . ' have been deleted successfully',
                 'deleted_count' => $products->count()
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus produk: ' . $e->getMessage()
+                'message' => 'Failed to delete products: ' . $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Tambah stok untuk produk dengan ukuran tertentu
+     * Add stock for a product of a specific size.
+     *
+     * @param Request $request
+     * @param int $inventoryId
+     * @return RedirectResponse
      */
-    public function addStock(Request $request, $inventoryId)
+    public function addStock(Request $request, int $inventoryId): RedirectResponse
     {
         $request->validate([
             'size' => 'required|string',
@@ -321,16 +359,16 @@ class InventoryController extends Controller
             $size = $request->size;
             $addStock = $request->stock;
 
-            // Cari produk dengan ukuran yang sama
+            // Find a product with the same size
             $product = Product::where('inventory_id', $inventoryId)
                              ->where('size', $size)
                              ->first();
 
             if ($product) {
-                // Jika produk sudah ada, tambah stoknya
+                // If the product exists, increment its stock
                 $product->increment('stock', $addStock);
             } else {
-                // Jika produk belum ada, buat produk baru
+                // If the product does not exist, create a new one
                 Product::create([
                     'inventory_id' => $inventoryId,
                     'name' => $inventory->name . ' - ' . $size,
@@ -343,20 +381,24 @@ class InventoryController extends Controller
                 ]);
             }
 
-            // Inventory stock akan otomatis terupdate melalui Product model event listeners
+            // Inventory stock is automatically updated via Product model event listeners
 
             return redirect()->route('inventory.index')
-                ->with('success', "Berhasil menambah {$addStock} stok untuk ukuran {$size}");
+                ->with('success', "Successfully added {$addStock} stock for size {$size}");
         } catch (\Exception $e) {
             return redirect()->route('inventory.index')
-                ->with('error', 'Gagal menambah stok: ' . $e->getMessage());
+                ->with('error', 'Failed to add stock: ' . $e->getMessage());
         }
     }
 
     /**
-     * Kurangi stok untuk produk dengan ukuran tertentu
+     * Reduce stock for a product of a specific size.
+     *
+     * @param Request $request
+     * @param int $inventoryId
+     * @return RedirectResponse
      */
-    public function reduceStock(Request $request, $inventoryId)
+    public function reduceStock(Request $request, int $inventoryId): RedirectResponse
     {
         $request->validate([
             'size' => 'required|string',
@@ -368,38 +410,42 @@ class InventoryController extends Controller
             $size = $request->size;
             $reduceStock = $request->stock;
 
-            // Cari produk dengan ukuran yang sama
+            // Find a product with the same size
             $product = Product::where('inventory_id', $inventoryId)
                              ->where('size', $size)
                              ->first();
 
             if (!$product) {
                 return redirect()->route('inventory.index')
-                    ->with('error', "Produk dengan ukuran {$size} tidak ditemukan");
+                    ->with('error', "Product with size {$size} not found");
             }
 
             if ($product->stock < $reduceStock) {
                 return redirect()->route('inventory.index')
-                    ->with('error', "Stok tidak mencukupi. Stok saat ini: {$product->stock}");
+                    ->with('error', "Insufficient stock. Current stock: {$product->stock}");
             }
 
-            // Kurangi stok
+            // Reduce the stock
             $product->decrement('stock', $reduceStock);
 
-            // Inventory stock akan otomatis terupdate melalui Product model event listeners
+            // Inventory stock is automatically updated via Product model event listeners
 
             return redirect()->route('inventory.index')
-                ->with('success', "Berhasil mengurangi {$reduceStock} stok untuk ukuran {$size}");
+                ->with('success', "Successfully reduced {$reduceStock} stock for size {$size}");
         } catch (\Exception $e) {
             return redirect()->route('inventory.index')
-                ->with('error', 'Gagal mengurangi stok: ' . $e->getMessage());
+                ->with('error', 'Failed to reduce stock: ' . $e->getMessage());
         }
     }
 
     /**
-     * Tampilkan form edit produk berdasarkan ukuran
+     * Display the form for editing products of a specific size.
+     *
+     * @param int $inventoryId
+     * @param string $size
+     * @return View|RedirectResponse
      */
-    public function editProductsBySize($inventoryId, $size)
+    public function editProductsBySize(int $inventoryId, string $size)
     {
         try {
             $inventory = Inventory::findOrFail($inventoryId);
@@ -415,7 +461,7 @@ class InventoryController extends Controller
             ]);
         } catch (\Exception $e) {
             return redirect()->route('inventory.index')
-                ->with('error', 'Gagal memuat halaman edit: ' . $e->getMessage());
+                ->with('error', 'Failed to load edit page: ' . $e->getMessage());
         }
     }
 }
