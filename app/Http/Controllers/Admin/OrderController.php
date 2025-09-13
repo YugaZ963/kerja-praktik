@@ -15,21 +15,12 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status');
-        $search = $request->get('search');
         
         $query = Order::with(['items', 'user'])->recent();
         
         if ($status && $status !== 'all') {
             // Filter berdasarkan status yang dipilih
             $query->byStatus($status);
-        }
-        
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%")
-                  ->orWhere('customer_phone', 'like', "%{$search}%");
-            });
         }
         
         $orders = $query->paginate(15);
@@ -42,8 +33,7 @@ class OrderController extends Controller
             'metaKeywords' => 'manajemen pesanan RAVAZKA, admin order seragam, kelola pesanan, status pembayaran, tracking pengiriman',
             'orders' => $orders,
             'statusCounts' => $statusCounts,
-            'status' => $status,
-            'search' => $search
+            'status' => $status
         ]);
     }
 

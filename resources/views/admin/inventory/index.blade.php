@@ -101,10 +101,13 @@
                             <label class="form-label fw-semibold">Kategori</label>
                             <select name="category" class="form-select">
                                 <option value="">Semua Kategori</option>
-                                <option value="Kemeja" {{ request('category') == 'Kemeja' ? 'selected' : '' }}>Kemeja</option>
-                                <option value="Celana" {{ request('category') == 'Celana' ? 'selected' : '' }}>Celana</option>
-                                <option value="Rok" {{ request('category') == 'Rok' ? 'selected' : '' }}>Rok</option>
+                                <option value="Kemeja Sekolah" {{ request('category') == 'Kemeja Sekolah' ? 'selected' : '' }}>Kemeja Sekolah</option>
+                                <option value="Kemeja Batik" {{ request('category') == 'Kemeja Batik' ? 'selected' : '' }}>Kemeja Batik</option>
+                                <option value="Kemeja Padang" {{ request('category') == 'Kemeja Padang' ? 'selected' : '' }}>Kemeja Padang</option>
+                                <option value="Rok Sekolah" {{ request('category') == 'Rok Sekolah' ? 'selected' : '' }}>Rok Sekolah</option>
+                                <option value="Celana Sekolah" {{ request('category') == 'Celana Sekolah' ? 'selected' : '' }}>Celana Sekolah</option>
                                 <option value="Aksesoris" {{ request('category') == 'Aksesoris' ? 'selected' : '' }}>Aksesoris</option>
+                                <option value="Pramuka" {{ request('category') == 'Pramuka' ? 'selected' : '' }}>Pramuka</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -120,9 +123,12 @@
                             <label class="form-label fw-semibold">Supplier</label>
                             <select name="supplier" class="form-select">
                                 <option value="">Semua Supplier</option>
-                                <option value="PT. Seragam Nusantara" {{ request('supplier') == 'PT. Seragam Nusantara' ? 'selected' : '' }}>PT. Seragam Nusantara</option>
-                                <option value="CV. Tekstil Jaya" {{ request('supplier') == 'CV. Tekstil Jaya' ? 'selected' : '' }}>CV. Tekstil Jaya</option>
-                                <option value="UD. Konveksi Mandiri" {{ request('supplier') == 'UD. Konveksi Mandiri' ? 'selected' : '' }}>UD. Konveksi Mandiri</option>
+                                <option value="PT Seragam Jaya" {{ request('supplier') == 'PT Seragam Jaya' ? 'selected' : '' }}>PT Seragam Jaya</option>
+                                <option value="CV Batik Nusantara" {{ request('supplier') == 'CV Batik Nusantara' ? 'selected' : '' }}>CV Batik Nusantara</option>
+                                <option value="PT Sabana" {{ request('supplier') == 'PT Sabana' ? 'selected' : '' }}>PT Sabana</option>
+                                <option value="PD Padang Garment" {{ request('supplier') == 'PD Padang Garment' ? 'selected' : '' }}>PD Padang Garment</option>
+                                <option value="CV Aksesoris Sekolah" {{ request('supplier') == 'CV Aksesoris Sekolah' ? 'selected' : '' }}>CV Aksesoris Sekolah</option>
+                                <option value="CV Pramuka Indonesia" {{ request('supplier') == 'CV Pramuka Indonesia' ? 'selected' : '' }}>CV Pramuka Indonesia</option>
                             </select>
                         </div>
                         <div class="col-md-3">

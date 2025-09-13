@@ -157,7 +157,7 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if($item->product && $item->product->image)
-                                            <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                            <img src="{{ $item->product && $item->product->image ? asset('images/products/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
                                                  alt="{{ $item->product_name }}" 
                                                  class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                             @endif

@@ -259,8 +259,8 @@
                     <td class="text-right">Rp {{ number_format($item->purchase_price, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($item->selling_price, 0, ',', '.') }}</td>
                     <td class="sizes">
-                        @if(is_array($item->sizes_available) && count($item->sizes_available) > 0)
-                            {{ implode(', ', $item->sizes_available) }}
+                        @if(count($item->available_sizes) > 0)
+                            {{ implode(', ', $item->available_sizes) }}
                         @else
                             -
                         @endif

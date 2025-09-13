@@ -45,8 +45,8 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        @if($product->image && file_exists(public_path('images/' . $product->image)))
-                            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
+                        @if($product->image && file_exists(public_path('images/products/' . $product->image)))
+                            <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
                                  class="img-fluid rounded mb-3" style="max-height: 300px; object-fit: cover;">
                         @else
                             <div class="bg-light d-flex align-items-center justify-content-center mx-auto mb-3" 
@@ -336,8 +336,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="text-center mb-3">
-                        @if($product->image && file_exists(public_path('images/' . $product->image)))
-                            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
+                        @if($product->image && file_exists(public_path('images/products/' . $product->image)))
+                            <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
                                  class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
                         @endif
                     </div>

@@ -30,7 +30,7 @@
         <div class="row mb-5">
             <div class="col-md-5">
                 <div class="card border-0 shadow-sm">
-                    <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}" 
+                    <img src="{{ $product->image ? asset('images/products/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}" 
                          class="card-img-top" alt="{{ $product->name }}" style="height:400px;object-fit:cover;">
                 </div>
             </div>

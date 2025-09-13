@@ -29,17 +29,22 @@ class InventoryController extends Controller
             $query->where('category', $request->category);
         }
         
+        // Filter berdasarkan supplier
+        if ($request->filled('supplier')) {
+            $query->where('supplier', $request->supplier);
+        }
+        
         // Filter berdasarkan status stok
-        if ($request->filled('status')) {
-            switch ($request->status) {
+        if ($request->filled('stock_status')) {
+            switch ($request->stock_status) {
                 case 'low':
                     $query->whereRaw('stock <= 100')->whereRaw('stock > 0');
                     break;
                 case 'out':
                     $query->where('stock', 0);
                     break;
-                case 'ready':
-                    $query->whereRaw('stock > 100');
+                case 'available':
+                    $query->whereRaw('stock > 0');
                     break;
                 case 'critical':
                     $query->whereRaw('stock <= 50');
@@ -65,6 +70,15 @@ class InventoryController extends Controller
         
         // Sorting
         switch ($request->sort) {
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'category':
+                $query->orderBy('category', 'asc');
+                break;
+            case 'stock':
+                $query->orderBy('stock', 'desc');
+                break;
             case 'name-asc':
                 $query->orderBy('name', 'asc');
                 break;
@@ -183,6 +197,125 @@ class InventoryController extends Controller
     }
     
     /**
+     * Show the form for creating a new inventory item.
+     */
+    public function create()
+    {
+        return view('admin.inventory.create', [
+            'titleShop' => 'Tambah Item Inventaris - Admin RAVAZKA',
+            'title' => 'Tambah Item Inventaris Baru'
+        ]);
+    }
+
+    /**
+     * Store a newly created inventory item in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|max:255|unique:inventories,code',
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'supplier' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'stock' => 'nullable|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
+            'optimal_stock' => 'required|integer|min:0|gte:min_stock',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'selling_price' => 'nullable|numeric|min:0',
+            'sizes_available' => 'nullable|string'
+        ], [
+            'optimal_stock.gte' => 'Stok optimal harus lebih besar atau sama dengan stok minimum.'
+        ]);
+
+        // Set default values for nullable fields
+        $data = $request->all();
+        $data['stock'] = $data['stock'] ?? 0;
+        $data['purchase_price'] = $data['purchase_price'] ?? 0;
+        $data['selling_price'] = $data['selling_price'] ?? 0;
+        $data['supplier'] = $data['supplier'] ?? 'Belum ditentukan';
+        $data['location'] = $data['location'] ?? 'Belum ditentukan';
+        $data['last_restock'] = now()->toDateString();
+        $data['stock_history'] = json_encode([
+            ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => $data['stock'], 'notes' => 'Stok awal']
+        ]);
+        $data['sizes_available'] = isset($data['sizes_available']) && $data['sizes_available'] ? json_encode(explode(',', $data['sizes_available'])) : json_encode([]);
+        $data['description'] = $data['description'] ?? 'Tidak ada deskripsi';
+
+        try {
+            Inventory::create($data);
+            
+            return redirect()->route('inventory.index')
+                ->with('success', 'Item inventaris berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan item inventaris: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified inventory item.
+     */
+    public function edit(Inventory $inventory)
+    {
+        return view('admin.inventory.edit', [
+            'titleShop' => 'Edit Item Inventaris - Admin RAVAZKA',
+            'title' => 'Edit Item Inventaris',
+            'item' => $inventory
+        ]);
+    }
+
+    /**
+     * Update the specified inventory item in storage.
+     */
+    public function update(Request $request, Inventory $inventory)
+    {
+        $request->validate([
+            'code' => 'required|string|max:255|unique:inventories,code,' . $inventory->id,
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'supplier' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'stock' => 'required|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
+            'optimal_stock' => 'required|integer|min:0|gte:min_stock',
+            'sizes_available' => 'nullable|string'
+        ], [
+            'optimal_stock.gte' => 'Stok optimal harus lebih besar atau sama dengan stok minimum.'
+        ]);
+
+        try {
+            $inventory->update($request->all());
+            
+            return redirect()->route('inventory.index')
+                ->with('success', 'Item inventaris berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui item inventaris: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified inventory item from storage.
+     */
+    public function destroy(Inventory $inventory)
+    {
+        try {
+            $inventory->delete();
+            
+            return redirect()->route('inventory.index')
+                ->with('success', 'Item inventaris berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus item inventaris: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Get products by inventory for AJAX requests
      */
     public function getProducts($inventoryId)
@@ -201,6 +334,22 @@ class InventoryController extends Controller
         ]);
     }
     
+    /**
+     * Export inventory data to Excel
+     */
+    public function export(Request $request)
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\InventoryExport($request),
+                'laporan-inventaris-' . date('Y-m-d-H-i-s') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            return redirect()->route('inventory.index')
+                ->with('error', 'Gagal mengekspor data: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Update inventory stock based on product changes
      */

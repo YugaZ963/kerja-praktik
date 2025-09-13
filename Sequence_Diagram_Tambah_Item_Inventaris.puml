@@ -1,22 +1,33 @@
-@startuml
+@startuml Sequence_Diagram_Tambah_Item_Inventaris
 !theme plain
 title Sequence Diagram - Tambah Item Inventaris (REQ-APITS-F-03C)
 
-actor Admin
-participant "Form Tambah\nInventaris" as Form
-participant "Validation\nSystem" as Validation
-participant "Database" as DB
-participant "Notification\nSystem" as Notif
+actor "Admin" as Admin
+participant "Halaman Inventaris" as Inventaris
+participant "Form Tambah Item" as Form
+participant "Validation System" as Validation
+database "Database" as DB
+participant "Notification System" as Notif
 
-Admin -> Form: Akses halaman tambah inventaris
+Admin -> Inventaris: Akses halaman inventaris
+activate Inventaris
+Inventaris --> Admin: Tampilkan halaman dengan tombol "Tambah Item"
+deactivate Inventaris
+
+Admin -> Inventaris: Klik tombol "Tambah Item"
+activate Inventaris
+Inventaris -> Form: Buka form tambah item
 activate Form
-Form --> Admin: Tampilkan form kosong
+Form --> Admin: Tampilkan form input lengkap
+deactivate Inventaris
 
-Admin -> Form: Isi data inventaris\n(nama, kategori, stok, harga)
-Form -> Validation: Validasi input data
+Admin -> Form: Isi data item (nama, kategori, kode, stok, dll)
+Form -> Validation: Validasi input data real-time
 activate Validation
 
 alt Data Valid
+    Admin -> Form: Submit form dengan tombol "Simpan"
+    Form -> Validation: Validasi final data
     Validation --> Form: Data tervalidasi
     deactivate Validation
     Form -> DB: Simpan data inventaris baru
@@ -28,12 +39,14 @@ alt Data Valid
     Notif --> Admin: Tampilkan pesan berhasil
     deactivate Notif
     Form --> Admin: Redirect ke halaman inventaris
+    deactivate Form
 else Data Tidak Valid
     Validation --> Form: Return error messages
     deactivate Validation
-    Form --> Admin: Tampilkan pesan error\ndan form dengan data sebelumnya
+    Form --> Admin: Tampilkan pesan error spesifik
+    Admin -> Form: Perbaiki data yang tidak valid
+    Form -> Validation: Validasi input data kembali
+    activate Validation
 end
-
-deactivate Form
 
 @enduml

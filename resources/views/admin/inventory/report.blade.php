@@ -1,10 +1,9 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Laporan Inventaris')
 
 @section('content')
     <div class="container mt-4">
-        <x-navbar />
 
         <div class="bg-light p-4 rounded mb-4">
             <div class="d-flex justify-content-between align-items-center">
@@ -180,12 +179,10 @@
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->category }}</td>
                                     <td>
-                                        @if(is_string($item->sizes_available))
-                                            {{ implode(', ', json_decode($item->sizes_available, true) ?? []) }}
-                                        @elseif(is_array($item->sizes_available))
-                                            {{ implode(', ', $item->sizes_available) }}
+                                        @if(count($item->available_sizes) > 0)
+                                            {{ implode(', ', $item->available_sizes) }}
                                         @else
-                                            {{ $item->sizes_available ?? '-' }}
+                                            -
                                         @endif
                                     </td>
                                     <td>

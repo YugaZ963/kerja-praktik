@@ -1,0 +1,40 @@
+@startuml Sequence_Diagram_Hapus_Item_Inventaris
+!theme plain
+title Sequence Diagram - Hapus Item Inventaris
+
+actor "Admin" as Admin
+participant "Halaman Inventaris" as UI
+participant "Sistem Konfirmasi" as Confirm
+participant "Sistem" as System
+database "Database" as DB
+
+Admin -> UI: klik tombol 'Hapus' pada item
+activate UI
+
+UI -> Confirm: tampilkan dialog konfirmasi()
+activate Confirm
+
+alt Konfirmasi Hapus
+    Admin -> Confirm: klik 'Ya, Hapus'
+    Confirm -> System: processDelete(itemId)
+    activate System
+
+    System -> DB: deleteInventoryItem(itemId)
+    activate DB
+    DB --> System: success
+    deactivate DB
+
+    System -> UI: hapus berhasil, refresh halaman
+    deactivate System
+    UI -> Admin: tampilkan notifikasi sukses
+
+else Batal Hapus
+    Admin -> Confirm: klik 'Batal'
+    Confirm -> UI: tutup dialog()
+    UI --> Admin: kembali ke halaman inventaris
+end
+
+deactivate Confirm
+deactivate UI
+
+@enduml

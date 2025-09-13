@@ -32,16 +32,7 @@
                 </li>
             </ul>
             
-            <!-- Search Bar untuk customer -->
-            <div class="d-flex me-2">
-                <form class="d-flex" method="GET" action="/products">
-                    <input class="form-control me-1" type="search" name="search" placeholder="Cari..." 
-                           value="{{ request('search') }}" style="width: 120px;">
-                    <button class="btn btn-outline-primary btn-sm" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-            </div>
+            <!-- Search Bar telah dihapus -->
             
             <!-- Cart untuk customer yang login -->
             @auth
@@ -67,8 +58,7 @@
                     </div>
                 @else
                     <div class="dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle me-1"></i>
                             <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
                         </a>
@@ -98,9 +88,24 @@
                             <!-- Navigation Menu -->
                             @if (Auth::user()->isAdmin())
                                 <li>
+                                    <a class="dropdown-item" href="{{ route('inventory.report') }}">
+                                        <i class="bi bi-clipboard-data me-2"></i>Laporan Inventaris
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.sales.index') }}">
+                                        <i class="bi bi-graph-up me-2"></i>Laporan Penjualan
+                                    </a>
+                                </li>
+                                <li>
                                     <hr class="dropdown-divider">
                                 </li>
                             @else
+                                <li>
+                                    <a class="dropdown-item" href="/orders">
+                                        <i class="bi bi-bag-check me-2"></i>Pesanan Saya
+                                    </a>
+                                </li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -122,19 +127,4 @@
     </div>
 </nav>
 
-<script>
-// Search functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.querySelector('form[action="/products"]');
-    const searchInput = document.querySelector('input[name="search"]');
-    
-    if (searchForm && searchInput) {
-        searchForm.addEventListener('submit', function(e) {
-            if (searchInput.value.trim() === '') {
-                e.preventDefault();
-                window.location.href = '/products';
-            }
-        });
-    }
-});
-</script>
+<!-- Script search telah dihapus -->

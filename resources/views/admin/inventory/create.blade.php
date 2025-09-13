@@ -80,6 +80,24 @@
                     </div>
 
                     <div class="col-md-4">
+                        <label for="min_stock" class="form-label">Stok Minimal</label>
+                        <input type="number" class="form-control @error('min_stock') is-invalid @enderror" id="min_stock" name="min_stock" value="{{ old('min_stock', 1) }}" min="1" required>
+                        @error('min_stock')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Batas minimum stok untuk peringatan</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="optimal_stock" class="form-label">Stok Optimal <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('optimal_stock') is-invalid @enderror" id="optimal_stock" name="optimal_stock" value="{{ old('optimal_stock', 10) }}" min="1" required>
+                        @error('optimal_stock')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Target stok ideal yang harus dijaga (harus ≥ stok minimal)</small>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
                             <strong>Info:</strong> Stok akan dikelola melalui data produk, tidak perlu diisi di sini.
@@ -141,4 +159,30 @@
         border-color: #0d6efd;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+// Validasi client-side untuk memastikan optimal_stock >= min_stock
+document.addEventListener('DOMContentLoaded', function() {
+    const minStockInput = document.getElementById('min_stock');
+    const optimalStockInput = document.getElementById('optimal_stock');
+    
+    function validateOptimalStock() {
+        const minStock = parseInt(minStockInput.value) || 0;
+        const optimalStock = parseInt(optimalStockInput.value) || 0;
+        
+        if (optimalStock < minStock) {
+            optimalStockInput.setCustomValidity('Stok optimal harus lebih besar atau sama dengan stok minimal');
+            optimalStockInput.classList.add('is-invalid');
+        } else {
+            optimalStockInput.setCustomValidity('');
+            optimalStockInput.classList.remove('is-invalid');
+        }
+    }
+    
+    minStockInput.addEventListener('input', validateOptimalStock);
+    optimalStockInput.addEventListener('input', validateOptimalStock);
+});
+</script>
 @endpush

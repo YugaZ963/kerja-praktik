@@ -50,7 +50,7 @@
             @forelse ($products as $product)
                 <div class="col-md-4 col-lg-3">
                     <div class="card h-100">
-                        <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}"
+                        <img src="{{ $product->image ? asset('images/products/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}"
                             class="card-img-top" alt="{{ $product->name }}" style="height:180px;object-fit:cover;">
                         <div class="card-body text-center">
                             <h6 class="card-title mb-2">{{ $product->name }}</h6>

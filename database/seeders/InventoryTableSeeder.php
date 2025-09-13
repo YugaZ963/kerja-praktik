@@ -9,6 +9,9 @@ class InventoryTableSeeder extends Seeder
 {
     public function run()
     {
+        // Hapus data yang ada
+        \App\Models\Inventory::truncate();
+        
         $inventories = [
             [
                 'id'              => 1,
@@ -17,16 +20,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Kemeja Sekolah',
                 'stock'           => 0,        // <-- sudah ada
                 'min_stock'       => 50,
+                'optimal_stock'   => 100,
                 'purchase_price'  => 35000,
                 'selling_price'   => 40000,
                 'supplier'        => 'PT Seragam Jaya',
-                'sizes_available' => json_encode(['8', '9', '10', '11', '12', '13', '14', '15', '16']),
+                'sizes_available' => ['8', '9', '10', '11', '12', '13', '14', '15', '16'],
                 'location'        => 'Rak A-1',
                 'description'     => 'Kemeja seragam sekolah lengan pendek putih premium',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
+                'stock_history'   => [
                     ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 180, 'notes' => 'Stok awal']
-                ]),
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -37,16 +41,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Kemeja Sekolah',
                 'stock'           => 0,        // <-- tambahkan ini
                 'min_stock'       => 50,
+                'optimal_stock'   => 100,
                 'purchase_price'  => 38000,
                 'selling_price'   => 43000,
                 'supplier'        => 'PT Seragam Jaya',
-                'sizes_available' => json_encode(['8', '9', '10', '11', '12', '13', '14', '15', '16']),
+                'sizes_available' => ['8', '9', '10', '11', '12', '13', '14', '15', '16'],
                 'location'        => 'Rak A-2',
                 'description'     => 'Kemeja seragam sekolah lengan panjang putih premium',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 180, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 80, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -57,6 +62,7 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Kemeja Batik',
                 'stock'           => 0,        // <-- tambahkan
                 'min_stock'       => 50,
+                'optimal_stock'   => 100,
                 'purchase_price'  => 42000,
                 'selling_price'   => 46000,
                 'supplier'        => 'CV Batik Nusantara',
@@ -72,20 +78,21 @@ class InventoryTableSeeder extends Seeder
             ],
             [
                 'id'              => 4,
-                'code'            => 'INV-KOKO-001',
-                'name'            => 'Kemeja Batik Koko Hijau',
-                'category'        => 'Kemeja Batik Koko',
-                'stock'           => 0,        // <-- tambahkan
-                'min_stock'       => 50,
-                'purchase_price'  => 52000,
-                'selling_price'   => 56000,
-                'supplier'        => 'CV Batik Nusantara',
-                'sizes_available' => json_encode(['8', '9', '10', '11', '12', '13', '14', '15', '16']),
-                'location'        => 'Rak C-2',
-                'description'     => 'Kemeja koko hijau batik premium',
-                'last_restock'    => now()->toDateString(),
+                'code'            => 'INV-BAJU-KOKO-001',
+                'name'            => 'Baju Koko',
+                'category'        => 'Kemeja Sekolah',
+                'stock'           => 30,
+                'min_stock'       => 1,
+                'optimal_stock'   => 12,
+                'purchase_price'  => 0,
+                'selling_price'   => 47500,
+                'supplier'        => 'PT Sabana',
+                'sizes_available' => json_encode(['M', 'S']),
+                'location'        => 'Rak S-2',
+                'description'     => 'kefneskfnekfsneskfnfklesnfeskfnesl',
+                'last_restock'    => '2025-09-12',
                 'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 180, 'notes' => 'Stok awal']
+                    ['date' => '2025-09-12', 'type' => 'in', 'quantity' => 30, 'notes' => 'Stok awal']
                 ]),
                 'created_at'      => now(),
                 'updated_at'      => now(),
@@ -97,16 +104,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Kemeja Padang',
                 'stock'           => 0,        // <-- tambahkan
                 'min_stock'       => 30,
+                'optimal_stock'   => 60,
                 'purchase_price'  => 62000,
                 'selling_price'   => 66000,
                 'supplier'        => 'PD Padang Garment',
-                'sizes_available' => json_encode(['14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6']),
+                'sizes_available' => ['14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6'],
                 'location'        => 'Rak D-1',
                 'description'     => 'Kemeja padang motif khas untuk seragam sekolah',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 110, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 150, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -117,16 +125,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Rok Sekolah',
                 'stock'           => 0,        // <-- tambahkan
                 'min_stock'       => 30,
+                'optimal_stock'   => 60,
                 'purchase_price'  => 44000,
                 'selling_price'   => 48000,
                 'supplier'        => 'PT Seragam Jaya',
-                'sizes_available' => json_encode(['3', '4', '5', '6', '7', '8', '9', '10', '11', '12']),
+                'sizes_available' => ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
                 'location'        => 'Rak E-1',
                 'description'     => 'Rok panjang seragam SD warna biru dongker',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 100, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 150, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -137,16 +146,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Celana Sekolah',
                 'stock'           => 0,        // <-- tambahkan
                 'min_stock'       => 30,
+                'optimal_stock'   => 60,
                 'purchase_price'  => 43000,
                 'selling_price'   => 47000,
                 'supplier'        => 'PT Seragam Jaya',
-                'sizes_available' => json_encode(['3', '4', '5', '6', '7', '8', '9', '10', '11', '12']),
+                'sizes_available' => ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
                 'location'        => 'Rak F-1',
                 'description'     => 'Celana panjang seragam SD warna abu-abu',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 100, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 120, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -157,16 +167,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Aksesoris',
                 'stock'           => 0,
                 'min_stock'       => 100,
+                'optimal_stock'   => 200,
                 'purchase_price'  => 8000,
                 'selling_price'   => 10000,
                 'supplier'        => 'CV Aksesoris Sekolah',
-                'sizes_available' => json_encode(['Kecil', 'Besar']),
+                'sizes_available' => ['Kecil', 'Besar'],
                 'location'        => 'Rak G-1',
                 'description'     => 'Topi seragam sekolah berbagai tingkat',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 400, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 200, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -177,16 +188,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Aksesoris',
                 'stock'           => 0,
                 'min_stock'       => 100,
+                'optimal_stock'   => 200,
                 'purchase_price'  => 8000,
                 'selling_price'   => 10000,
                 'supplier'        => 'CV Aksesoris Sekolah',
-                'sizes_available' => json_encode(['S', 'M', 'L', 'XL']),
+                'sizes_available' => ['S', 'M', 'L', 'XL'],
                 'location'        => 'Rak G-2',
                 'description'     => 'Kerudung seragam sekolah berbagai tingkat',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
+                'stock_history'   => [
                     ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 400, 'notes' => 'Stok awal']
-                ]),
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -197,16 +209,17 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Aksesoris',
                 'stock'           => 0,
                 'min_stock'       => 100,
+                'optimal_stock'   => 200,
                 'purchase_price'  => 8000,
                 'selling_price'   => 10000,
                 'supplier'        => 'CV Aksesoris Sekolah',
-                'sizes_available' => json_encode(['Kecil', 'Besar']),
+                'sizes_available' => ['Kecil', 'Besar'],
                 'location'        => 'Rak G-3',
                 'description'     => 'Sabuk seragam sekolah berbagai tingkat',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
+                'stock_history'   => [
                     ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 400, 'notes' => 'Stok awal']
-                ]),
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
@@ -217,23 +230,26 @@ class InventoryTableSeeder extends Seeder
                 'category'        => 'Pramuka',
                 'stock'           => 0,
                 'min_stock'       => 50,
+                'optimal_stock'   => 100,
                 'purchase_price'  => 45000,
                 'selling_price'   => 50000,
                 'supplier'        => 'CV Pramuka Indonesia',
-                'sizes_available' => json_encode(['8', '9', '10', '11', '12', '13', '14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6']),
+                'sizes_available' => ['8', '9', '10', '11', '12', '13', '14', '15', '16', 'S', 'M', 'L', 'XL', 'L3', 'L4', 'L5', 'L6'],
                 'location'        => 'Rak H-1',
                 'description'     => 'Seragam pramuka lengkap berbagai tingkat',
                 'last_restock'    => now()->toDateString(),
-                'stock_history'   => json_encode([
-                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 300, 'notes' => 'Stok awal']
-                ]),
+                'stock_history'   => [
+                    ['date' => now()->toDateString(), 'type' => 'in', 'quantity' => 200, 'notes' => 'Stok awal']
+                ],
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
         ];
 
-        DB::table('inventories')->delete();
-        DB::table('inventories')->insert($inventories);
+        // Gunakan model Eloquent untuk insert agar array casting berfungsi
+        foreach ($inventories as $inventory) {
+            \App\Models\Inventory::create($inventory);
+        }
 
         // Update stock otomatis dari produk
         foreach ($inventories as $inv) {

@@ -14,27 +14,6 @@
                     </h2>
                     <p class="text-muted mb-0">Kelola dan pantau semua pesanan pelanggan</p>
                 </div>
-                <div class="d-flex gap-3">
-                    <!-- Search Form -->
-                    <form method="GET" action="{{ route('admin.orders.index') }}" class="d-flex gap-2">
-                        <div class="input-group" style="width: 300px;">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text" name="search" class="form-control border-start-0 search-input" 
-                                   placeholder="Cari nomor pesanan, nama, atau telepon..." 
-                                   value="{{ request('search') }}">
-                        </div>
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-search me-2"></i>Cari
-                        </button>
-                        @if(request('search') || request('status'))
-                        <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-danger">
-                            <i class="fas fa-times me-2"></i>Reset
-                        </a>
-                        @endif
-                    </form>
-                </div>
             </div>
 
             <div class="card border-0 shadow-lg">
@@ -60,7 +39,7 @@
                                 <div class="row g-2">
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ !request('status') || request('status') === 'all' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'all', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'all']) }}">
                                             <div class="status-icon bg-primary">
                                                 <i class="fas fa-list"></i>
                                             </div>
@@ -72,7 +51,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'pending' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'pending', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'pending']) }}">
                                             <div class="status-icon bg-warning">
                                                 <i class="fas fa-clock"></i>
                                             </div>
@@ -84,7 +63,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'payment_pending' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'payment_pending', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'payment_pending']) }}">
                                             <div class="status-icon bg-info">
                                                 <i class="fas fa-credit-card"></i>
                                             </div>
@@ -96,7 +75,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'payment_verified' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'payment_verified', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'payment_verified']) }}">
                                             <div class="status-icon bg-success">
                                                 <i class="fas fa-check-circle"></i>
                                             </div>
@@ -108,7 +87,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'processing' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'processing', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'processing']) }}">
                                             <div class="status-icon bg-primary">
                                                 <i class="fas fa-cogs"></i>
                                             </div>
@@ -120,7 +99,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'packaged' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'packaged', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'packaged']) }}">
                                             <div class="status-icon bg-purple">
                                                 <i class="fas fa-box"></i>
                                             </div>
@@ -132,7 +111,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'shipped' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'shipped', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'shipped']) }}">
                                             <div class="status-icon bg-info">
                                                 <i class="fas fa-shipping-fast"></i>
                                             </div>
@@ -144,7 +123,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'delivered' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'delivered', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'delivered']) }}">
                                             <div class="status-icon bg-success">
                                                 <i class="fas fa-truck"></i>
                                             </div>
@@ -156,7 +135,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'completed' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'completed', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'completed']) }}">
                                             <div class="status-icon bg-success">
                                                 <i class="fas fa-check-double"></i>
                                             </div>
@@ -168,7 +147,7 @@
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                         <a class="status-tab {{ request('status') === 'cancelled' ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['status' => 'cancelled', 'search' => request('search')]) }}">
+                                           href="{{ route('admin.orders.index', ['status' => 'cancelled']) }}">
                                             <div class="status-icon bg-danger">
                                                 <i class="fas fa-times-circle"></i>
                                             </div>

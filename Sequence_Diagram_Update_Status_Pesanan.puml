@@ -1,0 +1,55 @@
+@startuml Sequence_Diagram_Update_Status_Pesanan
+!theme plain
+title Sequence Diagram - Update Status Pesanan
+
+actor "Admin" as Admin
+participant "Halaman Detail Pesanan" as UI
+participant "Sistem" as System
+database "Database" as DB
+participant "Sistem Notifikasi" as NotificationSystem
+
+Admin -> UI: Akses halaman detail pesanan
+activate UI
+
+UI -> System: requestDetailPesanan(orderId)
+activate System
+
+System -> DB: fetchDetailPesanan(orderId)
+activate DB
+DB --> System: detailPesanan
+deactivate DB
+
+System --> UI: detailPesanan
+deactivate System
+
+UI -> Admin: Tampilkan detail pesanan dan form update status
+
+Admin -> UI: Pilih status baru dan isi catatan
+
+UI -> System: submitUpdateStatus(orderId, newStatus, catatan)
+activate System
+
+System -> System: validasiData(newStatus, catatan)
+
+alt Data Valid
+    System -> DB: updateOrderStatus(orderId, newStatus, catatan)
+    activate DB
+    DB --> System: statusUpdateSuccess
+    deactivate DB
+
+    System -> NotificationSystem: kirimNotifikasi(orderId, newStatus)
+    activate NotificationSystem
+    NotificationSystem --> System: notifikasiTerkirim
+    deactivate NotificationSystem
+
+    System --> UI: updateBerhasil
+    UI -> Admin: Tampilkan notifikasi sukses
+else Data Tidak Valid
+    System --> UI: updateGagal(errors)
+    UI -> Admin: Tampilkan pesan error
+end
+
+deactivate System
+deactivate UI
+
+@enduml

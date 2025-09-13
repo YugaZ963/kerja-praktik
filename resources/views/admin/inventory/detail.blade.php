@@ -90,20 +90,8 @@
                             <div class="col-md-4 fw-bold">Ukuran Tersedia</div>
                             <div class="col-md-8">
                                 @php
-                                    // Ambil ukuran dari produk yang sebenarnya ada di database
+                                    // Hanya ambil ukuran dari produk yang benar-benar ada di database
                                     $actualSizes = $item->available_sizes; // Menggunakan accessor yang sudah ada
-                                    
-                                    // Jika tidak ada produk, fallback ke sizes_available dari inventory
-                                    if (empty($actualSizes)) {
-                                        $sizes = $item->sizes_available;
-                                        if (is_string($sizes)) {
-                                            $sizes = json_decode($sizes, true) ?? [];
-                                        }
-                                        if (!is_array($sizes)) {
-                                            $sizes = [];
-                                        }
-                                        $actualSizes = $sizes;
-                                    }
                                 @endphp
                                 @if(count($actualSizes) > 0)
                                     @foreach ($actualSizes as $size)
@@ -116,12 +104,6 @@
                                             {{ $size }} ({{ $sizeStock }})
                                         </span>
                                     @endforeach
-                                    <div class="mt-2">
-                                        <small class="text-muted">
-                                            <i class="bi bi-info-circle"></i> 
-                                            Hijau: Ada stok, Abu-abu: Stok habis
-                                        </small>
-                                    </div>
                                 @else
                                     <span class="text-muted">Tidak ada ukuran tersedia</span>
                                 @endif
@@ -214,7 +196,7 @@
                                                         
                                                         @if($product->image)
                                                             <div class="mt-2">
-                                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 60px; max-width: 60px;">
+                                                                <img src="{{ $product->image ? asset('images/products/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 60px; max-width: 60px;">
                                                             </div>
                                                         @endif
                                                     </div>
@@ -305,7 +287,7 @@
                             <p class="text-muted">Jumlah Stok Saat Ini</p>
 
                             @php
-                                $stockPercentage = ($item['stock'] / ($item['min_stock'] * 3)) * 100;
+                                $stockPercentage = ($item['stock'] / $item['optimal_stock']) * 100;
                                 $progressClass = 'bg-success';
 
                                 if ($stockPercentage <= 33) {
@@ -318,13 +300,13 @@
                             <div class="progress" style="height: 10px;">
                                 <div class="progress-bar {{ $progressClass }}" role="progressbar"
                                     style="width: {{ min($stockPercentage, 100) }}%" aria-valuenow="{{ $item['stock'] }}"
-                                    aria-valuemin="0" aria-valuemax="{{ $item['min_stock'] * 3 }}">
+                                    aria-valuemin="0" aria-valuemax="{{ $item['optimal_stock'] }}">
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-between mt-1">
                                 <small class="text-danger">Minimum ({{ $item['min_stock'] }})</small>
-                                <small class="text-success">Optimal ({{ $item['min_stock'] * 3 }})</small>
+                                <small class="text-success">Optimal ({{ $item['optimal_stock'] }})</small>
                             </div>
                         </div>
 
@@ -344,9 +326,9 @@
                             <div class="col-6 fw-bold">Margin</div>
                             <div class="col-6 text-end">
                                 @php
-                                    $margin = $item['selling_price'] - $item['purchase_price'];
-                                    $marginPercentage = ($margin / $item['purchase_price']) * 100;
-                                @endphp
+                                     $margin = $item['selling_price'] - $item['purchase_price'];
+                                     $marginPercentage = $item['purchase_price'] > 0 ? (($margin / $item['purchase_price']) * 100) : 0;
+                                 @endphp
                                 Rp {{ number_format($margin) }} ({{ number_format($marginPercentage, 1) }}%)
                             </div>
                         </div>
@@ -391,23 +373,61 @@
             <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="inventory_id" value="{{ $item->id }}">
+                <input type="hidden" name="category" value="{{ $item->category }}">
                 
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="product_name" class="form-label">Nama Produk <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="product_name" name="name" required>
+                                <input type="text" class="form-control" id="product_name" name="name" value="{{ $item->name }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="product_size" class="form-label">Ukuran <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="product_size" name="size" placeholder="Masukkan ukuran (contoh: S, M, L, XL, 14, 16, dll)" required>
-                                <div class="form-text">Masukkan ukuran produk. Anda bisa menambahkan ukuran baru.</div>
+                                <label for="product_size_select" class="form-label">Ukuran <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <select class="form-select" id="product_size_select" name="size" onchange="handleSizeSelection()">
+                                        <option value="">Pilih Ukuran</option>
+                                        @if($item->available_sizes && count($item->available_sizes) > 0)
+                                            @foreach($item->available_sizes as $size)
+                                                <option value="{{ $size }}">{{ $size }}</option>
+                                            @endforeach
+                                        @endif
+                                        <option value="new">+ Ukuran Baru</option>
+                                    </select>
+                                </div>
+                                <input type="text" class="form-control mt-2" id="product_size_new" name="new_size" style="display: none;" placeholder="Masukkan ukuran baru">
+                                <div class="form-text">Pilih ukuran yang sudah ada atau tambahkan ukuran baru jika tidak ditemukan.</div>
                             </div>
                         </div>
                     </div>
+
+<script>
+function handleSizeSelection() {
+    const selectElement = document.getElementById('product_size_select');
+    const inputElement = document.getElementById('product_size_new');
+    
+    if (selectElement.value === 'new') {
+        inputElement.style.display = 'block';
+        inputElement.required = true;
+        inputElement.value = '';
+        inputElement.focus();
+    } else {
+        inputElement.style.display = 'none';
+        inputElement.required = false;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Pastikan elemen ada sebelum menambahkan event listener
+    const selectElement = document.getElementById('product_size_select');
+    if (selectElement) {
+        handleSizeSelection();
+    }
+});
+</script>
                     
                     <div class="row">
                         <div class="col-md-6">
@@ -437,7 +457,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="product_image" class="form-label">Upload Gambar</label>
-                                <input type="file" class="form-control" id="product_image" name="image" accept="image/*" onchange="previewImage(this)">
+                                <input type="file" class="form-control" id="product_image" name="image_file" accept="image/*" onchange="previewImage(this)">
                                 <div class="form-text">Format: JPG, PNG, GIF. Maksimal 2MB</div>
                             </div>
                         </div>
@@ -445,7 +465,7 @@
                     
                     <div class="mb-3">
                         <label for="product_description" class="form-label">Deskripsi</label>
-                        <textarea class="form-control" id="product_description" name="description" rows="3" placeholder="Deskripsi produk (opsional)"></textarea>
+                        <textarea class="form-control" id="product_description" name="description" rows="3" placeholder="Deskripsi produk (opsional)">{{ $item->description }}</textarea>
                     </div>
                     
                     <!-- Preview Gambar -->
@@ -508,16 +528,39 @@ function previewImage(input) {
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="edit_product_size" class="form-label">Ukuran <span class="text-danger">*</span></label>
-                                <select class="form-select" id="edit_product_size" name="size" required>
-                                    <option value="">Pilih Ukuran</option>
-                                    @if($item->available_sizes && count($item->available_sizes) > 0)
-                                        @foreach($item->available_sizes as $size)
-                                            <option value="{{ $size }}">{{ $size }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
+                                <div class="input-group">
+                                    <select class="form-select" id="edit_product_size_select" onchange="handleEditSizeSelection()">
+                                        <option value="">Pilih Ukuran</option>
+                                        @if($item->available_sizes && count($item->available_sizes) > 0)
+                                            @foreach($item->available_sizes as $size)
+                                                <option value="{{ $size }}">{{ $size }}</option>
+                                            @endforeach
+                                        @endif
+                                        <option value="new">+ Ukuran Baru</option>
+                                    </select>
+                                    <input type="text" class="form-control" id="edit_product_size_new" name="size" style="display: none;" placeholder="Masukkan ukuran baru">
+                                </div>
+                                <div class="form-text">Pilih ukuran yang sudah ada atau tambahkan ukuran baru.</div>
                             </div>
                         </div>
+
+<script>
+function handleEditSizeSelection() {
+    const selectElement = document.getElementById('edit_product_size_select');
+    const inputElement = document.getElementById('edit_product_size_new');
+    
+    if (selectElement.value === 'new') {
+        inputElement.style.display = 'block';
+        inputElement.required = true;
+        inputElement.value = '';
+        inputElement.focus();
+    } else {
+        inputElement.style.display = 'none';
+        inputElement.required = false;
+        inputElement.value = selectElement.value;
+    }
+}
+</script>
                     </div>
                     
                     <div class="row">

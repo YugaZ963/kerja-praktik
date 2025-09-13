@@ -122,7 +122,7 @@
                                                     <div class="d-flex flex-wrap" style="max-width: 80px;">
                                                         @foreach($order->items->take(2) as $item)
                                                             @if($item->product && $item->product->image)
-                                                                <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                                                <img src="{{ $item->product->image ? asset('images/products/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
                                                                      alt="{{ $item->product_name }}" 
                                                                      class="rounded-2 border me-1 mb-1 shadow-sm" 
                                                                      style="width: 40px; height: 40px; object-fit: cover;">

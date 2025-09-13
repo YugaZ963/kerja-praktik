@@ -1,0 +1,37 @@
+@startuml Proses_Bisnis_Usulan
+!theme plain
+
+title Proses Bisnis Usulan E-Commerce Ravazka
+
+|Pelanggan|
+start
+:Akses Website & Memilih Produk;
+:Menambah Produk ke Keranjang;
+:Melakukan Checkout & Konfirmasi Pesanan;
+
+|Sistem|
+:Menampilkan Halaman & Memvalidasi Stok;
+:Memproses Checkout & Membuat Pesanan;
+:Mengirim Notifikasi Pesanan Baru ke Admin;
+
+|Admin|
+:Login & Menerima Notifikasi Pesanan Baru;
+:Memproses Pesanan (Validasi & Kemas);
+
+|Sistem|
+:Mengupdate Status Pesanan menjadi "Diproses";
+:Mengirim Notifikasi Status ke Pelanggan;
+
+|Admin|
+:Menyerahkan Paket ke Jasa Kirim;
+
+|Sistem|
+:Mengupdate Status Pesanan menjadi "Dikirim";
+:Mengirim Notifikasi Pengiriman ke Pelanggan;
+
+|Pelanggan|
+:Menerima Notifikasi & Lacak Pengiriman;
+:Menerima Produk Pesanan;
+stop
+
+@enduml

@@ -56,12 +56,34 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
             'stock' => 'required|integer|min:0',
-            'size' => 'required|string|max:10',
+            'size' => [
+                'required',
+                'string',
+                'max:10',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('inventory_id', $request->inventory_id);
+                })
+            ],
+            'new_size' => 'nullable|string|max:10',
             'category' => 'required|string|max:100',
             'weight' => 'nullable|numeric|min:0',
             'image' => 'nullable|string|max:255',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+        
+        // Jika ukuran baru diisi, gunakan ukuran baru tersebut
+        if (!empty($request->new_size) && $request->size === 'new') {
+            $validated['size'] = $request->new_size;
+            
+            // Periksa apakah ukuran baru sudah ada untuk inventory ini
+            $isDuplicate = Product::where('inventory_id', $request->inventory_id)
+                                ->where('size', $validated['size'])
+                                ->exists();
+                                
+            if ($isDuplicate) {
+                return back()->withErrors(['new_size' => 'Ukuran ini sudah ada untuk item inventaris ini.'])->withInput();
+            }
+        }
         
         // Handle image upload
         if ($request->hasFile('image_file')) {
@@ -92,6 +114,33 @@ class ProductController extends Controller
         
         $product = Product::create($validated);
         
+        // Jika ukuran baru ditambahkan, perbarui sizes_available di inventory
+        if ($request->size === 'new' && !empty($request->new_size)) {
+            $inventory = Inventory::find($validated['inventory_id']);
+            if ($inventory) {
+                // Pastikan $sizes adalah array
+                $sizes = $inventory->sizes_available;
+                
+                // Jika sizes_available masih berupa string, konversi ke array
+                if (is_string($sizes)) {
+                    $sizes = json_decode($sizes, true) ?? [];
+                }
+                
+                // Pastikan $sizes adalah array
+                if (!is_array($sizes)) {
+                    $sizes = [];
+                }
+                
+                $new_size = $validated['size'];
+
+                if (!in_array($new_size, $sizes)) {
+                    $sizes[] = $new_size;
+                    sort($sizes); // Urutkan ukuran
+                    $inventory->update(['sizes_available' => $sizes]);
+                }
+            }
+        }
+        
         // Inventory stock akan otomatis terupdate melalui Product model event listeners
         
         if ($request->expectsJson()) {
@@ -100,6 +149,13 @@ class ProductController extends Controller
                 'message' => "Produk '{$product->name}' ukuran {$product->size} berhasil ditambahkan.",
                 'product' => $product
             ]);
+        }
+        
+        // Jika request berasal dari halaman detail inventaris, redirect kembali ke halaman tersebut
+        if ($request->has('inventory_id')) {
+            $inventory = Inventory::find($request->inventory_id);
+            return redirect()->route('inventory.detail', $inventory->code)
+                ->with('success', "Produk '{$product->name}' ukuran {$product->size} berhasil ditambahkan.");
         }
         
         return redirect()->route('inventory.index')
@@ -217,12 +273,35 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
             'stock' => 'required|integer|min:0',
-            'size' => 'required|string|max:10',
+            'size' => [
+                'required',
+                'string',
+                'max:10',
+                Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('inventory_id', $request->inventory_id);
+                })->ignore($product->id)
+            ],
+            'new_size' => 'nullable|string|max:10',
             'category' => 'required|string|max:100',
             'weight' => 'nullable|numeric|min:0',
             'image' => 'nullable|string|max:255',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+        
+        // Jika ukuran baru diisi, gunakan ukuran baru tersebut
+        if (!empty($request->new_size) && $request->size === 'new') {
+            $validated['size'] = $request->new_size;
+            
+            // Periksa apakah ukuran baru sudah ada untuk inventory ini
+            $isDuplicate = Product::where('inventory_id', $request->inventory_id)
+                                ->where('size', $validated['size'])
+                                ->where('id', '!=', $product->id)
+                                ->exists();
+                                
+            if ($isDuplicate) {
+                return back()->withErrors(['new_size' => 'Ukuran ini sudah ada untuk item inventaris ini.'])->withInput();
+            }
+        }
         
         // Handle image upload
         if ($request->hasFile('image_file')) {
@@ -259,6 +338,18 @@ class ProductController extends Controller
         }
         
         $product->update($validated);
+        
+        // Jika ukuran baru ditambahkan, perbarui sizes_available di inventory
+        if (!empty($request->new_size) && $request->size === 'new') {
+            $inventory = Inventory::find($validated['inventory_id']);
+            if ($inventory) {
+                $sizes = $inventory->sizes_available ?? [];
+                if (!in_array($validated['size'], $sizes)) {
+                    $sizes[] = $validated['size'];
+                    $inventory->update(['sizes_available' => $sizes]);
+                }
+            }
+        }
         
         // Inventory stock akan otomatis terupdate melalui Product model event listeners
         

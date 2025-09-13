@@ -79,9 +79,22 @@
                         <input type="number" class="form-control" id="stock" name="stock" min="0" value="{{ $item->stock }}" readonly>
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="min_stock" class="form-label">Stok Minimal</label>
-                        <input type="number" class="form-control" id="min_stock" name="min_stock" min="1" value="{{ $item->min_stock }}" required>
+                    <div class="col-md-6">
+                        <label for="min_stock" class="form-label">Stok Minimal <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('min_stock') is-invalid @enderror" id="min_stock" name="min_stock" value="{{ old('min_stock', $item->min_stock) }}" min="1" required>
+                        @error('min_stock')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Batas minimum stok untuk peringatan</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="optimal_stock" class="form-label">Stok Optimal <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('optimal_stock') is-invalid @enderror" id="optimal_stock" name="optimal_stock" value="{{ old('optimal_stock', $item->optimal_stock) }}" min="1" required>
+                        @error('optimal_stock')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Target stok ideal yang harus dijaga (harus ≥ stok minimal)</small>
                     </div>
 
                     <div class="col-12">
@@ -127,4 +140,30 @@
         border-color: #0d6efd;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+// Validasi client-side untuk memastikan optimal_stock >= min_stock
+document.addEventListener('DOMContentLoaded', function() {
+    const minStockInput = document.getElementById('min_stock');
+    const optimalStockInput = document.getElementById('optimal_stock');
+    
+    function validateOptimalStock() {
+        const minStock = parseInt(minStockInput.value) || 0;
+        const optimalStock = parseInt(optimalStockInput.value) || 0;
+        
+        if (optimalStock < minStock) {
+            optimalStockInput.setCustomValidity('Stok optimal harus lebih besar atau sama dengan stok minimal');
+            optimalStockInput.classList.add('is-invalid');
+        } else {
+            optimalStockInput.setCustomValidity('');
+            optimalStockInput.classList.remove('is-invalid');
+        }
+    }
+    
+    minStockInput.addEventListener('input', validateOptimalStock);
+    optimalStockInput.addEventListener('input', validateOptimalStock);
+});
+</script>
 @endpush

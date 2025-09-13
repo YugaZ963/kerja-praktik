@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // Jalankan seeder inventaris terlebih dahulu
         $this->call([
+            AdminUserSeeder::class,
             InventoryTableSeeder::class,
             ProductsTableSeeder::class,
         ]);

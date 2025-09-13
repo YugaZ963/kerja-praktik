@@ -76,56 +76,10 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
     Route::get('/{inventory}/edit-products/{size}', [InventoryController::class, 'editProductsBySize'])->name('inventory.edit-products-by-size');
     
     // Route untuk membuat inventaris baru
-    Route::get('/create', function () {
-        return view('admin.inventory.create', [
-            'titleShop' => 'RAVAZKA - Tambah Inventaris'
-        ]);
-    })->name('inventory.create');
+    Route::get('/create', [InventoryController::class, 'create'])->name('inventory.create');
     
     // Route untuk menyimpan inventaris baru
-    Route::post('/store', function () {
-        // Validasi input
-        $validated = request()->validate([
-            'code' => 'required|string|max:50|unique:inventories,code',
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'supplier' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'description' => 'required|string',
-        ]);
-        
-        // Set nilai default (akan dikelola melalui produk)
-        $validated['stock'] = 0;
-        $validated['min_stock'] = 1;
-        $validated['purchase_price'] = 0;
-        $validated['selling_price'] = 0;
-        $validated['sizes_available'] = json_encode([]);
-        
-        // Set default values untuk field yang kosong
-        if (empty($validated['supplier'])) {
-            $validated['supplier'] = 'Supplier Tidak Diketahui';
-        }
-        if (empty($validated['location'])) {
-            $validated['location'] = 'Lokasi Tidak Ditentukan';
-        }
-        
-        // Set tanggal restock terakhir dan stock_history
-        $validated['last_restock'] = now()->toDateString();
-        $validated['stock_history'] = [
-            [
-                'date' => now()->toDateString(),
-                'type' => 'initial',
-                'quantity' => 0,
-                'note' => 'Inventaris dibuat - stok akan dikelola melalui data produk'
-            ]
-        ];
-        
-        // Buat item inventory baru
-        $item = Inventory::create($validated);
-        
-        return redirect()->route('inventory.index')
-            ->with('success', "Item inventaris '{$item->name}' berhasil ditambahkan.");
-    })->name('inventory.store');
+    Route::post('/store', [InventoryController::class, 'store'])->name('inventory.store');
     
     // Route untuk laporan inventaris
     Route::get('/report', [InventoryController::class, 'report'])->name('inventory.report');
@@ -133,79 +87,16 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
 
     
     // Route untuk export inventaris
-    Route::get('/export', function () {
-        // Logic untuk export Excel akan ditambahkan nanti
-        return redirect()->route('inventory.index')->with('success', 'Data berhasil diekspor');
-    })->name('inventory.export');
+    Route::get('/export', [InventoryController::class, 'export'])->name('inventory.export');
     
     // Route untuk edit inventaris
-    Route::get('/edit/{id}', function ($id) {
-        $item = Inventory::find($id);
-        
-        if (!$item) {
-            return redirect()->route('inventory.index')
-                ->with('error', "Item inventaris dengan ID {$id} tidak ditemukan. Silakan pilih item yang valid dari daftar di bawah.");
-        }
-        
-        return view('admin.inventory.edit', [
-            'titleShop' => 'RAVAZKA - Edit Inventaris',
-            'item' => $item
-        ]);
-    })->name('inventory.edit');
+    Route::get('/{inventory}/edit', [InventoryController::class, 'edit'])->name('inventory.edit');
     
     // Route untuk update inventaris
-    Route::put('/update/{id}', function ($id) {
-        $item = Inventory::find($id);
-        
-        if (!$item) {
-            return redirect()->route('inventory.index')
-                ->with('error', "Item inventaris dengan ID {$id} tidak ditemukan.");
-        }
-        
-        // Validasi input
-        $validated = request()->validate([
-            'code' => 'required|string|max:50|unique:inventories,code,' . $id,
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'stock' => 'required|integer|min:0',
-            'min_stock' => 'required|integer|min:0',
-            'supplier' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-        
-        // Harga akan dikelola melalui produk, jangan ubah nilai yang sudah ada
-        // Hanya update jika tidak ada produk terkait atau untuk keperluan khusus
-        if (!$item->products()->exists()) {
-            $validated['purchase_price'] = $item->purchase_price ?? 0;
-            $validated['selling_price'] = $item->selling_price ?? 0;
-        }
-        
-        // Ukuran akan otomatis dikelola melalui produk, tidak perlu diubah manual
-        
-        // Update item
-        $item->update($validated);
-        
-        return redirect()->route('inventory.index')
-            ->with('success', "Item inventaris '{$item->name}' berhasil diperbarui.");
-    })->name('inventory.update');
+    Route::put('/{inventory}', [InventoryController::class, 'update'])->name('inventory.update');
     
     // Route untuk hapus inventaris
-    Route::delete('/destroy/{id}', function ($id) {
-        $item = Inventory::findOrFail($id);
-        
-        // Hapus semua produk yang terkait dengan inventory ini
-        $item->products()->delete();
-        
-        // Simpan nama item untuk pesan sukses
-        $itemName = $item->name;
-        
-        // Hapus item inventory
-        $item->delete();
-        
-        return redirect()->route('inventory.index')
-            ->with('success', "Item inventaris '{$itemName}' dan semua produk terkait berhasil dihapus.");
-    })->name('inventory.destroy');
+    Route::delete('/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
 
 
     
@@ -309,6 +200,16 @@ Route::prefix('inventory')->middleware('admin')->group(function () {
         $item = Inventory::with('products')
             ->where('code', $code)
             ->firstOrFail();
+        
+        // Hitung total stok dari semua produk terkait
+        $totalStock = $item->products->sum('stock');
+        
+        // Update stok di inventory jika berbeda
+        if ($item->stock != $totalStock) {
+            $item->update(['stock' => $totalStock]);
+            $item->stock = $totalStock; // Update instance untuk view
+        }
+        
         return view('admin.inventory.detail', [
             'titleShop' => 'RAVAZKA - Detail Inventaris',
             'item' => $item

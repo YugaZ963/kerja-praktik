@@ -82,12 +82,12 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="position-relative">
-                            <img src="{{ asset('images/kemeja-sd-pdk.png') }}{{-- asset('storage/products/' . $product->main_image) --}}" class="card-img-top"
-                                alt="{{-- $product->name --}}">
-                            {{-- @if ($product->stock <= 5) --}}
+                            <img src="{{ $product->image ? asset('images/products/' . $product->image) : asset('images/kemeja-sd-pdk.png') }}" class="card-img-top"
+                                alt="{{ $product->name }}">
+                            @if ($product->stock <= 5)
                             <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Stok
                                 Rendah</span>
-                            {{-- @endif --}}
+                            @endif
                         </div>
                         <div class="card-body p-3">
                             <h5 class="card-title">{{ $product['name'] }}{{-- Str::limit($product->name, 20) --}}</h5>

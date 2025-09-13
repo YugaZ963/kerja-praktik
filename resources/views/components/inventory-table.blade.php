@@ -8,6 +8,8 @@
                 <th style="min-width: 200px;">Nama Item</th>
                 <th style="min-width: 100px;">Kategori</th>
                 <th style="min-width: 80px;">Stok</th>
+                <th style="min-width: 80px;" class="d-none d-sm-table-cell">Min</th>
+                <th style="min-width: 80px;" class="d-none d-sm-table-cell">Optimal</th>
                 <th style="min-width: 120px;" class="d-none d-md-table-cell">Supplier</th>
                 <th style="min-width: 120px;" class="d-none d-lg-table-cell">Terakhir Diperbarui</th>
                 <th style="min-width: 150px;">Aksi</th>
@@ -30,6 +32,8 @@
                             <span class="badge bg-success">{{ $item['stock'] }}</span>
                         @endif
                     </td>
+                    <td class="d-none d-sm-table-cell">{{ $item['min_stock'] }}</td>
+                    <td class="d-none d-sm-table-cell">{{ $item['optimal_stock'] }}</td>
                     <td class="d-none d-md-table-cell">{{ $item['supplier'] }}</td>
                     <td class="d-none d-lg-table-cell">{{ $item['last_restock'] }}</td>
                     <td>
@@ -58,7 +62,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center py-4">
+                    <td colspan="9" class="text-center py-4">
                         <div class="text-muted">
                             <i class="bi bi-inbox display-4 d-block mb-2"></i>
                             <p class="mb-0">Tidak ada data inventaris</p>

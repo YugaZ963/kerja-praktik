@@ -1,0 +1,42 @@
+@startuml Sequence_Diagram_Lihat_Item_Inventaris
+!theme plain
+title Sequence Diagram - Lihat Item Inventaris
+
+actor "Admin" as Admin
+participant "Halaman Inventaris" as UI
+participant "Sistem" as System
+database "Database" as DB
+
+Admin -> UI: akses halaman inventaris
+activate UI
+
+UI -> System: requestDataInventaris()
+activate System
+
+System -> DB: fetchInventoryData()
+activate DB
+DB --> System: dataInventaris
+deactivate DB
+
+System --> UI: dataInventaris
+deactivate System
+
+UI -> Admin: tampilkanDaftarInventaris(dataInventaris)
+
+Admin -> UI: klik item untuk lihat detail
+
+UI -> System: requestDetailItem(itemId)
+activate System
+
+System -> DB: fetchDetailItem(itemId)
+activate DB
+DB --> System: detailItem
+deactivate DB
+
+System --> UI: detailItem
+deactivate System
+
+UI -> Admin: tampilkanDetailItem(detailItem)
+deactivate UI
+
+@enduml

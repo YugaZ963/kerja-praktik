@@ -1,10 +1,9 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Laporan Penjualan')
 
 @section('content')
     <div class="container mt-4">
-        <x-navbar />
 
         <div class="bg-light p-4 rounded mb-4">
             <div class="d-flex justify-content-between align-items-center">

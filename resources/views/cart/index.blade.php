@@ -47,8 +47,8 @@
                                 <div class="border-bottom p-3" data-item-id="{{ $item->id }}">
                                     <div class="cart-item-row">
                                         <div class="cart-item-image">
-                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
-                                                 class="img-fluid rounded" alt="{{ $item->product->name }}">
+                                            <img src="{{ $item->product->image ? asset('images/products/' . $item->product->image) : asset('images/kemeja-sd-pdk.png') }}" 
+                                 class="img-fluid rounded" alt="{{ $item->product->name }}">
                                         </div>
                                         <div class="cart-item-details">
                                             <h6 class="mb-1">{{ $item->product->name }}</h6>

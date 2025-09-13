@@ -13,6 +13,7 @@ class Inventory extends Model
         'category',
         'stock',
         'min_stock',
+        'optimal_stock',
         'purchase_price',
         'selling_price',
         'supplier',
@@ -27,6 +28,7 @@ class Inventory extends Model
     protected $casts = [
         'stock' => 'integer',
         'min_stock' => 'integer',
+        'optimal_stock' => 'integer',
         'purchase_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
         'last_restock' => 'date',

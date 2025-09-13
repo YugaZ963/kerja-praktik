@@ -1,0 +1,26 @@
+@startuml Activity_Diagram_Lihat_Item_Inventaris
+!theme plain
+title Activity Diagram - Lihat Item Inventaris
+
+|#LightBlue|Admin|
+|#LightGreen|Sistem|
+
+|Admin|
+start
+:Akses halaman inventaris;
+
+|Sistem|
+:Ambil data inventaris dari database;
+:Tampilkan daftar item inventaris;
+
+|Admin|
+:Pilih salah satu item untuk melihat detail;
+
+|Sistem|
+:Ambil data detail item dari database;
+:Tampilkan halaman detail item inventaris;
+
+|Admin|
+stop
+
+@enduml

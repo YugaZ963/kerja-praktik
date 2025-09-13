@@ -1,0 +1,49 @@
+@startuml Sequence_Diagram_Lihat_Data_Pesanan
+!theme plain
+title Sequence Diagram - Lihat Data Pesanan
+
+actor "Admin" as Admin
+participant "Halaman Manajemen Pesanan" as UI_List
+participant "Halaman Detail Pesanan" as UI_Detail
+participant "Sistem" as System
+database "Database" as DB
+
+Admin -> UI_List: Akses Halaman Manajemen Pesanan
+activate UI_List
+
+UI_List -> System: requestDaftarPesanan()
+activate System
+
+System -> DB: fetchDaftarPesanan()
+activate DB
+DB --> System: daftarPesanan
+deactivate DB
+
+System --> UI_List: daftarPesanan
+deactivate System
+
+UI_List -> Admin: Tampilkan daftar pesanan
+
+' Alt untuk sorting, bisa ditambahkan jika perlu detail lebih
+
+Admin -> UI_List: Klik nomor pesanan untuk lihat detail
+
+UI_List -> UI_Detail: Buka Halaman Detail Pesanan(orderId)
+deactivate UI_List
+activate UI_Detail
+
+UI_Detail -> System: requestDetailPesanan(orderId)
+activate System
+
+System -> DB: fetchDetailPesanan(orderId)
+activate DB
+DB --> System: detailPesanan
+deactivate DB
+
+System --> UI_Detail: detailPesanan
+deactivate System
+
+UI_Detail -> Admin: Tampilkan detail lengkap pesanan
+deactivate UI_Detail
+
+@enduml

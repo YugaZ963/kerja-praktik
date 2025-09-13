@@ -182,8 +182,8 @@
                                                         @if(file_exists(public_path('images/products/' . $product->image)))
                                                             <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
                                                                  class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
-                                                        @elseif(file_exists(public_path('images/' . $product->image)))
-                                                            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
+                                                        @elseif(file_exists(public_path('images/products/' . $product->image)))
+                                                            <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
                                                                  class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
                                                         @else
                                                             <div class="bg-light d-flex align-items-center justify-content-center" 
@@ -266,8 +266,8 @@
                     </div>
                     <div class="card-body">
                         <div class="text-center mb-3">
-                            @if($product->image && file_exists(public_path('images/' . $product->image)))
-                                <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
+                            @if($product->image && file_exists(public_path('images/products/' . $product->image)))
+                                <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
                                      class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
                             @else
                                 <div class="bg-light d-flex align-items-center justify-content-center mx-auto" 
