@@ -171,12 +171,7 @@
                                                                             </button>
                                                                         </form>
                                                                     </li>
-                                                                    <li><hr class="dropdown-divider"></li>
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="{{ route('customer.product.detail', $product->slug) }}" target="_blank">
-                                                                            <i class="bi bi-eye"></i> Lihat di Katalog
-                                                                        </a>
-                                                                    </li>
+
                                                                 </ul>
                                                             </div>
                                                         </div>

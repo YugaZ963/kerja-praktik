@@ -24,12 +24,12 @@
                     </td>
                     <td>{{ $item['category'] }}</td>
                     <td>
-                        @if ($item['stock'] <= $item['min_stock'])
-                            <span class="badge bg-danger">Stok Rendah ({{ $item['stock'] }})</span>
-                        @elseif ($item['stock'] <= $item['min_stock'] * 1.5)
-                            <span class="badge bg-warning text-dark">Perlu Restock ({{ $item['stock'] }})</span>
+                        @if ($item['stock'] == 0)
+                            <span class="badge bg-danger">Habis ({{ $item['stock'] }})</span>
+                        @elseif ($item['stock'] <= $item['min_stock'])
+                            <span class="badge bg-warning text-dark">Restock ({{ $item['stock'] }})</span>
                         @else
-                            <span class="badge bg-success">{{ $item['stock'] }}</span>
+                            <span class="badge bg-success">Tersedia ({{ $item['stock'] }})</span>
                         @endif
                     </td>
                     <td class="d-none d-sm-table-cell">{{ $item['min_stock'] }}</td>

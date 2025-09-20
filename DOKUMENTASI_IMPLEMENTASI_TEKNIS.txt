@@ -1,0 +1,317 @@
+=================================================================
+                DOKUMENTASI IMPLEMENTASI TEKNIS
+                    APLIKASI RAVAZKA
+              (Sistem Manajemen Inventaris Seragam Sekolah)
+=================================================================
+
+OVERVIEW APLIKASI
+=================
+RAVAZKA adalah aplikasi web berbasis Laravel untuk manajemen inventaris dan penjualan seragam sekolah. Aplikasi ini memiliki dua role utama: Admin (untuk mengelola inventaris) dan Customer (untuk berbelanja).
+
+TEKNOLOGI YANG DIGUNAKAN
+========================
+- Framework: Laravel 11.x
+- Database: MySQL
+- Frontend: Bootstrap 5.3.0, Blade Templates
+- Authentication: Laravel Built-in Auth
+- PDF Generation: barryvdh/laravel-dompdf
+- Excel Export: maatwebsite/excel
+- Testing: Pest PHP
+- Build Tool: Vite
+- Package Manager: Composer (Backend), NPM (Frontend)
+
+=================================================================
+                    LANGKAH IMPLEMENTASI
+=================================================================
+
+1. SETUP DAN KONFIGURASI AWAL LARAVEL
+=====================================
+
+1.1 Instalasi Laravel
+---------------------
+- Install Laravel menggunakan Composer:
+  composer create-project laravel/laravel kerja-praktik
+- Konfigurasi environment file (.env):
+  - APP_NAME=RAVAZKA
+  - APP_ENV=local
+  - APP_DEBUG=true
+  - Database configuration (MySQL)
+
+1.2 Konfigurasi Database
+------------------------
+- Setup koneksi database di config/database.php
+- Konfigurasi default connection: mysql
+- Environment variables untuk database:
+  DB_CONNECTION=mysql
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_DATABASE=kerja_praktik
+  DB_USERNAME=root
+  DB_PASSWORD=
+
+1.3 Instalasi Dependencies
+--------------------------
+Backend Dependencies (composer.json):
+- laravel/framework: ^11.0
+- barryvdh/laravel-dompdf: ^3.0 (untuk PDF generation)
+- maatwebsite/excel: ^3.1 (untuk Excel export)
+
+Frontend Dependencies (package.json):
+- bootstrap: untuk UI framework
+- vite: untuk build tool
+- laravel-vite-plugin: integrasi Vite dengan Laravel
+
+1.4 Konfigurasi Middleware
+--------------------------
+Dalam bootstrap/app.php, register middleware aliases:
+- 'admin' => AdminMiddleware::class
+- 'require.login' => RequireLoginMiddleware::class
+- 'seo' => SeoMiddleware::class
+- 'block.admin.customer' => BlockAdminFromCustomerFeatures::class
+
+2. IMPLEMENTASI DATABASE DAN MIGRASI
+====================================
+
+2.1 Struktur Database
+--------------------
+Tabel utama yang dibuat:
+
+a) users (2014_10_12_000000_create_users_table.php)
+   - id, name, email, email_verified_at
+   - password, role (enum: admin, customer)
+   - remember_token, timestamps
+
+b) products (2024_11_25_create_products_table.php)
+   - id, name, slug, description, category
+   - price, image, inventory_id (nullable)
+   - timestamps
+
+c) inventories (2024_11_25_create_inventories_table.php)
+   - id, code, name, category, supplier
+   - sizes_available (JSON), total_stock
+   - stock_history (JSON), timestamps
+
+d) carts (2024_11_25_create_carts_table.php)
+   - id, session_id, product_id, quantity
+   - price, timestamps
+   - Index pada session_id untuk performa
+
+e) orders (2024_11_25_create_orders_table.php)
+   - id, order_number, customer_name, email, phone
+   - address, payment_method, subtotal, shipping_cost
+   - total, status, payment_proof, delivery_proof
+   - timestamps
+
+2.2 Relasi Database
+------------------
+- products.inventory_id -> inventories.id (nullable)
+- carts.product_id -> products.id
+- Foreign key constraints untuk data integrity
+
+2.3 Menjalankan Migrasi
+-----------------------
+perintah: php artisan migrate
+
+3. IMPLEMENTASI MODEL DAN RELASI
+================================
+
+3.1 User Model (app/Models/User.php)
+------------------------------------
+- Extends Authenticatable
+- Fillable: name, email, password, role
+- Hidden: password, remember_token
+- Method isAdmin(): return $this->role === 'admin'
+
+3.2 Product Model (app/Models/Product.php)
+------------------------------------------
+- Fillable: name, slug, description, category, price, image, inventory_id
+- Relasi belongsTo dengan Inventory
+- Method updateInventoryStock() untuk sinkronisasi stok
+
+3.3 Inventory Model (app/Models/Inventory.php)
+----------------------------------------------
+- Fillable: code, name, category, supplier, sizes_available, total_stock, stock_history
+- Casts: sizes_available dan stock_history ke array
+- Relasi hasMany dengan Product
+- Method updateStock() untuk update stok
+
+3.4 Cart Model (app/Models/Cart.php)
+------------------------------------
+- Fillable: session_id, product_id, quantity, price
+- Relasi belongsTo dengan Product dan User
+- Accessor getTotalAttribute() untuk total harga
+
+4. IMPLEMENTASI CONTROLLER DAN ROUTING
+======================================
+
+4.1 Authentication Controller
+-----------------------------
+AuthController (app/Http/Controllers/Auth/AuthController.php):
+- showLoginForm(): tampilkan form login
+- login(): proses autentikasi
+- showRegisterForm(): tampilkan form registrasi
+- register(): proses registrasi user
+- logout(): proses logout
+
+4.2 Admin Controllers
+--------------------
+InventoryController (app/Http/Controllers/Admin/InventoryController.php):
+- index(): tampilkan daftar inventaris dengan filter
+- getProducts(): ambil produk berdasarkan inventaris
+- updateStockFromProducts(): update stok dari produk
+- addStock(), reduceStock(): operasi stok
+- create(): form buat inventaris baru
+
+4.3 Customer Controllers
+-----------------------
+ProductController (app/Http/Controllers/Customer/ProductController.php):
+- index(): tampilkan katalog produk untuk customer
+
+CartController (app/Http/Controllers/Customer/CartController.php):
+- index(): tampilkan keranjang belanja
+- add(): tambah item ke keranjang
+
+4.4 Routing Structure (routes/web.php)
+--------------------------------------
+a) Authentication Routes:
+   - GET/POST /login, /register
+   - POST /logout
+
+b) Admin Routes (middleware: admin):
+   - GET /dashboard
+   - Prefix 'inventory' untuk manajemen inventaris
+
+c) Customer Routes (middleware: block.admin.customer):
+   - GET / (welcome page)
+   - GET /products (katalog)
+   - GET /products/{slug} (detail produk)
+   - Prefix 'orders' untuk manajemen pesanan
+
+d) Public Routes:
+   - GET /about, /contact
+
+5. IMPLEMENTASI VIEW DAN UI
+===========================
+
+5.1 Layout Structure
+-------------------
+Layouts (resources/views/layouts/):
+- app.blade.php: layout untuk admin panel
+- customer.blade.php: layout untuk customer
+
+5.2 View Organization
+--------------------
+Views terorganisir dalam folder:
+- admin/: views untuk admin (dashboard, inventory, orders, sales)
+- auth/: views untuk autentikasi (login, register)
+- customer/: views untuk customer (orders, products)
+- public/: views untuk halaman publik (welcome, about, contact)
+- components/: komponen reusable (navbar, inventory-table, dll)
+
+5.3 Frontend Framework
+---------------------
+- Bootstrap 5.3.0 untuk styling
+- Bootstrap Icons untuk ikon
+- Custom CSS untuk styling tambahan
+- Responsive design untuk mobile compatibility
+
+6. IMPLEMENTASI FITUR UTAMA
+===========================
+
+6.1 Sistem Autentikasi
+----------------------
+- Multi-role authentication (admin/customer)
+- Middleware protection untuk routes
+- Session management
+- Password hashing dengan bcrypt
+
+6.2 Manajemen Inventaris
+------------------------
+- CRUD inventaris dengan filter pencarian
+- Manajemen stok per ukuran (JSON storage)
+- History tracking untuk perubahan stok
+- Sinkronisasi stok antara inventory dan products
+
+6.3 Sistem Keranjang Belanja
+----------------------------
+- Session-based cart untuk guest users
+- Persistent cart untuk logged users
+- Add/remove items functionality
+- Real-time total calculation
+
+6.4 Sistem Pemesanan
+--------------------
+- Order creation dengan unique order number
+- Multiple payment methods
+- Order status tracking
+- File upload untuk bukti pembayaran
+
+6.5 Reporting dan Export
+------------------------
+- PDF generation untuk laporan
+- Excel export untuk data inventaris
+- Sales reporting dengan filter tanggal
+
+7. MIDDLEWARE DAN SECURITY
+==========================
+
+7.1 Custom Middleware
+---------------------
+- AdminMiddleware: proteksi routes admin
+- BlockAdminFromCustomerFeatures: blokir admin dari fitur customer
+- SeoMiddleware: optimasi SEO
+- RequireLoginMiddleware: require authentication
+
+7.2 Security Features
+--------------------
+- CSRF protection pada semua forms
+- Input validation dan sanitization
+- Role-based access control
+- Secure password hashing
+
+8. TESTING DAN QUALITY ASSURANCE
+================================
+
+8.1 Testing Framework
+--------------------
+- Pest PHP untuk unit dan feature testing
+- PHPUnit sebagai underlying framework
+- Factory dan Seeder untuk test data
+
+8.2 Code Quality
+---------------
+- Laravel Pint untuk code formatting
+- Consistent coding standards
+- Proper error handling
+
+9. DEPLOYMENT DAN PRODUCTION
+============================
+
+9.1 Build Process
+----------------
+- Vite untuk asset compilation
+- NPM scripts untuk development dan production
+- Asset optimization untuk production
+
+9.2 Environment Configuration
+-----------------------------
+- Separate .env files untuk different environments
+- Production-ready configurations
+- Database optimization settings
+
+=================================================================
+                        KESIMPULAN
+=================================================================
+
+Aplikasi RAVAZKA berhasil diimplementasikan dengan arsitektur MVC yang bersih, menggunakan best practices Laravel, dan menyediakan fitur lengkap untuk manajemen inventaris seragam sekolah. Sistem ini scalable, maintainable, dan user-friendly untuk kedua role (admin dan customer).
+
+Fitur utama yang berhasil diimplementasikan:
+✓ Multi-role authentication system
+✓ Comprehensive inventory management
+✓ Shopping cart dan order system
+✓ Reporting dan export functionality
+✓ Responsive UI dengan Bootstrap
+✓ Security dan middleware protection
+✓ Testing framework setup
+
+Aplikasi siap untuk deployment dan dapat dikembangkan lebih lanjut sesuai kebutuhan bisnis.

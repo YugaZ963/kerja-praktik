@@ -115,7 +115,7 @@
                             <select name="stock_status" class="form-select">
                                 <option value="">Semua Status</option>
                                 <option value="available" {{ request('stock_status') == 'available' ? 'selected' : '' }}>Tersedia</option>
-                                <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Stok Rendah</option>
+                                <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Restock</option>
                                 <option value="out" {{ request('stock_status') == 'out' ? 'selected' : '' }}>Habis</option>
                             </select>
                         </div>
@@ -123,6 +123,7 @@
                             <label class="form-label fw-semibold">Supplier</label>
                             <select name="supplier" class="form-select">
                                 <option value="">Semua Supplier</option>
+                                <option value="Ravazka" {{ request('supplier') == 'Ravazka' ? 'selected' : '' }}>Ravazka</option>
                                 <option value="PT Seragam Jaya" {{ request('supplier') == 'PT Seragam Jaya' ? 'selected' : '' }}>PT Seragam Jaya</option>
                                 <option value="CV Batik Nusantara" {{ request('supplier') == 'CV Batik Nusantara' ? 'selected' : '' }}>CV Batik Nusantara</option>
                                 <option value="PT Sabana" {{ request('supplier') == 'PT Sabana' ? 'selected' : '' }}>PT Sabana</option>

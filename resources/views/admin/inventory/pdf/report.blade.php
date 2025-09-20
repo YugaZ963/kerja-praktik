@@ -165,7 +165,7 @@
         <p>Sistem Manajemen Inventaris</p>
     </div>
 
-    @if($filters['category'] || $filters['status'] || $filters['period'])
+    @if($filters['category'] || $filters['stock_status'] || $filters['period'])
     <div class="filters">
         <h3>Filter yang Diterapkan:</h3>
         @if($filters['category'])
@@ -174,14 +174,15 @@
                 <span class="filter-value">{{ $filters['category'] }}</span>
             </div>
         @endif
-        @if($filters['status'])
+        @if($filters['stock_status'])
             <div class="filter-item">
                 <span class="filter-label">Status Stok:</span>
                 <span class="filter-value">
-                    @if($filters['status'] == 'low') Stok Rendah
-                    @elseif($filters['status'] == 'out') Stok Habis
-                    @elseif($filters['status'] == 'ready') Stok Siap
-                    @else {{ $filters['status'] }}
+                    @if($filters['stock_status'] == 'low') Restock
+                    @elseif($filters['stock_status'] == 'out') Habis
+                    @elseif($filters['stock_status'] == 'adequate') Tersedia
+
+                    @else {{ $filters['stock_status'] }}
                     @endif
                 </span>
             </div>
@@ -249,10 +250,10 @@
                             @if($item->stock == 0)
                                 <span class="status-badge status-out">Habis</span>
                             @else
-                                <span class="status-badge status-low">Rendah</span>
+                                <span class="status-badge status-low">Restock</span>
                             @endif
                         @else
-                            <span class="status-badge status-ready">Siap</span>
+                            <span class="status-badge status-ready">Tersedia</span>
                         @endif
                     </td>
                     <td class="text-center">{{ number_format($item->min_stock) }}</td>

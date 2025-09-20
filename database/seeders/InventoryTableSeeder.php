@@ -9,8 +9,11 @@ class InventoryTableSeeder extends Seeder
 {
     public function run()
     {
-        // Hapus data yang ada
+        // Hapus data yang ada dengan cara yang aman untuk foreign key
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         \App\Models\Inventory::truncate();
+        \App\Models\Product::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         
         $inventories = [
             [

@@ -23,7 +23,7 @@
                             <i class="bi bi-geo-alt-fill text-primary me-3 fs-4"></i>
                             <div>
                                 <h6 class="mb-0">Alamat</h6>
-                                <p class="mb-0">{{ $mapsData['storeLocation']['address'] }}</p>
+                                <p class="mb-0">Pasar Baru, Bandung, Jawa Barat</p>
                             </div>
                         </div>
 
@@ -114,96 +114,5 @@
             </div>
         </div>
 
-        <!-- Map Section -->
-        <div class="row mb-2">
-            <div class="col-12">
-
-            </div>
-        </div>
     </div>
-@endsection
-
-@section('scripts')
-    <script>
-        let map;
-
-        function initMap() {
-            // Koordinat toko dari controller
-            const storeLocation = {
-                lat: {{ $mapsData['storeLocation']['lat'] }},
-                lng: {{ $mapsData['storeLocation']['lng'] }}
-            };
-
-            // Inisialisasi map
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: {{ $mapsData['mapSettings']['zoom'] }},
-                center: storeLocation,
-                mapTypeId: google.maps.MapTypeId.{{ strtoupper($mapsData['mapSettings']['map_type']) }},
-                styles: [{
-                    featureType: "poi.business",
-                    stylers: [{
-                        visibility: "on"
-                    }]
-                }]
-            });
-
-            // Marker untuk toko
-            const storeMarker = new google.maps.Marker({
-                position: storeLocation,
-                map: map,
-                title: "{{ $mapsData['storeLocation']['name'] }}",
-                icon: {
-                    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-                         <svg width="{{ $mapsData['mapSettings']['marker_icon']['width'] }}" height="{{ $mapsData['mapSettings']['marker_icon']['height'] }}" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                             <circle cx="20" cy="20" r="18" fill="{{ $mapsData['mapSettings']['marker_icon']['color'] }}" stroke="white" stroke-width="2"/>
-                             <text x="20" y="26" text-anchor="middle" fill="white" font-size="16" font-weight="bold">🏪</text>
-                         </svg>
-                     `),
-                    scaledSize: new google.maps.Size({{ $mapsData['mapSettings']['marker_icon']['width'] }},
-                        {{ $mapsData['mapSettings']['marker_icon']['height'] }})
-                }
-            });
-
-            // Info window untuk marker
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                     <div style="padding: 10px; max-width: 300px;">
-                         <h6 style="margin: 0 0 8px 0; color: #0d6efd; font-weight: bold;">
-                             🏪 {{ $mapsData['storeLocation']['name'] }}
-                         </h6>
-                         <p style="margin: 0 0 5px 0; font-size: 14px;">
-                             📍 {{ $mapsData['storeLocation']['address'] }}
-                         </p>
-                         <p style="margin: 0 0 5px 0; font-size: 14px;">
-                             📞 {{ $mapsData['storeLocation']['phone'] }}
-                         </p>
-                        <p style="margin: 0 0 10px 0; font-size: 14px;">
-                            🕒 Senin - Jumat: 08.00 - 17.00<br>
-                            🕒 Sabtu: 09.00 - 13.00<br>
-                            🕒 Minggu: Tutup
-                        </p>
-                        <div style="text-align: center;">
-                             <a href="{{ $mapsData['simpleDirectionsUrl'] }}" target="_blank" 
-                                style="background: #0d6efd; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 12px;">
-                                 Buka di Google Maps
-                             </a>
-                         </div>
-                    </div>
-                `
-            });
-
-            // Event listener untuk marker
-            storeMarker.addListener("click", () => {
-                infoWindow.open(map, storeMarker);
-            });
-
-            // Buka info window secara default
-            infoWindow.open(map, storeMarker);
-        }
-
-        // Load Google Maps API
-        window.initMap = initMap;
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $mapsData['apiKey'] }}&callback=initMap">
-    </script>
 @endsection

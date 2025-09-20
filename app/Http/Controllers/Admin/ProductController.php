@@ -141,7 +141,10 @@ class ProductController extends Controller
             }
         }
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
+        // Sinkronisasi inventory data setelah product dibuat
+        $this->syncInventoryData($product);
+        
+        \Illuminate\Support\Facades\Log::info("Product created: {$product->name} - {$product->size}, syncing inventory data");
         
         if ($request->expectsJson()) {
             return response()->json([
@@ -337,6 +340,9 @@ class ProductController extends Controller
             }
         }
         
+        // Simpan inventory_id lama untuk sinkronisasi sebelum update
+        $oldInventoryId = $product->getOriginal('inventory_id');
+        
         $product->update($validated);
         
         // Jika ukuran baru ditambahkan, perbarui sizes_available di inventory
@@ -351,7 +357,19 @@ class ProductController extends Controller
             }
         }
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
+        // Sinkronisasi inventory data setelah product diupdate
+        $this->syncInventoryData($product);
+        
+        // Jika inventory_id berubah, sync inventory lama juga
+        if ($oldInventoryId && $oldInventoryId !== $product->inventory_id) {
+            $oldInventory = Inventory::find($oldInventoryId);
+            if ($oldInventory) {
+                $oldInventory->updateStock();
+                $oldInventory->updateFromProducts();
+            }
+        }
+        
+        \Illuminate\Support\Facades\Log::info("Product updated: {$product->name} - {$product->size}, syncing inventory data");
         
         if ($request->expectsJson()) {
             return response()->json([
@@ -376,7 +394,16 @@ class ProductController extends Controller
         
         $product->delete();
         
-        // Inventory stock akan otomatis terupdate melalui Product model event listeners
+        // Sinkronisasi inventory data setelah product dihapus
+        if ($inventoryId) {
+            $inventory = Inventory::find($inventoryId);
+            if ($inventory) {
+                $inventory->updateStock();
+                $inventory->updateFromProducts();
+            }
+        }
+        
+        \Illuminate\Support\Facades\Log::info("Product deleted: {$productName} - {$productSize}, syncing inventory data");
         
         if ($request->expectsJson()) {
             return response()->json([
@@ -491,5 +518,19 @@ class ProductController extends Controller
         // ]);
 
         return redirect()->back()->with('success', $message);
+    }
+    
+    /**
+     * Sync inventory data based on product changes
+     */
+    private function syncInventoryData(Product $product): void
+    {
+        if ($product->inventory_id) {
+            $inventory = Inventory::find($product->inventory_id);
+            if ($inventory) {
+                $inventory->updateStock();
+                $inventory->updateFromProducts();
+            }
+        }
     }
 }

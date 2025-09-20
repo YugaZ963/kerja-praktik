@@ -21,9 +21,8 @@ return new class extends Migration
             $table->string('size');
             $table->string('category');
             $table->timestamps();
-            // Tambahkan pada migration products:
+            // Foreign key akan ditambahkan di migrasi terpisah setelah tabel inventories dibuat
             $table->unsignedBigInteger('inventory_id')->nullable();
-            $table->foreign('inventory_id')->references('id')->on('inventories')->onDelete('set null');
         });
     }
 

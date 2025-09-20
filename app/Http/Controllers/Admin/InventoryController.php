@@ -44,7 +44,7 @@ class InventoryController extends Controller
                     $query->where('stock', 0);
                     break;
                 case 'available':
-                    $query->whereRaw('stock > 0');
+                    $query->whereRaw('stock > min_stock');
                     break;
                 case 'critical':
                     $query->whereRaw('stock <= 50');
@@ -148,9 +148,6 @@ class InventoryController extends Controller
             switch ($request->stock_status) {
                 case 'low':
                     $query->whereRaw('stock <= min_stock');
-                    break;
-                case 'critical':
-                    $query->whereRaw('stock <= (min_stock * 0.5)');
                     break;
                 case 'adequate':
                     $query->whereRaw('stock > min_stock');

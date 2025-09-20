@@ -4,27 +4,16 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\GoogleMapsService;
 
 class ContactController extends Controller
 {
     public function index()
     {
-        $mapsData = [
-            'apiKey' => GoogleMapsService::getApiKey(),
-            'storeLocation' => GoogleMapsService::getStoreLocation(),
-            'directionsUrl' => GoogleMapsService::getDirectionsUrl(),
-            'simpleDirectionsUrl' => GoogleMapsService::getSimpleDirectionsUrl(),
-            'embedUrl' => GoogleMapsService::getEmbedUrl(),
-            'mapSettings' => GoogleMapsService::getMapSettings(),
-        ];
-
         return view('public.contact', [
             'titleShop' => '📞 Hubungi Kami - RAVAZKA | Kontak & Lokasi Toko Seragam Sekolah',
             'title' => '📞 Hubungi Kami - RAVAZKA | Kontak & Lokasi Toko Seragam Sekolah',
             'metaDescription' => '📍 Hubungi RAVAZKA untuk konsultasi seragam sekolah. Alamat toko, nomor telepon, WhatsApp, dan peta lokasi lengkap untuk kemudahan akses pelanggan.',
-            'metaKeywords' => 'kontak RAVAZKA, alamat toko seragam, nomor telepon RAVAZKA, lokasi toko, WhatsApp seragam sekolah',
-            'mapsData' => $mapsData
+            'metaKeywords' => 'kontak RAVAZKA, alamat toko seragam, nomor telepon RAVAZKA, lokasi toko, WhatsApp seragam sekolah'
         ]);
     }
     public function send(Request $request)

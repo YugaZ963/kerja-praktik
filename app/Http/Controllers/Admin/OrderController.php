@@ -174,6 +174,15 @@ class OrderController extends Controller
                     // Kurangi stok produk
                     $newStock = max(0, $product->stock - $orderItem->quantity);
                     $product->update(['stock' => $newStock]);
+                    
+                    // Sinkronisasi inventory data setelah stok dikurangi
+                    if ($product->inventory_id) {
+                        $inventory = \App\Models\Inventory::find($product->inventory_id);
+                        if ($inventory) {
+                            $inventory->updateStock();
+                            $inventory->updateFromProducts();
+                        }
+                    }
 
                     Log::info("Stock reduced for product: {$product->name} (Size: {$product->size})", [
                         'order_number' => $order->order_number,

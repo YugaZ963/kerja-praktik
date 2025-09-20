@@ -56,6 +56,7 @@
                             <label class="form-label fw-semibold">Supplier</label>
                             <select name="supplier" class="form-select">
                                 <option value="">Semua Supplier</option>
+                                <option value="Ravazka" {{ request('supplier') == 'Ravazka' ? 'selected' : '' }}>Ravazka</option>
                                 <option value="PT Tekstil Nusantara" {{ request('supplier') == 'PT Tekstil Nusantara' ? 'selected' : '' }}>PT Tekstil Nusantara</option>
                                 <option value="CV Garmen Jaya" {{ request('supplier') == 'CV Garmen Jaya' ? 'selected' : '' }}>CV Garmen Jaya</option>
                                 <option value="UD Konveksi Mandiri" {{ request('supplier') == 'UD Konveksi Mandiri' ? 'selected' : '' }}>UD Konveksi Mandiri</option>
@@ -64,12 +65,11 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Status Stok</label>
-                            <select name="status" class="form-select">
+                            <select name="stock_status" class="form-select">
                                 <option value="">Semua Status</option>
-                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Tersedia (>5)</option>
-                                <option value="low" {{ request('status') == 'low' ? 'selected' : '' }}>Stok Rendah (1-5)</option>
-                                <option value="critical" {{ request('status') == 'critical' ? 'selected' : '' }}>Kritis (≤3)</option>
-                                <option value="out" {{ request('status') == 'out' ? 'selected' : '' }}>Habis (0)</option>
+                                <option value="adequate" {{ request('stock_status') == 'adequate' ? 'selected' : '' }}>Tersedia</option>
+                                <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Restock</option>
+                                <option value="out" {{ request('stock_status') == 'out' ? 'selected' : '' }}>Habis</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -138,8 +138,8 @@
             <div class="col-md-3">
                 <div class="card bg-warning text-dark h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Stok Rendah</h5>
-                        <h2 class="display-6">{{ $inventory_items->where('stock', '<=', 'min_stock')->count() }}</h2>
+                        <h5 class="card-title">Restock</h5>
+                        <h2 class="display-6">{{ $inventory_items->filter(function($item) { return $item->stock == 0 || ($item->stock > 0 && $item->stock <= $item->min_stock); })->count() }}</h2>
                     </div>
                 </div>
             </div>
@@ -186,12 +186,12 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($item->stock <= $item->min_stock)
-                                            <span class="badge bg-danger">{{ $item->stock }}</span>
-                                        @elseif ($item->stock <= $item->min_stock * 1.5)
-                                            <span class="badge bg-warning text-dark">{{ $item->stock }}</span>
+                                        @if ($item->stock == 0)
+                                            <span class="badge bg-danger">Habis ({{ $item->stock }})</span>
+                                        @elseif ($item->stock <= $item->min_stock)
+                                            <span class="badge bg-warning text-dark">Restock ({{ $item->stock }})</span>
                                         @else
-                                            <span class="badge bg-success">{{ $item->stock }}</span>
+                                            <span class="badge bg-success">Tersedia ({{ $item->stock }})</span>
                                         @endif
                                     </td>
                                     <td>{{ $item->supplier }}</td>
