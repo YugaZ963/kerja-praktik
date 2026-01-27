@@ -6,6 +6,8 @@
 <img src="https://img.shields.io/badge/Bootstrap-5-purple?style=for-the-badge&logo=bootstrap" alt="Bootstrap 5">
 </p>
 
+// Test Kilo Code Review
+
 ## Tentang Project
 
 Sistem Manajemen Inventaris Seragam Sekolah adalah aplikasi web yang dibangun dengan Laravel 11 untuk mengelola inventaris seragam sekolah. Aplikasi ini memiliki fitur authentication dengan role-based access control yang membedakan akses antara Administrator dan User biasa.
